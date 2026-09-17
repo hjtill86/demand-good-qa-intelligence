@@ -1,0 +1,31 @@
+{
+  "metrics": {
+    "qualityScore": 87,
+    "qualityScoreChange": "6%",
+    "compliantProducts": 94,
+    "compliantProductsChange": "2.4%",
+    "openActions": 12,
+    "actionsDue": 3
+  },
+  "actions": [
+    {
+      "level": "High",
+      "title": "Supplier COA missing",
+      "detail": "Northstar Labs · Batch 4021",
+      "due": "Today"
+    },
+    {
+      "level": "Medium",
+      "title": "EU packaging claim review",
+      "detail": "Regulatory · Cosmetics",
+      "due": "Sep 19"
+    },
+    {
+      "level": "Low",
+      "title": "Annual material declaration",
+      "detail": "Atlas Packaging · 2026",
+      "due": "Sep 24"
+    }
+  ],
+  "trend": [72, 70, 76, 74, 82, 80, 87]
+}
