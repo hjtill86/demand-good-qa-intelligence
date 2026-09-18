@@ -4,7 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { getStripePlanConfig, getStripeStatus } from "../../../lib/integration-config";
 
 export async function POST(request: Request) {
-  let body: { plan?: string } = {};
+  let body: { plan?: string; utm_source?: string; utm_campaign?: string } = {};
 
   try {
     const contentType = request.headers.get("content-type") ?? "";
@@ -13,7 +13,13 @@ export async function POST(request: Request) {
     } else {
       const formData = await request.formData();
       const plan = formData.get("plan");
-      body = typeof plan === "string" ? { plan } : {};
+      const utmSource = formData.get("utm_source");
+      const utmCampaign = formData.get("utm_campaign");
+      body = {
+        ...(typeof plan === "string" ? { plan } : {}),
+        ...(typeof utmSource === "string" ? { utm_source: utmSource } : {}),
+        ...(typeof utmCampaign === "string" ? { utm_campaign: utmCampaign } : {}),
+      };
     }
   } catch {
     return NextResponse.json(
@@ -80,6 +86,11 @@ export async function POST(request: Request) {
       metadata: {
         plan: planConfig.key,
         ...(user?.id ? { clerk_user_id: user.id } : {}),
+        // Referral source, e.g. "thinkific", when the customer clicked in
+        // from a banner/link on courses.demandgoodqa.com. Lets you see
+        // Thinkific-driven subscription conversions in the Stripe dashboard.
+        ...(body.utm_source ? { utm_source: body.utm_source } : {}),
+        ...(body.utm_campaign ? { utm_campaign: body.utm_campaign } : {}),
       },
     });
 

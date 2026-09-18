@@ -5,7 +5,7 @@ import { getStripePlanConfig, getStripeStatus } from "../../lib/integration-conf
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ plan?: string }>;
+  searchParams?: Promise<{ plan?: string; utm_source?: string; utm_campaign?: string }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const selectedPlan =
@@ -36,6 +36,12 @@ export default async function CheckoutPage({
 
         <form method="POST" action="/api/checkout">
           <input type="hidden" name="plan" value={selectedPlan?.key ?? "foundation"} />
+          {resolvedSearchParams.utm_source ? (
+            <input type="hidden" name="utm_source" value={resolvedSearchParams.utm_source} />
+          ) : null}
+          {resolvedSearchParams.utm_campaign ? (
+            <input type="hidden" name="utm_campaign" value={resolvedSearchParams.utm_campaign} />
+          ) : null}
           <button type="submit" className="button button-dark full">
             Start secure checkout preview <span>→</span>
           </button>
