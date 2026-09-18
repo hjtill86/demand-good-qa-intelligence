@@ -17,7 +17,7 @@ Visit `http://localhost:3000`, then use **Member login → Open demo dashboard**
 - The dashboard uses intentionally static mock data for the MVP.
 - Dashboard data now lives in `data/dashboard.json` and is read through the validated server-side repository in `lib/dashboard-data.ts`. Replace that reader with a database or API query when the hosted intelligence data source is ready.
 - `/api/checkout` is a server-only Stripe placeholder. It accepts `{ "plan": "foundation" }` or `{ "plan": "most-good" }`, validates the plan against environment config, and returns `501` without creating a live Checkout Session. Use the server-only Stripe key and recurring price IDs in the next authenticated checkout implementation.
-- Login is a clear Thinkific SSO integration boundary. `/api/auth/thinkific` and `/api/auth/thinkific/callback` are safe placeholders that validate configuration and show the exact environment variables needed before a real redirect or callback is enabled.
+- Thinkific is the published membership and member-hub destination. `/api/auth/thinkific` opens the configured Thinkific member hub; it is not the identity provider for the separate Demand Good QA dashboard. The dashboard remains protected by the local demo session until a dedicated portal auth provider is selected.
 - `/api/auth/demo` and `/api/auth/logout` provide local-only session behavior for previewing the protected shell. They are not production authentication.
 - `.env.example` documents the server-only Stripe and Thinkific SSO variables. Never commit `.env.local`.
 - No Thinkific Admin API calls are required by this demo. If added later, use only documented public paths such as `/users`, `/enrollments`, and `/course_progress`.

@@ -14,18 +14,18 @@ export default function LoginPage() {
         <p>Sign in to your quality intelligence workspace.</p>
 
         <a className="button button-dark full" href="/api/auth/thinkific">
-          {thinkificStatus.configured ? "Continue with Thinkific SSO" : "Thinkific SSO is not configured yet"}
+          {thinkificStatus.configured ? "Open Thinkific member hub" : "Thinkific member hub is not configured yet"}
           <span>→</span>
         </a>
 
         <div className="divider">
-          <span>SSO integration boundary</span>
+          <span>Member access</span>
         </div>
 
         <p className="fine-print">
           {thinkificStatus.configured
-            ? "This integration is ready for a configured Thinkific provider and will validate the callback state before creating a secure member session."
-            : "Set THINKIFIC_SSO_URL, THINKIFIC_SSO_CLIENT_ID, THINKIFIC_SSO_CLIENT_SECRET, and THINKIFIC_SSO_REDIRECT_URI in your environment before attempting live SSO."}
+            ? "Open your published Thinkific memberships and member hub. The separate Demand Good QA dashboard is currently available through the demo workspace below."
+            : "Set THINKIFIC_SSO_URL, THINKIFIC_SSO_CLIENT_ID, THINKIFIC_SSO_CLIENT_SECRET, and THINKIFIC_SSO_REDIRECT_URI in your environment before opening the member hub."}
         </p>
 
         <Link className="demo-link" href="/api/auth/demo?redirect=/dashboard">
