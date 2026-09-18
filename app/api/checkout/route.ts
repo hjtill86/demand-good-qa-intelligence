@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { currentUser } from "@clerk/nextjs/server";
 import { getStripePlanConfig, getStripeStatus } from "../../../lib/integration-config";
 
 export async function POST(request: Request) {
@@ -63,12 +64,23 @@ export async function POST(request: Request) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
     const suffix = Math.random().toString(36).slice(2, 10);
+    const user = await currentUser();
+    const customerEmail = user?.primaryEmailAddress?.emailAddress;
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: planConfig.priceId, quantity: 1 }],
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/checkout?plan=${planConfig.key}`,
       integration_identifier: `demand-good-qa-${suffix}`,
+      // Prefill/lock the email when the customer is already signed in with
+      // Clerk so the Stripe purchase and Thinkific fulfillment resolve to the
+      // exact same account without asking them to retype it.
+      ...(customerEmail ? { customer_email: customerEmail } : {}),
+      metadata: {
+        plan: planConfig.key,
+        ...(user?.id ? { clerk_user_id: user.id } : {}),
+      },
     });
 
     if (!session.url) {

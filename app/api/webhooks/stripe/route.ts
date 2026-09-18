@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getThinkificCourseIdForPlan } from "../../../../lib/integration-config";
+import { fulfillThinkificMembership } from "../../../../lib/thinkific-entitlements";
 
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
@@ -25,7 +27,52 @@ export async function POST(request: Request) {
 
   switch (event.type) {
     case "checkout.session.completed":
-    case "checkout.session.async_payment_succeeded":
+    case "checkout.session.async_payment_succeeded": {
+      const session = event.data.object as Stripe.Checkout.Session;
+      console.info("Stripe subscription event received.", {
+        eventId: event.id,
+        eventType: event.type,
+      });
+
+      if (session.payment_status !== "paid") {
+        break;
+      }
+
+      const email = session.customer_details?.email;
+      const plan = session.metadata?.plan;
+      const courseId = plan ? getThinkificCourseIdForPlan(plan) : null;
+
+      if (!email || !courseId) {
+        console.info("Skipping Thinkific fulfillment: missing customer email or mapped course id.", {
+          eventId: event.id,
+          hasEmail: Boolean(email),
+          plan,
+        });
+        break;
+      }
+
+      const nameParts = session.customer_details?.name?.split(" ") ?? [];
+      const result = await fulfillThinkificMembership(email, courseId, {
+        firstName: nameParts[0],
+        lastName: nameParts.slice(1).join(" ") || undefined,
+      });
+
+      if (result.status === "error") {
+        console.error("Thinkific fulfillment failed after Stripe payment.", {
+          eventId: event.id,
+          email,
+          plan,
+          error: result.error,
+        });
+      } else if (result.status === "enrolled") {
+        console.info("Thinkific membership enrolled after Stripe payment.", {
+          eventId: event.id,
+          email,
+          plan,
+        });
+      }
+      break;
+    }
     case "checkout.session.async_payment_failed":
     case "customer.subscription.created":
     case "customer.subscription.updated":

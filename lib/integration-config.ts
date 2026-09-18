@@ -6,12 +6,14 @@ export const stripePlans = {
     amount: 149,
     cadence: "month",
     priceEnvVar: "STRIPE_FOUNDATION_PRICE_ID",
+    thinkificCourseEnvVar: "THINKIFIC_FOUNDATION_COURSE_ID",
   },
   "most-good": {
     label: "Most Good",
     amount: 399,
     cadence: "month",
     priceEnvVar: "STRIPE_MOST_GOOD_PRICE_ID",
+    thinkificCourseEnvVar: "THINKIFIC_MOST_GOOD_COURSE_ID",
   },
 } as const;
 
@@ -50,6 +52,7 @@ export function getStripePlanConfig(plan: string) {
 
   const config = stripePlans[key];
   const priceId = process.env[config.priceEnvVar];
+  const thinkificCourseId = process.env[config.thinkificCourseEnvVar];
 
   return {
     key,
@@ -57,7 +60,16 @@ export function getStripePlanConfig(plan: string) {
     amount: config.amount,
     cadence: config.cadence,
     priceId: priceId ?? "not-configured",
+    thinkificCourseId: thinkificCourseId ?? null,
   };
+}
+
+export function getThinkificCourseIdForPlan(plan: string): string | null {
+  const key = plan as StripePlanKey;
+  if (!(key in stripePlans)) {
+    return null;
+  }
+  return process.env[stripePlans[key].thinkificCourseEnvVar] ?? null;
 }
 
 export function getThinkificStatus() {
