@@ -1,11 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-export function middleware(request: NextRequest) {
-  const hasSession = request.cookies.has("dg_session");
-  if (!hasSession) {
-    return NextResponse.redirect(new URL("/login", request.url));
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
+
+export default clerkMiddleware(async (auth, request) => {
+  if (isProtectedRoute(request)) {
+    await auth.protect();
   }
-  return NextResponse.next();
-}
+});
 
-export const config = { matcher: ["/dashboard/:path*"] };
+export const config = {
+  matcher: ["/((?!_next|.*\\..*).*)", "/(api|trpc)(.*)"],
+};

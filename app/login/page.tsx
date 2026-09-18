@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignIn } from "@clerk/nextjs";
 import { BrandLogo } from "../components/brand-logo";
 import { getThinkificStatus } from "../../lib/integration-config";
 
@@ -12,25 +13,18 @@ export default function LoginPage() {
         <div className="eyebrow">MEMBER ACCESS</div>
         <h1>Welcome back.</h1>
         <p>Sign in to your quality intelligence workspace.</p>
-
-        <a className="button button-dark full" href="/api/auth/thinkific">
-          {thinkificStatus.configured ? "Open Thinkific member hub" : "Thinkific member hub is not configured yet"}
-          <span>→</span>
-        </a>
-
+        <SignIn routing="hash" />
         <div className="divider">
-          <span>Member access</span>
+          <span>Thinkific membership</span>
         </div>
-
         <p className="fine-print">
           {thinkificStatus.configured
-            ? "Open your published Thinkific memberships and member hub. The separate Demand Good QA dashboard is currently available through the demo workspace below."
-            : "Set THINKIFIC_SSO_URL, THINKIFIC_SSO_CLIENT_ID, THINKIFIC_SSO_CLIENT_SECRET, and THINKIFIC_SSO_REDIRECT_URI in your environment before opening the member hub."}
+            ? "Already a member? Open your published Thinkific memberships and member hub."
+            : "Thinkific member-hub access is not configured yet."}
         </p>
-
-        <Link className="demo-link" href="/api/auth/demo?redirect=/dashboard">
-          Open demo dashboard →
-        </Link>
+        <a className="demo-link" href="/api/auth/thinkific">
+          Open Thinkific member hub →
+        </a>
         <Link className="back-link" href="/">
           ← Back to home
         </Link>

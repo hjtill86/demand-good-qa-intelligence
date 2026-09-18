@@ -1,13 +1,12 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
+import { UserButton } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { BrandLogo } from "../components/brand-logo";
 import { getDashboardData } from "../../lib/dashboard-data";
-import { parseMemberSession } from "../../lib/auth-session";
 
 export default async function DashboardPage() {
   const { metrics, actions } = await getDashboardData();
-  const session = parseMemberSession((await cookies()).get("dg_session")?.value);
-  const memberName = session?.name ?? "Member";
+  const user = await currentUser();
+  const memberName = user?.firstName || user?.username || user?.primaryEmailAddress?.emailAddress || "Member";
   const initials = memberName
     .split(" ")
     .filter(Boolean)
@@ -32,7 +31,7 @@ export default async function DashboardPage() {
             <span>{initials}</span>
             <div>
               <b>{memberName}</b>
-              <small>{session?.provider === "thinkific" ? "Thinkific member" : "Demo workspace"}</small>
+              <small>Clerk member</small>
             </div>
           </div>
         </div>
@@ -43,7 +42,7 @@ export default async function DashboardPage() {
             <span className="eyebrow">TUESDAY, SEPTEMBER 17, 2026</span>
             <h1>Good morning, {memberName.split(" ")[0]}.</h1>
           </div>
-          <Link href="/api/auth/logout" className="outline-small">Sign out</Link>
+          <UserButton />
         </header>
         <div className="dash-body">
           <div className="dash-intro">
