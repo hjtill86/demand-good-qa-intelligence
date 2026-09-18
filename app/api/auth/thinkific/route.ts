@@ -21,15 +21,15 @@ export async function GET(request: Request) {
   }
 
   const { state } = createIntegrationState();
+  const callbackUrl = new URL(redirectUri);
+  callbackUrl.searchParams.set("state", state);
   const payload = {
-    sub: process.env.THINKIFIC_SSO_CLIENT_ID,
     email: "member@demandgoodqa.com",
-    name: "Demand Good QA Member",
-    roles: ["member"],
+    first_name: "Demand Good",
+    last_name: "QA Member",
+    external_source: "demand-good-qa",
     exp: Math.floor(Date.now() / 1000) + 60 * 5,
     iat: Math.floor(Date.now() / 1000),
-    state,
-    redirect_to: redirectUri,
   };
 
   const jwt = createThinkificJwt(payload);
@@ -46,8 +46,8 @@ export async function GET(request: Request) {
   const baseUrl = (process.env.THINKIFIC_SSO_URL ?? "").replace(/\/+$/, "");
   const authUrl = new URL(`${baseUrl}/api/sso/v2/sso/jwt`);
   authUrl.searchParams.set("jwt", jwt);
-  authUrl.searchParams.set("return_to", redirectUri);
-  authUrl.searchParams.set("error_url", `${getAppUrl()}/login`);
+  authUrl.searchParams.set("return_to", callbackUrl.toString());
+  authUrl.searchParams.set("error_url", `${getAppUrl().replace(/\/+$/, "")}/login`);
 
   const response = NextResponse.redirect(authUrl.toString());
 

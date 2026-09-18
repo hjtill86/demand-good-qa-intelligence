@@ -52,10 +52,12 @@ export async function GET(request: Request) {
   const verifiedPayload = jwt ? verifyThinkificJwt(jwt) : null;
   const decodedPayload = jwt ? parseJwtPayload(jwt.split(".")[1]) : null;
   const memberName =
-    verifiedPayload?.name ??
-    decodedPayload?.name ??
-    decodedPayload?.full_name ??
-    decodedPayload?.user?.name ??
+    verifiedPayload?.name ||
+    [verifiedPayload?.first_name, verifiedPayload?.last_name].filter(Boolean).join(" ") ||
+    decodedPayload?.name ||
+    [decodedPayload?.first_name, decodedPayload?.last_name].filter(Boolean).join(" ") ||
+    decodedPayload?.full_name ||
+    decodedPayload?.user?.name ||
     "Demand Good QA Member";
   const memberEmail =
     verifiedPayload?.email ??
