@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { BrandLogo } from "../components/brand-logo";
 import { getDashboardData } from "../../lib/dashboard-data";
 import { getThinkificAccess } from "../../lib/thinkific-entitlements";
+import { getRegulatoryWatchFeed } from "../../lib/regulatory-feed";
 
 export default async function DashboardPage() {
   const user = await currentUser();
@@ -36,9 +37,11 @@ export default async function DashboardPage() {
     );
   }
 
-  const { metrics, actions, weeklyDigest, supplierRisk, regulatoryWatch } = await getDashboardData();
+  const { metrics, actions, weeklyDigest, supplierRisk, regulatoryWatch: mockRegulatoryWatch } = await getDashboardData();
   const plan = access.plan;
   const hasMostGood = plan === "most-good";
+  const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed() : [];
+  const usingLiveFeed = liveRegulatoryWatch.length > 0;
   const initials = memberName
     .split(" ")
     .filter(Boolean)
@@ -82,7 +85,11 @@ export default async function DashboardPage() {
               <h2>Your quality pulse <em>looks good.</em></h2>
               <p>Here’s what deserves your attention this week.</p>
             </div>
-            <button className="date-button">Last 30 days⌄</button>
+            <div className="dash-intro-actions">
+              <a className="outline-small" href="/api/dashboard/export/excel">Export Excel</a>
+              <a className="outline-small" href="/dashboard/report" target="_blank" rel="noreferrer">Export PDF</a>
+              <button className="date-button">Last 30 days⌄</button>
+            </div>
           </div>
           <div className="metric-grid">
             <div className="metric-card">
@@ -168,17 +175,35 @@ export default async function DashboardPage() {
               </div>
               <div className="actions-card">
                 <div className="card-heading">
-                  <div><span className="eyebrow">MOST GOOD</span><h3>Regulatory watch</h3></div>
-                  <a>View full feed →</a>
+                  <div>
+                    <span className="eyebrow">MOST GOOD · FDA · CDC · CMS · DHS · TJC</span>
+                    <h3>Regulatory watch{usingLiveFeed ? " (live)" : ""}</h3>
+                  </div>
+                  <a href="/dashboard/report">View full feed →</a>
                 </div>
-                {regulatoryWatch.map((item) => (
+                {!usingLiveFeed ? (
+                  <p className="fine-print" style={{ margin: "0 0 8px" }}>
+                    Live agency feeds were unavailable when this page loaded; showing sample data.
+                  </p>
+                ) : null}
+                {(usingLiveFeed ? liveRegulatoryWatch : mockRegulatoryWatch).map((item) => (
                   <div className="action-row" key={item.title}>
                     <i className={`risk ${item.impact.toLowerCase()}`} />
                     <div>
-                      <b>{item.title}</b>
+                      <b>
+                        {"agency" in item ? `[${item.agency}] ` : ""}
+                        {"link" in item && item.link ? (
+                          <a href={item.link} target="_blank" rel="noreferrer">{item.title}</a>
+                        ) : (
+                          item.title
+                        )}
+                      </b>
                       <span>{item.jurisdiction} · {item.summary}</span>
                     </div>
-                    <span className="due">{item.effectiveDate}</span><span>→</span>
+                    <span className="due">
+                      {"publishedAt" in item ? new Date(item.publishedAt).toLocaleDateString() : item.effectiveDate}
+                    </span>
+                    <span>→</span>
                   </div>
                 ))}
               </div>
@@ -189,8 +214,9 @@ export default async function DashboardPage() {
                 <div><span className="eyebrow">UPGRADE AVAILABLE</span><h3>Unlock Most Good</h3></div>
               </div>
               <p>
-                Add supplier risk intelligence across every vendor and a live multi-jurisdiction
-                regulatory watch feed — plus unlimited team members.
+                Add supplier risk intelligence across every vendor and a live regulatory watch feed
+                automatically pulled from FDA, CDC, CMS, DHS, and The Joint Commission — plus
+                unlimited team members.
               </p>
               <a className="button button-dark" href="/checkout?plan=most-good">
                 Upgrade to Most Good <span>→</span>
