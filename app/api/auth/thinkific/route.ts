@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { createIntegrationState, createThinkificJwt, getAppUrl, getThinkificStatus } from "../../../../lib/integration-config";
 
 export async function GET(request: Request) {
@@ -20,13 +21,24 @@ export async function GET(request: Request) {
     );
   }
 
+  const user = await currentUser();
+  const email = user?.primaryEmailAddress?.emailAddress;
+
+  if (!email) {
+    // Not signed in to Demand Good QA yet — send them to Clerk login first so
+    // the Thinkific handoff always carries a real, authenticated identity.
+    const loginUrl = new URL("/login", getAppUrl());
+    loginUrl.searchParams.set("redirect", "/api/auth/thinkific");
+    return NextResponse.redirect(loginUrl.toString());
+  }
+
   const { state } = createIntegrationState();
   const callbackUrl = new URL(redirectUri);
   callbackUrl.searchParams.set("state", state);
   const payload = {
-    email: "member@demandgoodqa.com",
-    first_name: "Demand Good",
-    last_name: "QA Member",
+    email,
+    first_name: user?.firstName ?? "",
+    last_name: user?.lastName ?? "",
     external_source: "demand-good-qa",
     exp: Math.floor(Date.now() / 1000) + 60 * 5,
     iat: Math.floor(Date.now() / 1000),
