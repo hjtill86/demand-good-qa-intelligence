@@ -19,13 +19,14 @@ Visit `http://localhost:3000`, then use **Member login** to create or sign in to
 - `/api/checkout` creates Stripe-hosted subscription Checkout Sessions from the configured recurring price IDs. Keep the Stripe secret and webhook signing secret server-side.
 - Thinkific is the published membership and member-hub destination. `/api/auth/thinkific` opens the configured Thinkific member hub; it is not the identity provider for the separate Demand Good QA dashboard.
 - Clerk protects `/dashboard` and supplies the portal identity. Add the two Clerk keys from the Clerk dashboard to `.env.local` and Vercel; never commit `.env.local`.
+- When `THINKIFIC_ADMIN_API_KEY` and `THINKIFIC_SUBDOMAIN` are configured, `/dashboard` verifies the Clerk user's email against Thinkific `/users` and `/enrollments` and requires an active, non-expired enrollment. Use the same email address in Clerk and Thinkific.
 - `/api/auth/demo` and `/api/auth/logout` are retained only as local legacy routes and are not used for dashboard protection.
 - `.env.example` documents the Clerk, Stripe, and Thinkific variables. Never commit `.env.local`.
 - No Thinkific Admin API calls are required by this demo. If added later, use only documented public paths such as `/users`, `/enrollments`, and `/course_progress`.
 
 ## Phase 2: integration wiring
 
-The MVP now uses Clerk for portal authentication, Stripe for billing, and Thinkific for published memberships/member-hub access. Membership entitlement synchronization between Thinkific and Clerk is intentionally not implemented; add a server-side entitlement check before restricting dashboard access to specific memberships.
+The MVP now uses Clerk for portal authentication, Stripe for billing, and Thinkific for published memberships/member-hub access. The dashboard entitlement bridge is email-based and read-only; it does not create, update, or delete Thinkific records.
 
 ## Validation
 

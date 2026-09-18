@@ -2,11 +2,41 @@ import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { BrandLogo } from "../components/brand-logo";
 import { getDashboardData } from "../../lib/dashboard-data";
+import { getThinkificAccess } from "../../lib/thinkific-entitlements";
 
 export default async function DashboardPage() {
-  const { metrics, actions } = await getDashboardData();
   const user = await currentUser();
   const memberName = user?.firstName || user?.username || user?.primaryEmailAddress?.emailAddress || "Member";
+  const email = user?.primaryEmailAddress?.emailAddress;
+  const access = email ? await getThinkificAccess(email) : { status: "error" as const, email: "" };
+
+  if (access.status !== "active") {
+    return (
+      <main className="auth-page">
+        <div className="auth-card">
+          <BrandLogo />
+          <div className="eyebrow">MEMBERSHIP REQUIRED</div>
+          <h1>Connect your membership.</h1>
+          <p>
+            Sign in with the same email you use for your active Thinkific membership. Once the
+            membership is found, your QA intelligence workspace will unlock.
+          </p>
+          {access.status === "not-configured" ? (
+            <p className="fine-print">Thinkific enrollment verification is not configured yet.</p>
+          ) : access.status === "error" ? (
+            <p className="fine-print">We could not verify membership right now. Please try again shortly.</p>
+          ) : (
+            <p className="fine-print">No active Thinkific enrollment was found for {access.email}.</p>
+          )}
+          <a className="button button-dark full" href="/api/auth/thinkific">
+            Open Thinkific member hub <span>→</span>
+          </a>
+        </div>
+      </main>
+    );
+  }
+
+  const { metrics, actions } = await getDashboardData();
   const initials = memberName
     .split(" ")
     .filter(Boolean)
