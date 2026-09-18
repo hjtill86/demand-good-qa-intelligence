@@ -19,10 +19,35 @@ export type DashboardMetrics = {
   actionsDue: number;
 };
 
+export type WeeklyDigest = {
+  headline: string;
+  summary: string;
+  bullets: string[];
+};
+
+export type SupplierRisk = {
+  name: string;
+  category: string;
+  score: number;
+  trend: "up" | "down" | "flat";
+  note: string;
+};
+
+export type RegulatoryWatchItem = {
+  jurisdiction: string;
+  title: string;
+  impact: RiskLevel;
+  effectiveDate: string;
+  summary: string;
+};
+
 export type DashboardData = {
   metrics: DashboardMetrics;
   actions: DashboardAction[];
   trend: number[];
+  weeklyDigest: WeeklyDigest;
+  supplierRisk: SupplierRisk[];
+  regulatoryWatch: RegulatoryWatchItem[];
 };
 
 const dashboardDataPath = path.join(process.cwd(), "data", "dashboard.json");
@@ -50,7 +75,32 @@ function isDashboardData(value: unknown): value is DashboardData {
           typeof action.due === "string"
       ) &&
       Array.isArray(data.trend) &&
-      data.trend.every((point) => typeof point === "number")
+      data.trend.every((point) => typeof point === "number") &&
+      data.weeklyDigest &&
+      typeof data.weeklyDigest.headline === "string" &&
+      typeof data.weeklyDigest.summary === "string" &&
+      Array.isArray(data.weeklyDigest.bullets) &&
+      data.weeklyDigest.bullets.every((bullet) => typeof bullet === "string") &&
+      Array.isArray(data.supplierRisk) &&
+      data.supplierRisk.every(
+        (supplier) =>
+          supplier &&
+          typeof supplier.name === "string" &&
+          typeof supplier.category === "string" &&
+          typeof supplier.score === "number" &&
+          ["up", "down", "flat"].includes(supplier.trend) &&
+          typeof supplier.note === "string"
+      ) &&
+      Array.isArray(data.regulatoryWatch) &&
+      data.regulatoryWatch.every(
+        (item) =>
+          item &&
+          typeof item.jurisdiction === "string" &&
+          typeof item.title === "string" &&
+          ["High", "Medium", "Low"].includes(item.impact) &&
+          typeof item.effectiveDate === "string" &&
+          typeof item.summary === "string"
+      )
   );
 }
 

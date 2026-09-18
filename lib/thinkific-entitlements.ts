@@ -1,3 +1,5 @@
+import { getPlanKeyForThinkificCourseId, type StripePlanKey } from "./integration-config";
+
 type ThinkificUser = {
   id: number;
   email: string;
@@ -5,6 +7,7 @@ type ThinkificUser = {
 
 type ThinkificEnrollment = {
   user_id: number;
+  course_id?: number;
   status?: string;
   expiry_date?: string | null;
 };
@@ -14,7 +17,7 @@ type ThinkificCollection<T> = {
 };
 
 export type ThinkificAccessResult =
-  | { status: "active"; email: string }
+  | { status: "active"; email: string; plan: StripePlanKey | null }
   | { status: "not-enrolled"; email: string }
   | { status: "not-configured"; email: string }
   | { status: "error"; email: string };
@@ -94,16 +97,25 @@ export async function getThinkificAccess(email: string): Promise<ThinkificAccess
     const enrollments = await thinkificRequest<ThinkificCollection<ThinkificEnrollment>>(
       `/enrollments?user_id=${user.id}&limit=100`,
     );
-    const hasActiveEnrollment = enrollments?.items?.some((enrollment) => {
+    const activeEnrollments = enrollments?.items?.filter((enrollment) => {
       if (enrollment.status?.toLowerCase() !== "active") {
         return false;
       }
       return !enrollment.expiry_date || new Date(enrollment.expiry_date) > new Date();
     });
 
-    return hasActiveEnrollment
-      ? { status: "active", email: normalizedEmail }
-      : { status: "not-enrolled", email: normalizedEmail };
+    if (!activeEnrollments || activeEnrollments.length === 0) {
+      return { status: "not-enrolled", email: normalizedEmail };
+    }
+
+    // Most Good includes Foundation's dashboard plus more, so if the
+    // customer holds both memberships, prefer the higher tier.
+    const plans = activeEnrollments
+      .map((enrollment) => (enrollment.course_id ? getPlanKeyForThinkificCourseId(enrollment.course_id) : null))
+      .filter((plan): plan is StripePlanKey => plan !== null);
+    const plan = plans.includes("most-good") ? "most-good" : plans[0] ?? null;
+
+    return { status: "active", email: normalizedEmail, plan };
   } catch (error) {
     console.error("Thinkific entitlement check failed", error);
     return { status: "error", email: normalizedEmail };

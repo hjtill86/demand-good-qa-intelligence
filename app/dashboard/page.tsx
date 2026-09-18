@@ -36,7 +36,9 @@ export default async function DashboardPage() {
     );
   }
 
-  const { metrics, actions } = await getDashboardData();
+  const { metrics, actions, weeklyDigest, supplierRisk, regulatoryWatch } = await getDashboardData();
+  const plan = access.plan;
+  const hasMostGood = plan === "most-good";
   const initials = memberName
     .split(" ")
     .filter(Boolean)
@@ -131,6 +133,70 @@ export default async function DashboardPage() {
               </div>
             ))}
           </div>
+          <div className="actions-card">
+            <div className="card-heading">
+              <div><span className="eyebrow">FOUNDATION + MOST GOOD</span><h3>Weekly decision digest</h3></div>
+            </div>
+            <p className="digest-headline"><b>{weeklyDigest.headline}</b></p>
+            <p>{weeklyDigest.summary}</p>
+            <ul className="digest-list">
+              {weeklyDigest.bullets.map((bullet) => (
+                <li key={bullet}>{bullet}</li>
+              ))}
+            </ul>
+          </div>
+          {hasMostGood ? (
+            <>
+              <div className="actions-card">
+                <div className="card-heading">
+                  <div><span className="eyebrow">MOST GOOD</span><h3>Supplier risk intelligence</h3></div>
+                  <a>View all suppliers →</a>
+                </div>
+                {supplierRisk.map((supplier) => (
+                  <div className="action-row" key={supplier.name}>
+                    <i
+                      className={`risk ${supplier.score >= 80 ? "low" : supplier.score >= 65 ? "medium" : "high"}`}
+                    />
+                    <div>
+                      <b>{supplier.name}</b>
+                      <span>{supplier.category} · {supplier.note}</span>
+                    </div>
+                    <span className="due">{supplier.score}/100</span>
+                    <span>{supplier.trend === "up" ? "↑" : supplier.trend === "down" ? "↓" : "→"}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="actions-card">
+                <div className="card-heading">
+                  <div><span className="eyebrow">MOST GOOD</span><h3>Regulatory watch</h3></div>
+                  <a>View full feed →</a>
+                </div>
+                {regulatoryWatch.map((item) => (
+                  <div className="action-row" key={item.title}>
+                    <i className={`risk ${item.impact.toLowerCase()}`} />
+                    <div>
+                      <b>{item.title}</b>
+                      <span>{item.jurisdiction} · {item.summary}</span>
+                    </div>
+                    <span className="due">{item.effectiveDate}</span><span>→</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="actions-card upsell-card">
+              <div className="card-heading">
+                <div><span className="eyebrow">UPGRADE AVAILABLE</span><h3>Unlock Most Good</h3></div>
+              </div>
+              <p>
+                Add supplier risk intelligence across every vendor and a live multi-jurisdiction
+                regulatory watch feed — plus unlimited team members.
+              </p>
+              <a className="button button-dark" href="/checkout?plan=most-good">
+                Upgrade to Most Good <span>→</span>
+              </a>
+            </div>
+          )}
         </div>
       </section>
     </main>

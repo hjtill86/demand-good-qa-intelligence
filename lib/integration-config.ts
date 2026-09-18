@@ -72,6 +72,22 @@ export function getThinkificCourseIdForPlan(plan: string): string | null {
   return process.env[stripePlans[key].thinkificCourseEnvVar] ?? null;
 }
 
+/**
+ * Reverse lookup: given a Thinkific course id from an enrollment, find which
+ * Stripe plan (and therefore which content tier) it corresponds to. Used by
+ * the dashboard to show Foundation vs. Most Good content based on the
+ * customer's actual active Thinkific enrollment.
+ */
+export function getPlanKeyForThinkificCourseId(courseId: string | number): StripePlanKey | null {
+  const normalized = String(courseId);
+  for (const key of Object.keys(stripePlans) as StripePlanKey[]) {
+    if (process.env[stripePlans[key].thinkificCourseEnvVar] === normalized) {
+      return key;
+    }
+  }
+  return null;
+}
+
 export function getThinkificStatus() {
   const requiredVariables = [
     "THINKIFIC_SSO_URL",
