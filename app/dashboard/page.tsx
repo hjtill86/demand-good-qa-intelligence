@@ -37,7 +37,14 @@ export default async function DashboardPage() {
     );
   }
 
-  const { metrics, actions, weeklyDigest, supplierRisk, regulatoryWatch: mockRegulatoryWatch } = await getDashboardData();
+  const {
+    metrics,
+    actions,
+    weeklyDigest,
+    supplierRisk,
+    regulatoryWatch: mockRegulatoryWatch,
+    licenseRecords,
+  } = await getDashboardData();
   const plan = access.plan;
   const hasMostGood = plan === "most-good";
   const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed() : [];
@@ -56,9 +63,9 @@ export default async function DashboardPage() {
         <div className="side-section">
           <span>WORKSPACE</span>
           <a className="active">Overview</a>
-          <a>Quality signals</a>
-          <a>Regulatory watch</a>
-          <a>Suppliers</a>
+          <a href="/dashboard/management-review">Management review</a>
+          <a href="/dashboard/quarterly-business-review">Quarterly review</a>
+          {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
         </div>
         <div className="side-bottom">
           <a>Settings</a>
@@ -152,8 +159,39 @@ export default async function DashboardPage() {
               ))}
             </ul>
           </div>
+          <div className="generator-grid">
+            <a className="generator-card" href="/dashboard/management-review">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Management review generator</h3>
+              <p>Prepare a structured quality-management review with current scorecards, risks, and decision fields.</p>
+              <b>Generate review →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/quarterly-business-review">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Quarterly business review generator</h3>
+              <p>Create an executive-ready quarterly snapshot of performance, commitments, and supplier trends.</p>
+              <b>Generate review →</b>
+            </a>
+          </div>
           {hasMostGood ? (
             <>
+              <div className="actions-card">
+                <div className="card-heading">
+                  <div><span className="eyebrow">MOST GOOD · RENEWAL CONTROL</span><h3>License & certification alerts</h3></div>
+                  <a href="/dashboard/licenses">Open license vault →</a>
+                </div>
+                {licenseRecords.filter((record) => record.status !== "Current").map((record) => (
+                  <div className="action-row" key={record.licenseNumber}>
+                    <i className={`risk ${record.status === "Renewal due" ? "high" : "medium"}`} />
+                    <div>
+                      <b>{record.company} — {record.documentName}</b>
+                      <span>{record.jurisdiction} · expires {record.expiresOn} · {record.renewalLeadDays}-day alert rule</span>
+                    </div>
+                    <span className="due">{record.status}</span>
+                    <span>→</span>
+                  </div>
+                ))}
+              </div>
               <div className="actions-card">
                 <div className="card-heading">
                   <div><span className="eyebrow">MOST GOOD</span><h3>Supplier risk intelligence</h3></div>

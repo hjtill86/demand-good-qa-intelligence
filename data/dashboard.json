@@ -96,5 +96,37 @@
       "effectiveDate": "2027-02-01",
       "summary": "No open findings; informational filing only."
     }
+  ],
+  "licenseRecords": [
+    {
+      "company": "Northstar Labs",
+      "documentName": "FDA Food Facility Registration",
+      "documentType": "License",
+      "jurisdiction": "US · FDA",
+      "licenseNumber": "FFR-8821",
+      "expiresOn": "2026-10-14",
+      "renewalLeadDays": 90,
+      "status": "Renewal due"
+    },
+    {
+      "company": "Atlas Packaging",
+      "documentName": "ISO 9001:2015 Certificate",
+      "documentType": "Certification",
+      "jurisdiction": "Global · ISO",
+      "licenseNumber": "ISO-9001-4450",
+      "expiresOn": "2026-11-30",
+      "renewalLeadDays": 90,
+      "status": "Expiring soon"
+    },
+    {
+      "company": "Brightform Co-Pack",
+      "documentName": "State Food Processing License",
+      "documentType": "License",
+      "jurisdiction": "California",
+      "licenseNumber": "CA-FPL-29384",
+      "expiresOn": "2027-03-31",
+      "renewalLeadDays": 60,
+      "status": "Current"
+    }
   ]
 }

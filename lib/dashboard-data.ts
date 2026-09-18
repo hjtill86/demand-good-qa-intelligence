@@ -41,6 +41,17 @@ export type RegulatoryWatchItem = {
   summary: string;
 };
 
+export type LicenseRecord = {
+  company: string;
+  documentName: string;
+  documentType: "License" | "Certification";
+  jurisdiction: string;
+  licenseNumber: string;
+  expiresOn: string;
+  renewalLeadDays: 30 | 60 | 90;
+  status: "Current" | "Renewal due" | "Expiring soon";
+};
+
 export type DashboardData = {
   metrics: DashboardMetrics;
   actions: DashboardAction[];
@@ -48,6 +59,7 @@ export type DashboardData = {
   weeklyDigest: WeeklyDigest;
   supplierRisk: SupplierRisk[];
   regulatoryWatch: RegulatoryWatchItem[];
+  licenseRecords: LicenseRecord[];
 };
 
 const dashboardDataPath = path.join(process.cwd(), "data", "dashboard.json");
@@ -100,6 +112,19 @@ function isDashboardData(value: unknown): value is DashboardData {
           ["High", "Medium", "Low"].includes(item.impact) &&
           typeof item.effectiveDate === "string" &&
           typeof item.summary === "string"
+      ) &&
+      Array.isArray(data.licenseRecords) &&
+      data.licenseRecords.every(
+        (record) =>
+          record &&
+          typeof record.company === "string" &&
+          typeof record.documentName === "string" &&
+          ["License", "Certification"].includes(record.documentType) &&
+          typeof record.jurisdiction === "string" &&
+          typeof record.licenseNumber === "string" &&
+          typeof record.expiresOn === "string" &&
+          [30, 60, 90].includes(record.renewalLeadDays) &&
+          ["Current", "Renewal due", "Expiring soon"].includes(record.status)
       )
   );
 }

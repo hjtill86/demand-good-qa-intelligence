@@ -15,7 +15,14 @@ export async function GET() {
   }
 
   const hasMostGood = access.plan === "most-good";
-  const { metrics, actions, weeklyDigest, supplierRisk, regulatoryWatch: mockRegulatoryWatch } = await getDashboardData();
+  const {
+    metrics,
+    actions,
+    weeklyDigest,
+    supplierRisk,
+    regulatoryWatch: mockRegulatoryWatch,
+    licenseRecords,
+  } = await getDashboardData();
   const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed() : [];
   const regulatoryRows = liveRegulatoryWatch.length > 0 ? liveRegulatoryWatch : mockRegulatoryWatch;
 
@@ -82,6 +89,20 @@ export async function GET() {
       });
     });
     regulatorySheet.getRow(1).font = { bold: true };
+
+    const licensesSheet = workbook.addWorksheet("License Vault");
+    licensesSheet.columns = [
+      { header: "Company", key: "company", width: 28 },
+      { header: "Document", key: "documentName", width: 36 },
+      { header: "Type", key: "documentType", width: 18 },
+      { header: "Jurisdiction", key: "jurisdiction", width: 24 },
+      { header: "Reference", key: "licenseNumber", width: 22 },
+      { header: "Expires", key: "expiresOn", width: 16 },
+      { header: "Renewal lead days", key: "renewalLeadDays", width: 20 },
+      { header: "Status", key: "status", width: 18 },
+    ];
+    licensesSheet.addRows(licenseRecords);
+    licensesSheet.getRow(1).font = { bold: true };
   }
 
   const buffer = await workbook.xlsx.writeBuffer();

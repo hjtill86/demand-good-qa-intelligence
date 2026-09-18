@@ -15,7 +15,14 @@ export default async function DashboardReportPage() {
   }
 
   const hasMostGood = access.plan === "most-good";
-  const { metrics, actions, weeklyDigest, supplierRisk, regulatoryWatch: mockRegulatoryWatch } = await getDashboardData();
+  const {
+    metrics,
+    actions,
+    weeklyDigest,
+    supplierRisk,
+    regulatoryWatch: mockRegulatoryWatch,
+    licenseRecords,
+  } = await getDashboardData();
   const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed() : [];
   const regulatoryRows = liveRegulatoryWatch.length > 0 ? liveRegulatoryWatch : mockRegulatoryWatch;
   const usingLiveFeed = liveRegulatoryWatch.length > 0;
@@ -85,6 +92,24 @@ export default async function DashboardReportPage() {
                     <td>{supplier.score}/100</td>
                     <td>{supplier.trend}</td>
                     <td>{supplier.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+
+          <section className="report-section">
+            <h2>License &amp; certification renewal control</h2>
+            <table className="report-table">
+              <thead><tr><th>Company</th><th>Document</th><th>Reference</th><th>Expires</th><th>Status</th></tr></thead>
+              <tbody>
+                {licenseRecords.map((record) => (
+                  <tr key={record.licenseNumber}>
+                    <td>{record.company}</td>
+                    <td>{record.documentName}</td>
+                    <td>{record.licenseNumber}</td>
+                    <td>{record.expiresOn}</td>
+                    <td>{record.status} ({record.renewalLeadDays}-day alert)</td>
                   </tr>
                 ))}
               </tbody>
