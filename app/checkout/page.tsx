@@ -42,6 +42,20 @@ export default async function CheckoutPage({
           {resolvedSearchParams.utm_campaign ? (
             <input type="hidden" name="utm_campaign" value={resolvedSearchParams.utm_campaign} />
           ) : null}
+          <label className="legal-check">
+            <input type="checkbox" name="agreedToTerms" value="yes" required />
+            <span>
+              I agree to the{" "}
+              <a href="https://courses.demandgoodqa.com/pages/terms" target="_blank" rel="noreferrer">
+                Terms and Conditions
+              </a>{" "}
+              and{" "}
+              <a href="https://courses.demandgoodqa.com/pages/privacy" target="_blank" rel="noreferrer">
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </label>
           <button type="submit" className="button button-dark full">
             Start secure checkout preview <span>→</span>
           </button>

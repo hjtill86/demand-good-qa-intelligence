@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SignIn } from "@clerk/nextjs";
 import { BrandLogo } from "../components/brand-logo";
 import { getThinkificStatus } from "../../lib/integration-config";
+import { LegalGate } from "./legal-gate";
 
 export default async function LoginPage({
   searchParams,
@@ -19,7 +20,9 @@ export default async function LoginPage({
         <div className="eyebrow">MEMBER ACCESS</div>
         <h1>Welcome back.</h1>
         <p>Sign in to your quality intelligence workspace.</p>
-        <SignIn routing="hash" forceRedirectUrl={afterSignInUrl} fallbackRedirectUrl={afterSignInUrl} />
+        <LegalGate>
+          <SignIn routing="hash" forceRedirectUrl={afterSignInUrl} fallbackRedirectUrl={afterSignInUrl} />
+        </LegalGate>
         <div className="divider">
           <span>Thinkific membership</span>
         </div>

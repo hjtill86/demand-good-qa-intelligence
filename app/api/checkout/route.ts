@@ -4,7 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { getStripePlanConfig, getStripeStatus } from "../../../lib/integration-config";
 
 export async function POST(request: Request) {
-  let body: { plan?: string; utm_source?: string; utm_campaign?: string } = {};
+  let body: { plan?: string; utm_source?: string; utm_campaign?: string; agreedToTerms?: string } = {};
 
   try {
     const contentType = request.headers.get("content-type") ?? "";
@@ -15,15 +15,24 @@ export async function POST(request: Request) {
       const plan = formData.get("plan");
       const utmSource = formData.get("utm_source");
       const utmCampaign = formData.get("utm_campaign");
+      const agreedToTerms = formData.get("agreedToTerms");
       body = {
         ...(typeof plan === "string" ? { plan } : {}),
         ...(typeof utmSource === "string" ? { utm_source: utmSource } : {}),
         ...(typeof utmCampaign === "string" ? { utm_campaign: utmCampaign } : {}),
+        ...(typeof agreedToTerms === "string" ? { agreedToTerms } : {}),
       };
     }
   } catch {
     return NextResponse.json(
       { error: "Send a JSON body with a valid plan." },
+      { status: 400 }
+    );
+  }
+
+  if (body.agreedToTerms !== "yes") {
+    return NextResponse.json(
+      { error: "You must agree to the Terms and Conditions and Privacy Policy to subscribe." },
       { status: 400 }
     );
   }
@@ -85,6 +94,7 @@ export async function POST(request: Request) {
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       metadata: {
         plan: planConfig.key,
+        terms_accepted_at: new Date().toISOString(),
         ...(user?.id ? { clerk_user_id: user.id } : {}),
         // Referral source, e.g. "thinkific", when the customer clicked in
         // from a banner/link on courses.demandgoodqa.com. Lets you see
