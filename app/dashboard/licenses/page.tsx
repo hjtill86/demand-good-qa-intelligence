@@ -2,6 +2,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getDashboardData } from "../../../lib/dashboard-data";
 import { getThinkificAccess } from "../../../lib/thinkific-entitlements";
+import { getLicenseAlertMetadata } from "../../../lib/license-alerts";
+import { EmailAlertPreference } from "./email-alert-preference";
 
 function statusClass(status: "Current" | "Renewal due" | "Expiring soon") {
   return status === "Current" ? "license-current" : status === "Renewal due" ? "license-due" : "license-soon";
@@ -21,6 +23,7 @@ export default async function LicensesPage() {
   }
 
   const { licenseRecords } = await getDashboardData();
+  const emailAlerts = await getLicenseAlertMetadata(user?.id ?? "");
   const renewalRecords = licenseRecords.filter((record) => record.status !== "Current");
 
   return (
@@ -63,12 +66,16 @@ export default async function LicensesPage() {
       </section>
 
       <section className="report-section storage-boundary">
+        <h2>Email renewal alerts</h2>
+        <p>Choose whether to receive email reminders in addition to the in-app alerts shown above.</p>
+        <EmailAlertPreference enabled={emailAlerts.enabled} />
+      </section>
+
+      <section className="report-section storage-boundary">
         <h2>Document storage setup</h2>
         <p>
-          The dashboard currently displays validated sample records and in-app renewal alerts. Before
-          uploading company documents or sending email reminders, connect a durable storage provider and
-          notification service; Vercel serverless files are not persistent. The storage boundary is
-          intentionally documented rather than accepting files that would disappear after deployment.
+          The dashboard currently displays validated sample records. Email alerts are sent only after a
+          member opts in and the email provider and scheduled job are configured.
         </p>
       </section>
     </main>

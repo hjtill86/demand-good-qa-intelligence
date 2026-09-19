@@ -124,10 +124,10 @@ labels are heuristic estimates and should be reviewed by a qualified person.
 Use the register to review company licenses and certifications, expiration
 dates, jurisdictions, and renewal lead-time alerts.
 
-**Important qualification:** The current MVP displays validated sample records.
-Durable document uploads and scheduled email reminders are not yet enabled.
-Do not promise file storage or email notifications until that integration is
-implemented.
+**Important qualification:** Most Good members can opt in to email reminders
+in addition to the in-app alerts. Email delivery requires the configured Resend
+provider and daily scheduled job. The current MVP displays validated sample
+records; durable document uploads are not yet enabled.
 
 ### Exportable reporting
 
