@@ -190,7 +190,7 @@ export default function Home() {
             <Link href="/login">Member login</Link>
             <a href="https://courses.demandgoodqa.com/pages/terms" target="_blank" rel="noreferrer">Terms</a>
             <a href="https://courses.demandgoodqa.com/pages/privacy" target="_blank" rel="noreferrer">Privacy</a>
-            <a href="mailto:hello@demandgood.co">Contact</a>
+            <a href="mailto:htillman@demandgoodqa.com">Contact</a>
           </div>
         </div>
       </footer>
