@@ -66,6 +66,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/management-review">Management review</a>
           <a href="/dashboard/quarterly-business-review">Quarterly review</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
+          <a href="/dashboard/guide">How to use (work instruction)</a>
         </div>
         <div className="side-bottom">
           <a>Settings</a>
@@ -171,6 +172,12 @@ export default async function DashboardPage() {
               <h3>Quarterly business review generator</h3>
               <p>Create an executive-ready quarterly snapshot of performance, commitments, and supplier trends.</p>
               <b>Generate review →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/guide">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Work instruction &amp; guide</h3>
+              <p>Step-by-step instructions for using every feature of your subscription — printable for new team members.</p>
+              <b>Open guide →</b>
             </a>
           </div>
           {hasMostGood ? (
