@@ -272,10 +272,10 @@ checkout or dashboard.
 
 ### Do customers need two logins?
 
-DGQI uses Clerk for portal authentication and can hand the authenticated member
-to Thinkific through SSO. Customers should use the same email address across
-Stripe, Clerk, and Thinkific so membership verification and enrollment can
-match correctly.
+DGQI uses Clerk for portal authentication and keeps customers in the DGQI app.
+Thinkific is used for course content, membership verification, and marketing.
+Customers should use the same email address across Stripe, Clerk, and Thinkific
+so membership verification and enrollment can match correctly.
 
 ### Is DGQI regulatory advice?
 

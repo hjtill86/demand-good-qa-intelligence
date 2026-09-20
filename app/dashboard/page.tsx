@@ -29,8 +29,8 @@ export default async function DashboardPage() {
           ) : (
             <p className="fine-print">No active Thinkific enrollment was found for {access.email}.</p>
           )}
-          <a className="button button-dark full" href="/api/auth/thinkific">
-            Open Thinkific member hub <span>→</span>
+          <a className="button button-dark full" href="/login">
+            Return to DGQI sign-in <span>→</span>
           </a>
         </div>
       </main>

@@ -10,7 +10,7 @@ copy .env.example .env.local
 npm run dev
 ```
 
-Visit `http://localhost:3000`, then use **Member login** to create or sign in to a Clerk account. The dashboard is protected by Clerk authentication; the Thinkific link remains a separate member-hub destination.
+Visit `http://localhost:3000`, then use **Member login** to create or sign in to a Clerk account. The dashboard is protected by Clerk authentication; DGQI is the app workspace. Thinkific is used for membership verification, course content, and marketing referrals.
 
 ## Product boundaries
 
@@ -30,9 +30,9 @@ Visit `http://localhost:3000`, then use **Member login** to create or sign in to
   Clicking either link takes the visitor to the DGQI site to complete the Stripe purchase and use the actual intelligence dashboard there — Thinkific never hosts the subscription checkout or the dashboard.
 - `/api/checkout` creates Stripe-hosted subscription Checkout Sessions from the configured recurring price IDs, tagged with the plan and (when signed in) the Clerk email/user id as metadata. Keep the Stripe secret and webhook signing secret server-side.
 - `/api/webhooks/stripe` fulfills the purchase on `checkout.session.completed`: it reads the paid session's customer email and plan, maps the plan to a Thinkific course via `THINKIFIC_FOUNDATION_COURSE_ID` / `THINKIFIC_MOST_GOOD_COURSE_ID`, finds-or-creates the matching Thinkific user, and enrolls them — so the Stripe subscription is what unlocks Thinkific access, automatically.
-- Thinkific is still the membership/course *content* platform and member-hub destination. `/api/auth/thinkific` performs a single-sign-on handoff: it reads the already-authenticated Clerk user's email/first/last name, signs a Thinkific JWT with that identity, and redirects to Thinkific. A customer who is signed in to Demand Good QA is not asked to log in again to reach the Thinkific member hub. If a visitor hits `/api/auth/thinkific` without a Clerk session, it redirects to `/login?redirect=/api/auth/thinkific` first.
+- Thinkific remains the membership/course content platform and marketing channel. DGQI is the subscription checkout, login, and dashboard; customers should use **Member login** on DGQI and do not need a Thinkific SSO handoff to use the app.
 - Clerk protects `/dashboard` and supplies the portal identity. Add the two Clerk keys from the Clerk dashboard to `.env.local` and Vercel; never commit `.env.local`.
-- When `THINKIFIC_ADMIN_API_KEY` and `THINKIFIC_SUBDOMAIN` are configured, `/dashboard` verifies the Clerk user's email against Thinkific `/users` and `/enrollments` and requires an active, non-expired enrollment. Use the same email address in Clerk and Thinkific so the one-login flow (Stripe purchase → auto-enrollment → Clerk sign-in → dashboard, or Clerk sign-in → SSO handoff into Thinkific) works without a second manual purchase or login.
+- When `THINKIFIC_ADMIN_API_KEY` and `THINKIFIC_SUBDOMAIN` are configured, `/dashboard` verifies the Clerk user's email against Thinkific `/users` and `/enrollments` and requires an active, non-expired enrollment. Use the same email address in Clerk and Thinkific so the flow (DGQI purchase → auto-enrollment → DGQI sign-in → dashboard) resolves automatically.
 - `/api/auth/demo` and `/api/auth/logout` are retained only as local legacy routes and are not used for dashboard protection.
 - `.env.example` documents the Clerk, Stripe, and Thinkific variables. Never commit `.env.local`.
 - Thinkific Admin API calls are limited to documented public paths: `GET /users`, `POST /users`, `GET /enrollments`, and `POST /enrollments`. No Thinkific data is deleted or mutated outside of creating the user/enrollment needed to fulfill a paid Stripe subscription.
@@ -45,7 +45,7 @@ The MVP connects Clerk (auth), Stripe (billing), and Thinkific (membership/cours
 2. The Stripe webhook automatically creates/enrolls that same email in the matching Thinkific membership — no second purchase on Thinkific.
 3. Customer signs in once with Clerk on `/login`.
 4. `/dashboard` checks that Clerk email against Thinkific enrollment (server-side, read-only) before showing the workspace.
-5. Clicking "Open Thinkific member hub" reuses the same Clerk identity to sign the customer into Thinkific via JWT SSO — no second login prompt.
+5. Thinkific is used behind the scenes to verify the active membership; the customer stays in the DGQI app.
 
 Fulfillment (steps 1–2) is create/enroll-only. The entitlement check (step 4) is read-only. Customers must use the same email address across Stripe, Clerk, and Thinkific for the whole flow to resolve automatically.
 

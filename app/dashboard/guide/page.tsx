@@ -45,7 +45,7 @@ export default async function WorkInstructionsPage() {
             you will see a &quot;Connect your membership&quot; screen — confirm you purchased a plan and are
             using the matching email, then try again.
           </li>
-          <li>Once verified, you land on the <b>Overview</b> dashboard automatically. No separate Thinkific login is required afterward.</li>
+          <li>Once verified, you land on the <b>Overview</b> dashboard automatically. Thinkific is used to verify your membership; the DGQI app is where you work.</li>
         </ol>
       </section>
 

@@ -28,8 +28,8 @@ renewals. It applies to every Demand Good QA Intelligence subscriber.
    enrollment. If it isn't found, you'll see a "Connect your membership"
    screen — confirm you purchased a plan and are using the matching email,
    then try again.
-4. Once verified, you land on the **Overview** dashboard automatically. You do
-   not need to log in to Thinkific separately afterward.
+4. Once verified, you land on the **Overview** dashboard automatically. Thinkific
+   verifies the membership; the DGQI app is where you work.
 
 ## 3. Reading the Overview dashboard
 
