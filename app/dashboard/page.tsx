@@ -41,7 +41,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/guide">How to use (work instruction)</a>
         </div>
         <div className="side-bottom">
-          <a>Settings</a>
+          <a href="/dashboard/team">Team &amp; invites</a>
           <div className="user-chip">
             <span>{initials}</span>
             <div>
