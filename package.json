@@ -14,10 +14,7 @@
     "exceljs": "^4.4.0",
     "fast-xml-parser": "^5.11.1",
     "next": "^16.3.5",
-<<<<<<< HEAD
     "pg": "^8.23.0",
-=======
->>>>>>> cc021afda9afc5f202fba4088b85c528af2187fc
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "resend": "^6.28.1",
@@ -32,3 +29,4 @@
     "typescript": "^5.5.4"
   }
 }
+
