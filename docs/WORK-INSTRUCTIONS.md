@@ -76,9 +76,8 @@ Available on both Foundation and Most Good.
 4. Use the **Email renewal alerts** option to opt in or out of email reminders.
    Email reminders are sent in addition to the in-app alerts when the service
    email provider is configured.
-5. Records shown today are sample data pending a document-storage
-   integration; contact support to add your company's real licenses and
-   certifications.
+5. Use **Dashboard → Manage data** to add your organization's real licenses and
+   certifications. Records are stored in the shared organization data store.
 
 ## 7. Reading the Regulatory Watch feed (Most Good)
 

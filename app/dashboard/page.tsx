@@ -36,6 +36,7 @@ export default async function DashboardPage() {
           <a className="active">Overview</a>
           <a href="/dashboard/management-review">Management review</a>
           <a href="/dashboard/quarterly-business-review">Quarterly review</a>
+          <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           <a href="/dashboard/guide">How to use (work instruction)</a>
         </div>
