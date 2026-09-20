@@ -1,0 +1,132 @@
+{
+  "metrics": {
+    "qualityScore": 87,
+    "qualityScoreChange": "6%",
+    "compliantProducts": 94,
+    "compliantProductsChange": "2.4%",
+    "openActions": 12,
+    "actionsDue": 3
+  },
+  "actions": [
+    {
+      "level": "High",
+      "title": "Supplier COA missing",
+      "detail": "Northstar Labs · Batch 4021",
+      "due": "Today"
+    },
+    {
+      "level": "Medium",
+      "title": "EU packaging claim review",
+      "detail": "Regulatory · Cosmetics",
+      "due": "Sep 19"
+    },
+    {
+      "level": "Low",
+      "title": "Annual material declaration",
+      "detail": "Atlas Packaging · 2026",
+      "due": "Sep 24"
+    }
+  ],
+  "trend": [72, 70, 76, 74, 82, 80, 87],
+  "weeklyDigest": {
+    "headline": "Quality score climbed 6% this week.",
+    "summary": "Three suppliers cleared open corrective actions and one EU labeling risk was resolved before its deadline.",
+    "bullets": [
+      "Northstar Labs closed 2 of 3 open COA requests",
+      "Atlas Packaging submitted its 2026 material declaration early",
+      "No new critical regulatory alerts in the last 7 days"
+    ]
+  },
+  "supplierRisk": [
+    {
+      "name": "Northstar Labs",
+      "category": "Raw materials",
+      "score": 82,
+      "trend": "up",
+      "note": "1 open COA request, due in 2 days"
+    },
+    {
+      "name": "Atlas Packaging",
+      "category": "Packaging",
+      "score": 91,
+      "trend": "up",
+      "note": "Fully compliant, next audit in 90 days"
+    },
+    {
+      "name": "Cedarline Ingredients",
+      "category": "Raw materials",
+      "score": 64,
+      "trend": "down",
+      "note": "Missed last 2 certificate renewals"
+    },
+    {
+      "name": "Brightform Co-Pack",
+      "category": "Manufacturing",
+      "score": 77,
+      "trend": "flat",
+      "note": "Minor labeling deviation under review"
+    }
+  ],
+  "regulatoryWatch": [
+    {
+      "jurisdiction": "EU",
+      "title": "Cosmetics packaging claim substantiation update",
+      "impact": "High",
+      "effectiveDate": "2026-11-01",
+      "summary": "New evidentiary standard for 'clean' and 'natural' packaging claims affects 3 active SKUs."
+    },
+    {
+      "jurisdiction": "US · FDA",
+      "title": "Annual material declaration cycle opens",
+      "impact": "Medium",
+      "effectiveDate": "2026-12-15",
+      "summary": "Renewal window for facility material declarations; Atlas Packaging already filed."
+    },
+    {
+      "jurisdiction": "CA · Health Canada",
+      "title": "Updated allergen labeling guidance",
+      "impact": "Medium",
+      "effectiveDate": "2027-01-10",
+      "summary": "Cross-contact disclosure language guidance affects co-packed SKUs at Brightform."
+    },
+    {
+      "jurisdiction": "UK",
+      "title": "Post-market surveillance reporting window",
+      "impact": "Low",
+      "effectiveDate": "2027-02-01",
+      "summary": "No open findings; informational filing only."
+    }
+  ],
+  "licenseRecords": [
+    {
+      "company": "Northstar Labs",
+      "documentName": "FDA Food Facility Registration",
+      "documentType": "License",
+      "jurisdiction": "US · FDA",
+      "licenseNumber": "FFR-8821",
+      "expiresOn": "2026-10-14",
+      "renewalLeadDays": 90,
+      "status": "Renewal due"
+    },
+    {
+      "company": "Atlas Packaging",
+      "documentName": "ISO 9001:2015 Certificate",
+      "documentType": "Certification",
+      "jurisdiction": "Global · ISO",
+      "licenseNumber": "ISO-9001-4450",
+      "expiresOn": "2026-11-30",
+      "renewalLeadDays": 90,
+      "status": "Expiring soon"
+    },
+    {
+      "company": "Brightform Co-Pack",
+      "documentName": "State Food Processing License",
+      "documentType": "License",
+      "jurisdiction": "California",
+      "licenseNumber": "CA-FPL-29384",
+      "expiresOn": "2027-03-31",
+      "renewalLeadDays": 60,
+      "status": "Current"
+    }
+  ]
+}
