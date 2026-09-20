@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getDashboardData } from "../../../lib/dashboard-data";
-import { getThinkificAccess } from "../../../lib/thinkific-entitlements";
+import { getDgqiPlan } from "../../../lib/dgqi-entitlements";
 import { getLicenseAlertMetadata } from "../../../lib/license-alerts";
 import { EmailAlertPreference } from "./email-alert-preference";
 
@@ -11,14 +11,7 @@ function statusClass(status: "Current" | "Renewal due" | "Expiring soon") {
 
 export default async function LicensesPage() {
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const access = email ? await getThinkificAccess(email) : { status: "error" as const, email: "" };
-
-  if (access.status !== "active") {
-    redirect("/dashboard");
-  }
-
-  if (access.plan !== "most-good") {
+  if (getDgqiPlan(user) !== "most-good") {
     redirect("/checkout?plan=most-good");
   }
 

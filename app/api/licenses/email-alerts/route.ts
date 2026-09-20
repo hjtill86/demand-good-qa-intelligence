@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getLicenseAlertMetadata, setLicenseAlertEmailPreference } from "../../../../lib/license-alerts";
-import { getThinkificAccess } from "../../../../lib/thinkific-entitlements";
+import { getDgqiPlan } from "../../../../lib/dgqi-entitlements";
 
 export async function PUT(request: Request) {
   const { userId } = await auth();
@@ -22,8 +22,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "A primary email address is required." }, { status: 400 });
   }
 
-  const access = await getThinkificAccess(email);
-  if (access.status !== "active" || access.plan !== "most-good") {
+  if (getDgqiPlan(user) !== "most-good") {
     return NextResponse.json({ error: "Email license alerts are available to Most Good members only." }, { status: 403 });
   }
 

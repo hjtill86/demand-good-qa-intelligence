@@ -22,14 +22,9 @@ renewals. It applies to every Demand Good QA Intelligence subscriber.
 ## 2. Signing in
 
 1. Go to the Demand Good QA Intelligence site and select **Member login**.
-2. Sign in (or create an account) using the **same email address** you used to
-   purchase your Thinkific membership/subscription.
-3. The dashboard checks that email against Thinkific for an active
-   enrollment. If it isn't found, you'll see a "Connect your membership"
-   screen — confirm you purchased a plan and are using the matching email,
-   then try again.
-4. Once verified, you land on the **Overview** dashboard automatically. Thinkific
-   verifies the membership; the DGQI app is where you work.
+2. Sign in (or create an account) with your DGQI account.
+3. DGQI authenticates you through Clerk and keeps you in the DGQI app.
+4. Once signed in, you land on the **Overview** dashboard automatically.
 
 ## 3. Reading the Overview dashboard
 

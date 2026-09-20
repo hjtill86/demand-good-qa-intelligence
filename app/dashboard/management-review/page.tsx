@@ -1,18 +1,9 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { getDashboardData } from "../../../lib/dashboard-data";
-import { getThinkificAccess } from "../../../lib/thinkific-entitlements";
 import { PrintButton } from "../report/print-button";
 
 export default async function ManagementReviewPage() {
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const access = email ? await getThinkificAccess(email) : { status: "error" as const, email: "" };
-
-  if (access.status !== "active") {
-    redirect("/dashboard");
-  }
-
   const { metrics, actions, weeklyDigest } = await getDashboardData();
   const reviewDate = new Date().toLocaleDateString(undefined, {
     year: "numeric",

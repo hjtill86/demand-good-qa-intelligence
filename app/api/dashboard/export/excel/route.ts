@@ -2,19 +2,12 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import ExcelJS from "exceljs";
 import { getDashboardData } from "../../../../../lib/dashboard-data";
-import { getThinkificAccess } from "../../../../../lib/thinkific-entitlements";
+import { getDgqiPlan } from "../../../../../lib/dgqi-entitlements";
 import { getRegulatoryWatchFeed } from "../../../../../lib/regulatory-feed";
 
 export async function GET() {
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const access = email ? await getThinkificAccess(email) : { status: "error" as const, email: "" };
-
-  if (access.status !== "active") {
-    return NextResponse.json({ error: "An active membership is required to export the dashboard." }, { status: 403 });
-  }
-
-  const hasMostGood = access.plan === "most-good";
+  const hasMostGood = getDgqiPlan(user) === "most-good";
   const {
     metrics,
     actions,

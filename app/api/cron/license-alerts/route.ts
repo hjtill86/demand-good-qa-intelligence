@@ -8,7 +8,6 @@ import {
   markLicenseAlertsSent,
   sendLicenseAlertEmail,
 } from "../../../../lib/license-alerts";
-import { getThinkificAccess } from "../../../../lib/thinkific-entitlements";
 
 export async function GET(request: Request) {
   const authorization = request.headers.get("authorization");
@@ -33,8 +32,7 @@ export async function GET(request: Request) {
       continue;
     }
 
-    const access = await getThinkificAccess(email);
-    if (access.status !== "active" || access.plan !== "most-good") {
+    if (user.publicMetadata?.dgqiPlan !== "most-good") {
       skipped++;
       continue;
     }

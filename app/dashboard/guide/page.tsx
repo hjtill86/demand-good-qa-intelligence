@@ -1,18 +1,10 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { getThinkificAccess } from "../../../lib/thinkific-entitlements";
+import { getDgqiPlan } from "../../../lib/dgqi-entitlements";
 import { PrintButton } from "../report/print-button";
 
 export default async function WorkInstructionsPage() {
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const access = email ? await getThinkificAccess(email) : { status: "error" as const, email: "" };
-
-  if (access.status !== "active") {
-    redirect("/dashboard");
-  }
-
-  const hasMostGood = access.plan === "most-good";
+  const hasMostGood = getDgqiPlan(user) === "most-good";
 
   return (
     <main className="report-page">
@@ -39,13 +31,9 @@ export default async function WorkInstructionsPage() {
         <h2>2. Signing in</h2>
         <ol className="wi-steps">
           <li>Go to the Demand Good QA Intelligence site and select <b>Member login</b>.</li>
-          <li>Sign in or create an account using the <b>same email address</b> used for your Thinkific membership purchase.</li>
-          <li>
-            The dashboard checks that email against Thinkific for an active enrollment. If it is not found,
-            you will see a &quot;Connect your membership&quot; screen — confirm you purchased a plan and are
-            using the matching email, then try again.
-          </li>
-          <li>Once verified, you land on the <b>Overview</b> dashboard automatically. Thinkific is used to verify your membership; the DGQI app is where you work.</li>
+          <li>Sign in or create an account with your DGQI account.</li>
+          <li>Your authenticated DGQI account opens the workspace.</li>
+          <li>You land on the <b>Overview</b> dashboard automatically. The DGQI app is where you work.</li>
         </ol>
       </section>
 

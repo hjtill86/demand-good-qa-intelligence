@@ -1,20 +1,13 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { getDashboardData } from "../../../lib/dashboard-data";
-import { getThinkificAccess } from "../../../lib/thinkific-entitlements";
+import { getDgqiPlan } from "../../../lib/dgqi-entitlements";
 import { getRegulatoryWatchFeed } from "../../../lib/regulatory-feed";
 import { PrintButton } from "./print-button";
 
 export default async function DashboardReportPage() {
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const access = email ? await getThinkificAccess(email) : { status: "error" as const, email: "" };
-
-  if (access.status !== "active") {
-    redirect("/dashboard");
-  }
-
-  const hasMostGood = access.plan === "most-good";
+  const email = user?.primaryEmailAddress?.emailAddress ?? "your DGQI account";
+  const hasMostGood = getDgqiPlan(user) === "most-good";
   const {
     metrics,
     actions,
