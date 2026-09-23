@@ -4,29 +4,31 @@
  "description": "My Node.js app on Railway",
  "main": "index.js",
  "scripts": {
- "dev": "next dev",
- "build": "next build",
- "start": "next start"
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
  },
  "dependencies": {
- "express": "^4.19.2",
- "@clerk/nextjs": "^7.9.4",
- "@supabase/supabase-js": "^2.116.0",
- "exceljs": "^4.4.0",
- "fast-xml-parser": "^5.11.1",
- "next": "^16.3.5",
- "pg": "^8.23.0",
- "react": "18.3.1",
- "react-dom": "18.3.1",
- "resend": "^6.28.1",
- "stripe": "^22.6.2"
+  "@clerk/nextjs": "^7.9.4",
+  "@supabase/supabase-js": "^2.116.0",
+  "exceljs": "^4.4.0",
+  "express": "^4.19.2",
+  "fast-xml-parser": "^5.11.1",
+  "ls": "^1.0.0",
+  "next": "^16.3.5",
+  "pg": "^8.23.0",
+  "react": "18.3.1",
+  "react-dom": "18.3.1",
+  "resend": "^6.28.1",
+  "stripe": "^22.6.2"
  },
  "devDependencies": {
- "@types/node": "^20.14.12",
- "@types/react": "^18.3.3",
- "@types/react-dom": "^18.3.0",
- "eslint": "^9.0.0",
- "eslint-config-next": "^16.3.5",
- "typescript": "^5.5.4"
+  "@types/node": "^20.14.12",
+  "@types/react": "^18.3.3",
+  "@types/react-dom": "^18.3.0",
+  "eslint": "^9.0.0",
+  "eslint-config-next": "^16.3.5",
+  "typescript": "^5.5.4",
+  "webpack-cli": "^7.2.3"
  }
 }
