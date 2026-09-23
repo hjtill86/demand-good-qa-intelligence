@@ -4,14 +4,13 @@
   "description": "My Node.js app on Railway",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-  }
-    "engines": {
+    "start": "node index.js"
+  },
+  "engines": {
     "node": "20.x"
   },
   "dependencies": {
-    "express": "^4.19.2"
-  }
+    "express": "^4.19.2",
     "@clerk/nextjs": "^7.9.4",
     "@supabase/supabase-js": "^2.116.0",
     "exceljs": "^4.4.0",
@@ -31,3 +30,4 @@
     "eslint-config-next": "^16.3.5",
     "typescript": "^5.5.4"
   }
+}
