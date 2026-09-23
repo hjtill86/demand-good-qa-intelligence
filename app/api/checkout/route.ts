@@ -1,25 +1,15 @@
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
 import { Client } from "pg";
 
+// Initialize PG client
 const client = new Client({
   connectionString: process.env.PG_URL,
 });
 
 await client.connect();
 
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import { Client } from "pg";   // ← Your new import
-
-const client = new Client({
-  connectionString: process.env.PG_URL,
-});
-
-await client.connect();   // ← Required
-
-export async function POST(req: Request) {
-  // your existing checkout logic here
-}
-
+export async function POST(request: Request) {
   let body: { plan?: string; utm_source?: string; utm_campaign?: string; agreedToTerms?: string } = {};
 
   try {
@@ -104,17 +94,11 @@ export async function POST(req: Request) {
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/checkout?plan=${planConfig.key}`,
       integration_identifier: `demand-good-qa-${suffix}`,
-      // Prefill/lock the email when the customer is already signed in with
-      // Clerk so the Stripe purchase and Thinkific fulfillment resolve to the
-      // exact same account without asking them to retype it.
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       metadata: {
         plan: planConfig.key,
         terms_accepted_at: new Date().toISOString(),
         ...(user?.id ? { clerk_user_id: user.id } : {}),
-        // Referral source, e.g. "thinkific", when the customer clicked in
-        // from a banner/link on courses.demandgoodqa.com. Lets you see
-        // Thinkific-driven subscription conversions in the Stripe dashboard.
         ...(body.utm_source ? { utm_source: body.utm_source } : {}),
         ...(body.utm_campaign ? { utm_campaign: body.utm_campaign } : {}),
       },
@@ -136,3 +120,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
