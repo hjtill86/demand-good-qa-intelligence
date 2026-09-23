@@ -1,3 +1,8 @@
+import { Client } from "pg";
+
+const client = new Client({
+  connectionString: process.env.PG_URL,
+});
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { currentUser } from "@clerk/nextjs/server";
