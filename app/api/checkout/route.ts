@@ -8,10 +8,18 @@ await client.connect();
 
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { currentUser } from "@clerk/nextjs/server";
-import { getStripePlanConfig, getStripeStatus } from "../../../lib/integration-config";
+import { Client } from "pg";   // ← Your new import
 
-export async function POST(request: Request) {
+const client = new Client({
+  connectionString: process.env.PG_URL,
+});
+
+await client.connect();   // ← Required
+
+export async function POST(req: Request) {
+  // your existing checkout logic here
+}
+
   let body: { plan?: string; utm_source?: string; utm_campaign?: string; agreedToTerms?: string } = {};
 
   try {
