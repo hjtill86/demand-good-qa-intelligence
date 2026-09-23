@@ -8,7 +8,6 @@
   "build": "next build",
   "start": "next start"
 }
-,
   "dependencies": {
     "express": "^4.19.2",
     "@clerk/nextjs": "^7.9.4",
