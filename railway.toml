@@ -1,8 +1,5 @@
 [build]
-nixpacksVersion = "latest"
+builder = "nixpacks"
 
 [build.nixpacks]
-providers = ["nodejs-pnpm"]
-
-[build.nixpacks.variables]
-NODE_VERSION = "20"
+providers = ["nodejs"]
