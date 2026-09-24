@@ -1,0 +1,17 @@
+{
+  "name": "Demand Good QA Intelligence",
+  "install": "bash .cursor/install.sh",
+  "terminals": [
+    {
+      "name": "next-dev",
+      "command": "npm run dev",
+      "description": "Next.js 16 dev server on http://localhost:3000 (home, /login, /checkout, and the Clerk-gated /dashboard)."
+    }
+  ],
+  "ports": [
+    {
+      "name": "web",
+      "port": 3000
+    }
+  ]
+}
