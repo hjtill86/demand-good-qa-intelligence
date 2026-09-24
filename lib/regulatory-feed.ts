@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import { getAllRegulatorySources, type RegulatorySource } from "./regulatory-sources";
+import { getAllRegulatorySources, type RegulatoryCategory, type RegulatorySource } from "./regulatory-sources";
 import type { RiskLevel } from "./dashboard-data";
 
 export type LiveRegulatoryItem = {
@@ -10,6 +10,8 @@ export type LiveRegulatoryItem = {
   publishedAt: string;
   impact: RiskLevel;
   summary: string;
+  category: RegulatoryCategory;
+  sourceLabel: string;
 };
 
 const HIGH_IMPACT_KEYWORDS = ["recall", "warning letter", "safety alert", "outbreak", "emergency", "advisory"];
@@ -44,7 +46,7 @@ function parseFeed(xml: string, source: RegulatorySource): LiveRegulatoryItem[] 
   const atomItems = normalizeEntries(doc?.feed?.entry);
   const items = rssItems.length > 0 ? rssItems : atomItems;
 
-  return items.slice(0, 8).map((item) => {
+  return items.slice(0, 15).map((item) => {
     const title = stripHtml(String(item.title ?? "Untitled update"));
     const linkField = item.link;
     const link =
@@ -66,7 +68,9 @@ function parseFeed(xml: string, source: RegulatorySource): LiveRegulatoryItem[] 
       link,
       publishedAt,
       impact: classifyImpact(`${title} ${description}`),
-      summary: description.slice(0, 220) || `${source.label} update.`,
+      summary: description.slice(0, 180) || `${source.label} update.`,
+      category: source.category,
+      sourceLabel: source.label,
     };
   });
 }
@@ -100,7 +104,7 @@ async function fetchSource(source: RegulatorySource): Promise<LiveRegulatoryItem
  * source do not block the others; if every source fails, returns an empty
  * array so the caller can fall back to mock data.
  */
-export async function getRegulatoryWatchFeed(limit = 12): Promise<LiveRegulatoryItem[]> {
+export async function getRegulatoryWatchFeed(limit = 40): Promise<LiveRegulatoryItem[]> {
   const sources = getAllRegulatorySources();
   const results = await Promise.all(sources.map(fetchSource));
   return results

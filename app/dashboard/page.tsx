@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   } = await getDashboardData();
   const plan = getDgqiPlan(user);
   const hasMostGood = plan === "most-good";
-  const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed() : [];
+  const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed(8) : [];
   const usingLiveFeed = liveRegulatoryWatch.length > 0;
   const initials = memberName
     .split(" ")
@@ -40,6 +40,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/validation">Validation suite</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
+          {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
           <a href="/dashboard/guide">How to use (work instruction)</a>
         </div>
         <div className="side-bottom">
@@ -210,7 +211,7 @@ export default async function DashboardPage() {
                     <span className="eyebrow">MOST GOOD · FDA · CDC · CMS · DHS · TJC</span>
                     <h3>Regulatory watch{usingLiveFeed ? " (live)" : ""}</h3>
                   </div>
-                  <a href="/dashboard/report">View full feed →</a>
+                  <a href="/dashboard/regulatory">Open full RSS radar →</a>
                 </div>
                 {!usingLiveFeed ? (
                   <p className="fine-print" style={{ margin: "0 0 8px" }}>

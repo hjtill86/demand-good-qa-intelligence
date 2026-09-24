@@ -171,6 +171,7 @@ export default function Home() {
             <p>Deeper context, shared accountability, and the confidence to scale.</p>
             <ul>
               <li>Everything in Foundation, including the validation suite</li>
+              <li>Live RSS regulatory radar</li>
               <li>Supplier risk intelligence</li>
               <li>Unlimited team members</li>
             </ul>
