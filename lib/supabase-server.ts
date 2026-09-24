@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
+import { isClerkConfigured } from "./clerk-config";
 
 export function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,6 +10,7 @@ export function getSupabaseAdmin() {
 }
 
 export async function getDataScope() {
+  if (!isClerkConfigured()) return null;
   const { userId, orgId } = await auth();
   if (!userId) return null;
   return { userId, organizationId: orgId ?? `user:${userId}` };

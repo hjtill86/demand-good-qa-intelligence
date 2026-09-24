@@ -1,6 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { isClerkConfigured } from "../../../lib/clerk-config";
 import { getStripePlanConfig, getStripeStatus } from "../../../lib/integration-config";
 
 export async function POST(request: Request) {
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
     const suffix = Math.random().toString(36).slice(2, 10);
-    const user = await currentUser();
+    const user = isClerkConfigured() ? await currentUser() : null;
     const customerEmail = user?.primaryEmailAddress?.emailAddress;
 
     const session = await stripe.checkout.sessions.create({
