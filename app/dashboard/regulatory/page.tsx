@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getDgqiPlan } from "../../../lib/dgqi-entitlements";
-import { getRegulatoryWatchFeed } from "../../../lib/regulatory-feed";
+import { getRegulatoryRadarPayload } from "../../../lib/regulatory-feed";
 import { RegulatoryRadar } from "./regulatory-radar";
 
 export default async function RegulatoryRadarPage() {
@@ -10,7 +10,7 @@ export default async function RegulatoryRadarPage() {
     redirect("/checkout?plan=most-good");
   }
 
-  const items = await getRegulatoryWatchFeed(48);
+  const { items, extraSources } = await getRegulatoryRadarPayload(48);
 
   return (
     <main className="report-page">
@@ -27,7 +27,7 @@ export default async function RegulatoryRadarPage() {
       {items.length === 0 ? (
         <p className="loader">Live agency feeds were unavailable when this page loaded. Try again shortly.</p>
       ) : (
-        <RegulatoryRadar items={items} />
+        <RegulatoryRadar items={items} extraSources={extraSources} />
       )}
     </main>
   );

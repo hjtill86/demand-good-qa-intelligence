@@ -1,5 +1,12 @@
 import { XMLParser } from "fast-xml-parser";
-import { getAllRegulatorySources, type RegulatoryCategory, type RegulatorySource } from "./regulatory-sources";
+import {
+  getAllRegulatorySources,
+  getExtraRegulatorySources,
+  laneForCategory,
+  type RegulatoryCategory,
+  type RegulatoryLane,
+  type RegulatorySource,
+} from "./regulatory-sources";
 import type { RiskLevel } from "./dashboard-data";
 
 export type LiveRegulatoryItem = {
@@ -11,7 +18,9 @@ export type LiveRegulatoryItem = {
   impact: RiskLevel;
   summary: string;
   category: RegulatoryCategory;
+  lane: RegulatoryLane;
   sourceLabel: string;
+  injected: boolean;
 };
 
 const HIGH_IMPACT_KEYWORDS = ["recall", "warning letter", "safety alert", "outbreak", "emergency", "advisory"];
@@ -70,7 +79,9 @@ function parseFeed(xml: string, source: RegulatorySource): LiveRegulatoryItem[] 
       impact: classifyImpact(`${title} ${description}`),
       summary: description.slice(0, 180) || `${source.label} update.`,
       category: source.category,
+      lane: laneForCategory(source.category),
       sourceLabel: source.label,
+      injected: Boolean(source.injected),
     };
   });
 }
@@ -112,4 +123,13 @@ export async function getRegulatoryWatchFeed(limit = 40): Promise<LiveRegulatory
     .flat()
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
     .slice(0, limit);
+}
+
+export async function getRegulatoryRadarPayload(limit = 48) {
+  const extraSources = getExtraRegulatorySources();
+  const items = await getRegulatoryWatchFeed(limit);
+  return {
+    items,
+    extraSources: extraSources.map((source) => ({ label: source.label, agency: source.agency })),
+  };
 }

@@ -115,7 +115,8 @@ export default async function DashboardReportPage() {
               Automatically monitored: FDA (including MedWatch), CDC, NIH, WHO, CMS, DHS, The Joint
               Commission, and NABP. Most state boards of pharmacy do not publish a standalone RSS feed;
               state coverage uses NABP news, selected state government health portals, and FDA MedWatch.
-              Additional state-portal feeds can be added with <code>REGULATORY_EXTRA_FEEDS</code>.
+              Additional state-portal feeds in <code>REGULATORY_EXTRA_FEEDS</code> are merged with the
+              baseline registry at runtime.
               Impact levels are an automated keyword estimate, not a formal regulatory determination.
             </p>
             <table className="report-table">

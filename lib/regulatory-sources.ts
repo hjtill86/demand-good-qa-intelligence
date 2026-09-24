@@ -1,4 +1,5 @@
 export type RegulatoryCategory = "fda" | "cdc" | "who" | "state" | "other";
+export type RegulatoryLane = "federal" | "state";
 
 export type RegulatorySource = {
   agency: string;
@@ -6,7 +7,14 @@ export type RegulatorySource = {
   label: string;
   feedUrl: string;
   category: RegulatoryCategory;
+  injected?: boolean;
 };
+
+const CATEGORIES = new Set<RegulatoryCategory>(["fda", "cdc", "who", "state", "other"]);
+
+export function laneForCategory(category: RegulatoryCategory): RegulatoryLane {
+  return category === "state" ? "state" : "federal";
+}
 
 /**
  * Public RSS/Atom feeds that are automatically polled to build the live
@@ -115,13 +123,39 @@ export const builtInRegulatorySources: RegulatorySource[] = [
 ];
 
 /**
- * Optional additional feeds via REGULATORY_EXTRA_FEEDS (JSON array). Use this
- * for a specific state health-department or professional-regulation portal
- * that does syndicate RSS. Most state boards of pharmacy do not publish a
- * dedicated pharmacy-only XML feed.
+ * Optional additional feeds via REGULATORY_EXTRA_FEEDS (JSON array), merged
+ * with built-in sources at request time. Accepts either the app schema
+ * (agency, label, feedUrl, category) or the compact injection schema
+ * (name, url, cat). Extra entries default to the state lane.
  *
  *   REGULATORY_EXTRA_FEEDS=[{"agency":"State portal","jurisdiction":"US · XX","label":"State health RSS","feedUrl":"https://example.gov/rss.xml","category":"state"}]
+ *   REGULATORY_EXTRA_FEEDS=[{"name":"CA Dept of Health","cat":"state","url":"https://www.cdph.ca.gov/rss.xml"}]
  */
+function normalizeCategory(value: unknown): RegulatoryCategory {
+  const raw = String(value ?? "state").toLowerCase();
+  if (raw === "federal") return "other";
+  if (CATEGORIES.has(raw as RegulatoryCategory)) return raw as RegulatoryCategory;
+  return "state";
+}
+
+function normalizeExtraSource(item: unknown): RegulatorySource | null {
+  if (!item || typeof item !== "object") return null;
+  const raw = item as Record<string, unknown>;
+  const feedUrl = String(raw.feedUrl ?? raw.url ?? "").trim();
+  const label = String(raw.label ?? raw.name ?? "").trim();
+  const agency = String(raw.agency ?? raw.name ?? label).trim();
+  if (!feedUrl || !agency) return null;
+
+  return {
+    agency,
+    jurisdiction: String(raw.jurisdiction ?? "US · State portal").trim() || "US · State portal",
+    label: label || agency,
+    feedUrl,
+    category: normalizeCategory(raw.category ?? raw.cat),
+    injected: true,
+  };
+}
+
 export function getExtraRegulatorySources(): RegulatorySource[] {
   const raw = process.env.REGULATORY_EXTRA_FEEDS;
   if (!raw) {
@@ -133,19 +167,7 @@ export function getExtraRegulatorySources(): RegulatorySource[] {
     if (!Array.isArray(parsed)) {
       return [];
     }
-    return parsed.filter((item): item is RegulatorySource => {
-      if (!item || typeof item !== "object") return false;
-      const source = item as RegulatorySource;
-      return (
-        typeof source.agency === "string" &&
-        typeof source.jurisdiction === "string" &&
-        typeof source.label === "string" &&
-        typeof source.feedUrl === "string"
-      );
-    }).map((source) => ({
-      ...source,
-      category: source.category ?? "state",
-    }));
+    return parsed.map(normalizeExtraSource).filter((source): source is RegulatorySource => Boolean(source));
   } catch (error) {
     console.error("Failed to parse REGULATORY_EXTRA_FEEDS", error);
     return [];
@@ -153,5 +175,12 @@ export function getExtraRegulatorySources(): RegulatorySource[] {
 }
 
 export function getAllRegulatorySources(): RegulatorySource[] {
-  return [...builtInRegulatorySources, ...getExtraRegulatorySources()];
+  const extra = getExtraRegulatorySources();
+  const seen = new Set(builtInRegulatorySources.map((source) => source.feedUrl));
+  const uniqueExtra = extra.filter((source) => {
+    if (seen.has(source.feedUrl)) return false;
+    seen.add(source.feedUrl);
+    return true;
+  });
+  return builtInRegulatorySources.concat(uniqueExtra);
 }
