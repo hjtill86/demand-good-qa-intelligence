@@ -37,6 +37,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/management-review">Management review</a>
           <a href="/dashboard/quarterly-business-review">Quarterly review</a>
           <a href="/dashboard/fmea">FMEA generator</a>
+          <a href="/dashboard/validation">Validation suite</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           <a href="/dashboard/guide">How to use (work instruction)</a>
@@ -151,6 +152,12 @@ export default async function DashboardPage() {
               <h3>FMEA risk generator</h3>
               <p>Prioritize failure modes with severity, occurrence, detection, and an automatic Risk Priority Number.</p>
               <b>Open generator →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/validation">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Validation control center</h3>
+              <p>Compile IQ/OQ/PQ protocols and track first-pass yield, deviations, and execution results.</p>
+              <b>Open suite →</b>
             </a>
             <a className="generator-card" href="/dashboard/guide">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>

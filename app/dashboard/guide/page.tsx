@@ -76,10 +76,20 @@ export default async function WorkInstructionsPage() {
         <p className="fine-print">Available on both Foundation and Most Good.</p>
       </section>
 
+      <section className="report-section">
+        <h2>6. Using the Validation Control Center</h2>
+        <ol className="wi-steps">
+          <li>From the sidebar or Overview, select <b>Validation suite</b>.</li>
+          <li>On <b>IQ/OQ/PQ generator</b>, enter the system name, choose IQ, OQ, or PQ, describe the test objective, then compile the protocol.</li>
+          <li>Use <b>Validation KPI tracker</b> to log pass/fail execution against a protocol reference and review first-pass yield and open deviations.</li>
+        </ol>
+        <p className="fine-print">Available on both Foundation and Most Good.</p>
+      </section>
+
       {hasMostGood ? (
         <>
           <section className="report-section">
-            <h2>6. Using the License &amp; Certification Vault (Most Good)</h2>
+            <h2>7. Using the License &amp; Certification Vault (Most Good)</h2>
             <ol className="wi-steps">
               <li>Select <b>License vault</b> from the sidebar to see every tracked company license and certification, its jurisdiction, reference number, expiration date, and status.</li>
               <li>Each record has a renewal alert lead time of 30, 60, or 90 days. When a license enters that window, it is flagged <b>Renewal due</b> or <b>Expiring soon</b> and appears in the Overview dashboard&apos;s alert card automatically — no manual check required.</li>
@@ -89,7 +99,7 @@ export default async function WorkInstructionsPage() {
           </section>
 
           <section className="report-section">
-            <h2>7. Reading the Regulatory Watch feed (Most Good)</h2>
+            <h2>8. Reading the Regulatory Watch feed (Most Good)</h2>
             <p>
               This feed is refreshed automatically about once an hour from FDA, CDC, CMS, Federal DHS, and
               The Joint Commission — you do not need to check agency websites yourself. Each item shows the
@@ -101,10 +111,10 @@ export default async function WorkInstructionsPage() {
         </>
       ) : (
         <section className="report-section upsell-card">
-          <h2>6. Unlock Most Good</h2>
+          <h2>7. Unlock Most Good</h2>
           <p>
-            Foundation includes your scorecard, trend, open actions, weekly digest, and both review
-            generators. Upgrading to <b>Most Good</b> adds Supplier Risk Intelligence, the License &amp;
+            Foundation includes your scorecard, trend, open actions, weekly digest, review generators,
+            FMEA, and the Validation Control Center. Upgrading to <b>Most Good</b> adds Supplier Risk Intelligence, the License &amp;
             Certification Vault with renewal alerts, and the live multi-agency Regulatory Watch feed.
           </p>
           <a className="button button-dark" href="/checkout?plan=most-good">Upgrade to Most Good <span>→</span></a>
@@ -112,7 +122,7 @@ export default async function WorkInstructionsPage() {
       )}
 
       <section className="report-section">
-        <h2>{hasMostGood ? "8" : "7"}. Exporting your data</h2>
+        <h2>{hasMostGood ? "9" : "8"}. Exporting your data</h2>
         <p>
           Use <b>Export Excel</b> on the Overview dashboard for a workbook of your metrics, actions, and
           weekly digest (plus Supplier Risk, License Vault, and Regulatory Watch sheets on Most Good). Use
@@ -121,7 +131,7 @@ export default async function WorkInstructionsPage() {
       </section>
 
       <section className="report-section">
-        <h2>{hasMostGood ? "9" : "8"}. Getting help</h2>
+        <h2>{hasMostGood ? "10" : "9"}. Getting help</h2>
         <p>
           If your membership is not recognized, verify you signed in with the email used at checkout, then
           contact support from the Demand Good QA Intelligence site. This work instruction is generated from

@@ -154,7 +154,7 @@ export default function Home() {
             <p>One clear view of the quality signals that keep your team moving.</p>
             <ul>
               <li>Quality intelligence dashboard</li>
-              <li>Regulatory signal tracking</li>
+              <li>IQ/OQ/PQ validation suite</li>
               <li>Weekly decision digest</li>
             </ul>
             <Link className="button button-outline" href="/checkout?plan=foundation">
@@ -170,7 +170,7 @@ export default function Home() {
             </div>
             <p>Deeper context, shared accountability, and the confidence to scale.</p>
             <ul>
-              <li>Everything in Foundation</li>
+              <li>Everything in Foundation, including the validation suite</li>
               <li>Supplier risk intelligence</li>
               <li>Unlimited team members</li>
             </ul>
