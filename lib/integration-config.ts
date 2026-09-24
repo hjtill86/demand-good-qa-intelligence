@@ -3,14 +3,14 @@ import crypto from "node:crypto";
 export const stripePlans = {
   foundation: {
     label: "Foundation",
-    amount: 149,
+    amount: 300,
     cadence: "month",
     priceEnvVar: "STRIPE_FOUNDATION_PRICE_ID",
     thinkificCourseEnvVar: "THINKIFIC_FOUNDATION_COURSE_ID",
   },
   "most-good": {
     label: "Most Good",
-    amount: 399,
+    amount: 500,
     cadence: "month",
     priceEnvVar: "STRIPE_MOST_GOOD_PRICE_ID",
     thinkificCourseEnvVar: "THINKIFIC_MOST_GOOD_COURSE_ID",

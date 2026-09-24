@@ -20,7 +20,7 @@ export default async function CheckoutPage({
         <div className="eyebrow">BILLING CHECKOUT</div>
         <h1>{selectedPlan?.label ?? "Foundation"}</h1>
         <p>
-          {selectedPlan?.amount ?? 149} USD / {selectedPlan?.cadence ?? "month"}
+          {`$${selectedPlan?.amount.toFixed(2) ?? "300.00"} USD / ${selectedPlan?.cadence ?? "month"}`}
         </p>
 
         <div className="checkout-box">

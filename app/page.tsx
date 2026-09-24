@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "./components/brand-logo";
+import { stripePlans } from "../lib/integration-config";
 
 const features = [
   ["01", "See risk before it ships", "Bring product, supplier, and regulatory signals into one decision-ready view."],
@@ -149,7 +150,7 @@ export default function Home() {
             <span className="tag">FOUNDATION</span>
             <h3>For focused teams</h3>
             <div className="price">
-              $149 <small>/ month</small>
+              ${stripePlans.foundation.amount.toFixed(2)} <small>/ month</small>
             </div>
             <p>One clear view of the quality signals that keep your team moving.</p>
             <ul>
@@ -166,7 +167,7 @@ export default function Home() {
             <span className="tag">MOST GOOD</span>
             <h3>For growing operations</h3>
             <div className="price">
-              $399 <small>/ month</small>
+              ${stripePlans["most-good"].amount.toFixed(2)} <small>/ month</small>
             </div>
             <p>Deeper context, shared accountability, and the confidence to scale.</p>
             <ul>
