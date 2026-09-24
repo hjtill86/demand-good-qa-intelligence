@@ -1,13 +1,7 @@
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { Client } from "pg";
-
-// Initialize PG client
-const client = new Client({
-  connectionString: process.env.PG_URL,
-});
-
-await client.connect();
+import { getStripePlanConfig, getStripeStatus } from "../../../lib/integration-config";
 
 export async function POST(request: Request) {
   let body: { plan?: string; utm_source?: string; utm_campaign?: string; agreedToTerms?: string } = {};
