@@ -29,12 +29,11 @@ export function LegalGate({ children }: { children: React.ReactNode }) {
         </span>
       </label>
       <div className={agreed ? "legal-gated" : "legal-gated locked"} aria-disabled={!agreed}>
-        {children}
-        {!agreed ? (
+        {agreed ? children : (
           <div className="legal-lock">
             <p>Please agree to the Terms and Conditions and Privacy Policy above to continue.</p>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

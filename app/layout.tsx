@@ -11,15 +11,21 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const content = (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-
   if (!isClerkConfigured()) {
-    return content;
+    return (
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    );
   }
 
-  return <ClerkProvider publishableKey={getClerkPublishableKey()}>{content}</ClerkProvider>;
+  return (
+    <html lang="en">
+      <body>
+        <ClerkProvider publishableKey={getClerkPublishableKey()} signInUrl="/login" signUpUrl="/login">
+          {children}
+        </ClerkProvider>
+      </body>
+    </html>
+  );
 }
