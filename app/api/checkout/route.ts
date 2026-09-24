@@ -110,7 +110,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Stripe Checkout Session creation failed.", error);
     return NextResponse.json(
-      { error: "Stripe Checkout could not be started. Check the server configuration and Stripe test-mode price IDs." },
+      { error: "Stripe Checkout could not be started. Check the Stripe secret key permissions and live price IDs." },
       { status: 502 }
     );
   }

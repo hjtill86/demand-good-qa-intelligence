@@ -57,14 +57,14 @@ export default async function CheckoutPage({
             </span>
           </label>
           <button type="submit" className="button button-dark full">
-            Start secure checkout preview <span>→</span>
+            Start secure Stripe checkout <span>→</span>
           </button>
         </form>
 
         <p className="fine-print">
           {stripeStatus.configured
-            ? "You will be redirected to Stripe&apos;s secure test checkout. No live charge will be made."
-            : "Configure the server-side Stripe test values before starting checkout."}
+            ? "You will be redirected to Stripe's secure checkout to complete a live monthly subscription."
+            : "Configure the server-side Stripe secret key and price IDs before starting checkout."}
         </p>
 
         <div className="link-row">

@@ -8,7 +8,7 @@ export default function CheckoutSuccessPage() {
         <BrandLogo />
         <div className="eyebrow">CHECKOUT COMPLETE</div>
         <h1>Thank you for joining.</h1>
-        <p>Your test checkout completed successfully. Subscription access will be managed from Stripe webhooks.</p>
+        <p>Your subscription checkout completed successfully. Access is confirmed when Stripe webhooks reach the app.</p>
         <Link className="button button-dark full" href="/login">
           Continue to member login <span>→</span>
         </Link>
