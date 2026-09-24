@@ -14,6 +14,7 @@ export default function Home() {
         <BrandLogo />
         <div className="nav-links">
           <a href="#how-it-works">How it works</a>
+          <Link href="/fmea">FMEA tool</Link>
           <a href="#pricing">Pricing</a>
           <Link href="/login">
             Member login <span>↗</span>

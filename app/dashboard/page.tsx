@@ -36,6 +36,7 @@ export default async function DashboardPage() {
           <a className="active">Overview</a>
           <a href="/dashboard/management-review">Management review</a>
           <a href="/dashboard/quarterly-business-review">Quarterly review</a>
+          <a href="/dashboard/fmea">FMEA generator</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           <a href="/dashboard/guide">How to use (work instruction)</a>
@@ -144,6 +145,12 @@ export default async function DashboardPage() {
               <h3>Quarterly business review generator</h3>
               <p>Create an executive-ready quarterly snapshot of performance, commitments, and supplier trends.</p>
               <b>Generate review →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/fmea">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>FMEA risk generator</h3>
+              <p>Prioritize failure modes with severity, occurrence, detection, and an automatic Risk Priority Number.</p>
+              <b>Open generator →</b>
             </a>
             <a className="generator-card" href="/dashboard/guide">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
