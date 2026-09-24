@@ -99,8 +99,9 @@ async function fetchSource(source: RegulatorySource): Promise<LiveRegulatoryItem
 
 /**
  * Automatically aggregates the live Regulatory Watch feed from every
- * configured agency source (FDA, CDC, CMS, DHS, TJC by default, plus any
- * state-specific feeds added via REGULATORY_EXTRA_FEEDS). Failures in one
+ * configured agency source (FDA including MedWatch, CDC, NIH, WHO, CMS, DHS,
+ * TJC, NABP, and selected state government portals, plus any extra feeds via
+ * REGULATORY_EXTRA_FEEDS). Failures in one
  * source do not block the others; if every source fails, returns an empty
  * array so the caller can fall back to mock data.
  */

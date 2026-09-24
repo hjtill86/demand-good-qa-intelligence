@@ -112,11 +112,11 @@ export default async function DashboardReportPage() {
           <section className="report-section">
             <h2>Regulatory watch{usingLiveFeed ? " — live feed" : " — sample data"}</h2>
             <p className="fine-print">
-              Automatically monitored: FDA, CDC, CMS, Federal DHS, and The Joint Commission. ISO and
-              state-specific agencies (State Departments of Health, State Boards of Pharmacy) require
-              adding their feed URLs via the <code>REGULATORY_EXTRA_FEEDS</code> environment variable,
-              since no single public feed covers every state. Impact levels are an automated keyword
-              estimate, not a formal regulatory determination.
+              Automatically monitored: FDA (including MedWatch), CDC, NIH, WHO, CMS, DHS, The Joint
+              Commission, and NABP. Most state boards of pharmacy do not publish a standalone RSS feed;
+              state coverage uses NABP news, selected state government health portals, and FDA MedWatch.
+              Additional state-portal feeds can be added with <code>REGULATORY_EXTRA_FEEDS</code>.
+              Impact levels are an automated keyword estimate, not a formal regulatory determination.
             </p>
             <table className="report-table">
               <thead><tr><th>Agency/Jurisdiction</th><th>Title</th><th>Impact</th><th>Date</th><th>Summary</th></tr></thead>

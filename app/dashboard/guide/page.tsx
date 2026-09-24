@@ -101,12 +101,14 @@ export default async function WorkInstructionsPage() {
           <section className="report-section">
             <h2>8. Reading the Regulatory Watch feed (Most Good)</h2>
             <p>
-              This feed is refreshed automatically about once an hour from official FDA, CDC, NIH, WHO,
-              CMS, DHS, and Joint Commission RSS feeds — plus any state Department of Health feeds you
-              configure. Open <b>Regulatory radar</b> from the sidebar to filter by FDA, CDC/NIH, WHO,
-              or state boards. Each item shows the issuing agency, an impact estimate (High/Medium/Low),
-              and a link to the original notice. Treat the impact rating as a starting point for your
-              own review, not a final regulatory determination.
+              This feed is refreshed automatically about once an hour from official FDA (including
+              MedWatch), CDC, NIH, WHO, CMS, DHS, Joint Commission, and NABP RSS feeds. Most state
+              boards of pharmacy do not publish a dedicated public RSS feed, so state coverage uses
+              NABP news, selected state government / health-department portals, and FDA MedWatch.
+              Open <b>Regulatory radar</b> to filter by FDA, CDC/NIH, WHO, or state portals. Each item
+              shows the issuing agency, an impact estimate (High/Medium/Low), and a link to the original
+              notice. Treat the impact rating as a starting point for your own review, not a final
+              regulatory determination.
             </p>
           </section>
         </>

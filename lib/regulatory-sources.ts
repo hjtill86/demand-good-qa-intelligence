@@ -13,13 +13,12 @@ export type RegulatorySource = {
  * Regulatory Watch feed. These agencies publish machine-readable feeds, so
  * no manual entry is required to keep them current.
  *
- * Coverage note: FDA, CDC, CMS, DHS, and The Joint Commission (TJC) all
- * publish a stable public RSS/Atom feed and are wired up below. ISO does not
- * publish a general-purpose public RSS feed of standard updates, and state
- * Departments of Health / Boards of Pharmacy are run independently per state
- * with no single federal feed — add specific state feed URLs to
- * `getExtraRegulatorySources()` (via the REGULATORY_EXTRA_FEEDS env var) once
- * you know which states you operate in.
+ * Most state boards of pharmacy do not publish a standalone public RSS feed.
+ * State coverage therefore uses centralized alternatives:
+ * NABP news (WordPress RSS), selected state government / health department
+ * portals (for example Indiana), and FDA MedWatch for drug-safety alerts
+ * that affect state practice. Additional state-portal feeds can still be
+ * added via REGULATORY_EXTRA_FEEDS.
  */
 export const builtInRegulatorySources: RegulatorySource[] = [
   {
@@ -42,6 +41,27 @@ export const builtInRegulatorySources: RegulatorySource[] = [
     label: "FDA Food Safety Alerts",
     feedUrl: "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/food/rss.xml",
     category: "fda",
+  },
+  {
+    agency: "FDA",
+    jurisdiction: "US · FDA MedWatch",
+    label: "FDA MedWatch Safety Alerts",
+    feedUrl: "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/medwatch/rss.xml",
+    category: "fda",
+  },
+  {
+    agency: "NABP",
+    jurisdiction: "US · State boards",
+    label: "NABP News & State Board Updates",
+    feedUrl: "https://nabp.pharmacy/feed/",
+    category: "state",
+  },
+  {
+    agency: "IN DOH",
+    jurisdiction: "US · Indiana",
+    label: "Indiana State Government Health News",
+    feedUrl: "https://www.in.gov/health/rss.xml",
+    category: "state",
   },
   {
     agency: "CDC",
@@ -95,15 +115,12 @@ export const builtInRegulatorySources: RegulatorySource[] = [
 ];
 
 /**
- * Optional additional feeds supplied via env, one JSON array per
- * REGULATORY_EXTRA_FEEDS, e.g. to add a specific State Department of Health
- * or State Board of Pharmacy RSS feed once you know your operating states:
+ * Optional additional feeds via REGULATORY_EXTRA_FEEDS (JSON array). Use this
+ * for a specific state health-department or professional-regulation portal
+ * that does syndicate RSS. Most state boards of pharmacy do not publish a
+ * dedicated pharmacy-only XML feed.
  *
- *   REGULATORY_EXTRA_FEEDS=[{"agency":"State DOH","jurisdiction":"US · CA DOH","label":"California DOH Alerts","feedUrl":"https://www.cdph.ca.gov/.../rss.xml"}]
- *
- * ISO does not publish a general public RSS feed; if you have access to an
- * ISO standards-update notification (e.g. via a paid monitoring service),
- * add it the same way.
+ *   REGULATORY_EXTRA_FEEDS=[{"agency":"State portal","jurisdiction":"US · XX","label":"State health RSS","feedUrl":"https://example.gov/rss.xml","category":"state"}]
  */
 export function getExtraRegulatorySources(): RegulatorySource[] {
   const raw = process.env.REGULATORY_EXTRA_FEEDS;

@@ -9,7 +9,7 @@ const filters: { id: "all" | RegulatoryCategory; label: string }[] = [
   { id: "fda", label: "FDA recalls & rules" },
   { id: "cdc", label: "CDC & NIH alerts" },
   { id: "who", label: "WHO bulletins" },
-  { id: "state", label: "State boards & DoH" },
+  { id: "state", label: "State portals & NABP" },
 ];
 
 function badgeClass(category: RegulatoryCategory) {
@@ -22,10 +22,15 @@ function badgeClass(category: RegulatoryCategory) {
 
 export function RegulatoryRadar({ items }: { items: LiveRegulatoryItem[] }) {
   const [filter, setFilter] = useState<(typeof filters)[number]["id"]>("all");
-  const visible = useMemo(
-    () => (filter === "all" ? items : items.filter((item) => item.category === filter)),
-    [filter, items]
-  );
+  const visible = useMemo(() => {
+    if (filter === "all") return items;
+    if (filter === "state") {
+      return items.filter(
+        (item) => item.category === "state" || item.sourceLabel.toLowerCase().includes("medwatch")
+      );
+    }
+    return items.filter((item) => item.category === filter);
+  }, [filter, items]);
 
   return (
     <div>
@@ -42,8 +47,32 @@ export function RegulatoryRadar({ items }: { items: LiveRegulatoryItem[] }) {
         ))}
       </div>
 
+      {filter === "state" ? (
+        <p className="fine-print" style={{ margin: "0 0 16px" }}>
+          Most state boards of pharmacy do not publish a standalone RSS feed. This filter uses
+          centralized sources:{" "}
+          <a href="https://nabp.pharmacy/newsroom/newsletters/" target="_blank" rel="noreferrer">
+            NABP State Newsletters
+          </a>
+          , selected state government / health-department portals (such as Indiana), and{" "}
+          <a
+            href="https://www.fda.gov/safety/medwatch-fda-safety-information-and-adverse-event-reporting-program"
+            target="_blank"
+            rel="noreferrer"
+          >
+            FDA MedWatch
+          </a>{" "}
+          for drug-safety alerts that affect state practice. Additional state-portal feeds can be
+          added with <code>REGULATORY_EXTRA_FEEDS</code>.
+        </p>
+      ) : null}
+
       {visible.length === 0 ? (
-        <p className="loader">No current updates match the selected filters.</p>
+        <p className="loader">
+          {filter === "state"
+            ? "No syndicated state-portal items loaded. Use the NABP newsletter directory linked above, or add a state government RSS URL."
+            : "No current updates match the selected filters."}
+        </p>
       ) : (
         <div className="feed-container">
           {visible.map((item) => {

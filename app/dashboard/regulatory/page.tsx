@@ -18,8 +18,10 @@ export default async function RegulatoryRadarPage() {
         <span className="eyebrow">MOST GOOD · LIVE RSS</span>
         <h1>Regulatory & quality intelligence radar</h1>
         <p>
-          Live monitoring of federal, international, and state pharmaceutical and healthcare updates,
-          pulled from official agency RSS feeds.
+          Live monitoring of federal, international, and selected state healthcare updates from
+          official RSS feeds. Most state boards of pharmacy do not publish a dedicated public RSS
+          feed; this radar uses NABP news, state government / health-department portals, and FDA
+          MedWatch instead.
         </p>
       </header>
       {items.length === 0 ? (
