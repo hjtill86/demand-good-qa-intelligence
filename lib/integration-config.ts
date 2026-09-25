@@ -44,6 +44,21 @@ export function getStripeStatus() {
   };
 }
 
+export function getStripeWebhookSecret() {
+  const names = [
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_WEBHOOK_SIGNING_SECRET",
+    "STRIPE_SIGNING_SECRET",
+  ];
+  for (const name of names) {
+    const value = process.env[name];
+    if (value && value !== "replace_me") {
+      return value;
+    }
+  }
+  return null;
+}
+
 export function getStripePlanConfig(plan: string) {
   const key = plan as StripePlanKey;
   if (!(key in stripePlans)) {

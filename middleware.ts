@@ -12,6 +12,10 @@ const clerkHandler = clerkMiddleware(async (auth, request) => {
 });
 
 export default function middleware(request: NextRequest, event: NextFetchEvent) {
+  if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
+    return NextResponse.next();
+  }
+
   if (!isClerkConfigured()) {
     return NextResponse.next();
   }

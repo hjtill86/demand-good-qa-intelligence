@@ -1,15 +1,23 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getThinkificCourseIdForPlan } from "../../../../lib/integration-config";
+import { getThinkificCourseIdForPlan, getStripeWebhookSecret } from "../../../../lib/integration-config";
 import { fulfillThinkificMembership } from "../../../../lib/thinkific-entitlements";
 
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = getStripeWebhookSecret();
 
-  if (!signature || !webhookSecret) {
+  if (!webhookSecret) {
+    console.error("Stripe webhook secret is not configured.");
     return NextResponse.json(
-      { error: "Stripe webhook signing configuration is missing." },
+      { error: "Stripe webhook signing secret is not configured." },
+      { status: 400 }
+    );
+  }
+
+  if (!signature) {
+    return NextResponse.json(
+      { error: "Stripe-Signature header is missing." },
       { status: 400 }
     );
   }
