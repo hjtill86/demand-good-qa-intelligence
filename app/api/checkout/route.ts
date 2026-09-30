@@ -97,6 +97,12 @@ export async function POST(request: Request) {
         ...(body.utm_source ? { utm_source: body.utm_source } : {}),
         ...(body.utm_campaign ? { utm_campaign: body.utm_campaign } : {}),
       },
+      subscription_data: {
+        metadata: {
+          plan: planConfig.key,
+          ...(user?.id ? { clerk_user_id: user.id } : {}),
+        },
+      },
     });
 
     if (!session.url) {

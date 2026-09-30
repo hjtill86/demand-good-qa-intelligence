@@ -1,7 +1,53 @@
+import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getThinkificCourseIdForPlan, getStripeWebhookSecret } from "../../../../lib/integration-config";
+import { isClerkConfigured } from "../../../../lib/clerk-config";
+import { getThinkificCourseIdForPlan, getStripeWebhookSecret, type StripePlanKey } from "../../../../lib/integration-config";
 import { fulfillThinkificMembership } from "../../../../lib/thinkific-entitlements";
+
+function asPlan(value: string | null | undefined): StripePlanKey | null {
+  return value === "foundation" || value === "most-good" ? value : null;
+}
+
+async function assignDgqiPlan(input: {
+  plan: StripePlanKey;
+  userId?: string | null;
+  email?: string | null;
+}) {
+  if (!isClerkConfigured()) {
+    console.error("Clerk is not configured, so the paid plan was not assigned.");
+    return;
+  }
+
+  const client = await clerkClient();
+  let userId = input.userId?.trim() || null;
+
+  if (!userId && input.email) {
+    const matches = await client.users.getUserList({ emailAddress: [input.email], limit: 5 });
+    userId = matches.data[0]?.id ?? null;
+  }
+
+  if (!userId && input.email) {
+    const created = await client.users.createUser({
+      emailAddress: [input.email],
+      skipPasswordRequirement: true,
+      publicMetadata: { dgqiPlan: input.plan },
+    });
+    console.info("Created a Clerk member for a Stripe subscription.", { plan: input.plan });
+    return created.id;
+  }
+
+  if (!userId) {
+    console.error("Stripe payment could not be matched to a Clerk member.");
+    return;
+  }
+
+  await client.users.updateUserMetadata(userId, {
+    publicMetadata: { dgqiPlan: input.plan },
+  });
+  console.info("Assigned DGQI plan from Stripe.", { plan: input.plan });
+  return userId;
+}
 
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
@@ -42,12 +88,19 @@ export async function POST(request: Request) {
         eventType: event.type,
       });
 
-      if (session.payment_status !== "paid") {
+      if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
         break;
       }
 
-      const email = session.customer_details?.email;
-      const plan = session.metadata?.plan;
+      const email = session.customer_details?.email ?? session.customer_email;
+      const plan = asPlan(session.metadata?.plan);
+      if (plan) {
+        await assignDgqiPlan({
+          plan,
+          userId: session.metadata?.clerk_user_id,
+          email,
+        });
+      }
       const courseId = plan ? getThinkificCourseIdForPlan(plan) : null;
 
       if (!email || !courseId) {
@@ -81,10 +134,39 @@ export async function POST(request: Request) {
       }
       break;
     }
-    case "checkout.session.async_payment_failed":
+    case "customer.subscription.deleted": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = typeof subscription.customer === "string" ? subscription.customer : null;
+      let email: string | null = null;
+      if (customerId) {
+        try {
+          const customer = await stripe.customers.retrieve(customerId);
+          email = "deleted" in customer && customer.deleted ? null : customer.email;
+        } catch (error) {
+          console.error("Could not read the Stripe customer for a canceled subscription.", error);
+        }
+      }
+      await assignDgqiPlan({
+        plan: "foundation",
+        userId: subscription.metadata?.clerk_user_id,
+        email,
+      });
+      break;
+    }
     case "customer.subscription.created":
-    case "customer.subscription.updated":
-    case "customer.subscription.deleted":
+    case "customer.subscription.updated": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const ended = subscription.status === "canceled" || subscription.status === "unpaid" || subscription.status === "incomplete_expired";
+      const plan = ended ? "foundation" : asPlan(subscription.metadata?.plan);
+      if (!plan) break;
+      await assignDgqiPlan({
+        plan,
+        userId: subscription.metadata?.clerk_user_id,
+        email: null,
+      });
+      break;
+    }
+    case "checkout.session.async_payment_failed":
     case "invoice.paid":
     case "invoice.payment_failed":
       console.info("Stripe subscription event received.", {

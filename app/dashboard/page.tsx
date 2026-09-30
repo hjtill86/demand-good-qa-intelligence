@@ -15,7 +15,9 @@ export default async function DashboardPage() {
     supplierRisk,
     regulatoryWatch: mockRegulatoryWatch,
     licenseRecords,
+    source,
   } = await getDashboardData();
+  const awaitingCompanyData = source === "empty";
   const plan = getDgqiPlan(user);
   const hasMostGood = plan === "most-good";
   const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed(8) : [];
@@ -57,7 +59,9 @@ export default async function DashboardPage() {
       <section className="dash-content">
         <header className="dash-header">
           <div>
-            <span className="eyebrow">TUESDAY, SEPTEMBER 17, 2026</span>
+            <span className="eyebrow">
+              {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).toUpperCase()}
+            </span>
             <h1>Good morning, {memberName.split(" ")[0]}.</h1>
           </div>
           <UserButton />
@@ -65,8 +69,12 @@ export default async function DashboardPage() {
         <div className="dash-body">
           <div className="dash-intro">
             <div>
-              <h2>Your quality pulse <em>looks good.</em></h2>
-              <p>Here’s what deserves your attention this week.</p>
+              <h2>{awaitingCompanyData ? <>Your quality workspace <em>is ready.</em></> : <>Your quality pulse <em>looks good.</em></>}</h2>
+              <p>
+                {awaitingCompanyData
+                  ? "Add your company’s records before these scores mean anything."
+                  : "Here’s what deserves your attention this week."}
+              </p>
             </div>
             <div className="dash-intro-actions">
               <a className="outline-small" href="/api/dashboard/export/excel">Export Excel</a>
@@ -91,6 +99,15 @@ export default async function DashboardPage() {
               <b className="neutral">{metrics.actionsDue} due this week</b>
             </div>
           </div>
+          {awaitingCompanyData ? (
+            <div className="actions-card">
+              <div className="card-heading">
+                <div><span className="eyebrow">NO COMPANY DATA YET</span><h3>This workspace starts empty.</h3></div>
+              </div>
+              <p>Scores, actions, and the weekly digest stay blank until you enter them. The homepage preview is not your data.</p>
+              <a className="button button-dark" href="/dashboard/data">Add company data <span>→</span></a>
+            </div>
+          ) : (
           <div className="chart-card">
             <div className="card-heading">
               <div>
@@ -110,11 +127,13 @@ export default async function DashboardPage() {
             </div>
             <div className="chart-x"><span>Aug 19</span><span>Aug 26</span><span>Sep 02</span><span>Sep 09</span><span>Sep 17</span></div>
           </div>
+          )}
           <div className="actions-card">
             <div className="card-heading">
               <div><span className="eyebrow">NEEDS ATTENTION</span><h3>Open actions</h3></div>
               <a>View all →</a>
             </div>
+            {actions.length === 0 ? <p>No open actions yet.</p> : null}
             {actions.map((action) => (
               <div className="action-row" key={action.title}>
                 <i className={`risk ${action.level.toLowerCase()}`} />

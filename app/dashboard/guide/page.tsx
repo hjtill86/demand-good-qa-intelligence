@@ -94,7 +94,7 @@ export default async function WorkInstructionsPage() {
               <li>Select <b>License vault</b> from the sidebar to see every tracked company license and certification, its jurisdiction, reference number, expiration date, and status.</li>
               <li>Each record has a renewal alert lead time of 30, 60, or 90 days. When a license enters that window, it is flagged <b>Renewal due</b> or <b>Expiring soon</b> and appears in the Overview dashboard&apos;s alert card automatically — no manual check required.</li>
               <li>Work expiring items in order of soonest expiration date.</li>
-              <li>Records currently shown are sample data pending a document-storage integration; contact support to add your company&apos;s real licenses and certifications.</li>
+              <li>Add each license or certification in <b>Manage data</b>. The vault stays empty until those records exist.</li>
             </ol>
           </section>
 

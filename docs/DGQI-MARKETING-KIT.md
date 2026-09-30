@@ -5,10 +5,10 @@
 **Prepared for:** Demand Good QA LLC  
 **Product:** Demand Good QA Intelligence (DGQI)  
 **Primary audience:** Quality, regulatory, compliance, and operations leaders  
-**Website placeholder:** `https://<your-production-domain>`  
+**Website:** `https://demandgoodqa.com`  
 **Contact:** `htillman@demandgoodqa.com`
 
-> Replace `<your-production-domain>` with the production URL shown in Vercel before publishing.
+> Use `https://demandgoodqa.com` in every public link.
 
 ---
 
@@ -58,7 +58,7 @@ Built for quality, regulatory, compliance, and operations leaders.
 | | Foundation | Most Good |
 |---|---|---|
 | Best for | Focused teams building a consistent quality review rhythm | Growing operations that need supplier and regulatory context |
-| Price | **$149/month** | **$399/month** |
+| Price | **$300/month** | **$500/month** |
 | Quality score and trend view | Included | Included |
 | Prioritized open actions | Included | Included |
 | Weekly decision digest | Included | Included |
@@ -72,12 +72,12 @@ Built for quality, regulatory, compliance, and operations leaders.
 ### Foundation CTA
 
 **Start with Foundation →**  
-`https://<your-production-domain>/checkout?plan=foundation&utm_source=thinkific&utm_campaign=foundation`
+`https://demandgoodqa.com/checkout?plan=foundation&utm_source=thinkific&utm_campaign=foundation`
 
 ### Most Good CTA
 
 **Choose Most Good →**  
-`https://<your-production-domain>/checkout?plan=most-good&utm_source=thinkific&utm_campaign=most_good`
+`https://demandgoodqa.com/checkout?plan=most-good&utm_source=thinkific&utm_campaign=most_good`
 
 ## 5. Feature benefit copy
 
@@ -144,7 +144,7 @@ trends, open actions, supplier context, and regulatory watch.
 **Explore DGQI →**
 
 Link:
-`https://<your-production-domain>/?utm_source=thinkific&utm_campaign=course_banner`
+`https://demandgoodqa.com/?utm_source=thinkific&utm_campaign=course_banner`
 
 ### Option B — course-member focused
 
@@ -154,7 +154,7 @@ scorecards, weekly decision digests, action priorities, and exportable reports.
 **See Foundation and Most Good →**
 
 Link:
-`https://<your-production-domain>/#pricing?utm_source=thinkific&utm_campaign=course_banner`
+`https://demandgoodqa.com/#pricing?utm_source=thinkific&utm_campaign=course_banner`
 
 ### Option C — Most Good upsell
 
@@ -164,7 +164,7 @@ and certification tracking to the DGQI workspace.
 **Explore Most Good →**
 
 Link:
-`https://<your-production-domain>/checkout?plan=most-good&utm_source=thinkific&utm_campaign=most_good_banner`
+`https://demandgoodqa.com/checkout?plan=most-good&utm_source=thinkific&utm_campaign=most_good_banner`
 
 ## 7. Email campaign copy
 
@@ -180,12 +180,12 @@ decision digest into one focused workspace. Use the Management Review and
 Quarterly Business Review generators to prepare structured conversations, then
 export your dashboard to Excel or PDF.
 
-Start with Foundation at **$149/month** or choose Most Good at **$399/month**
+Start with Foundation at **$300/month** or choose Most Good at **$500/month**
 for supplier-risk context, regulatory-watch views, and license/certification
 tracking.
 
 **Explore DGQI:**  
-`https://<your-production-domain>/#pricing?utm_source=email&utm_campaign=launch`
+`https://demandgoodqa.com/#pricing?utm_source=email&utm_campaign=launch`
 
 ### Email 2 — Foundation
 
@@ -203,8 +203,8 @@ You get:
 - Quarterly Business Review generator
 - Excel and PDF exports
 
-**Start with Foundation — $149/month:**  
-`https://<your-production-domain>/checkout?plan=foundation&utm_source=email&utm_campaign=foundation`
+**Start with Foundation — $300/month:**  
+`https://demandgoodqa.com/checkout?plan=foundation&utm_source=email&utm_campaign=foundation`
 
 ### Email 3 — Most Good
 
@@ -217,8 +217,8 @@ intelligence, a Regulatory Watch view, and license and certification tracking.
 Regulatory Watch helps you triage configured public updates; it does not replace
 your organization’s regulatory review or professional advice.
 
-**Explore Most Good — $399/month:**  
-`https://<your-production-domain>/checkout?plan=most-good&utm_source=email&utm_campaign=most_good`
+**Explore Most Good — $500/month:**  
+`https://demandgoodqa.com/checkout?plan=most-good&utm_source=email&utm_campaign=most_good`
 
 ## 8. Social media copy
 
@@ -233,7 +233,7 @@ exportable reports.
 
 Foundation and Most Good plans are available.
 
-`https://<your-production-domain>/#pricing`
+`https://demandgoodqa.com/#pricing`
 
 ### LinkedIn post 2
 
@@ -243,14 +243,14 @@ DGQI helps quality and operations leaders review those questions from one
 dashboard — with supplier-risk and regulatory-watch context available on Most
 Good.
 
-`https://<your-production-domain>/checkout?plan=most-good`
+`https://demandgoodqa.com/checkout?plan=most-good`
 
 ### Short social post
 
 Make quality signals easier to review and act on.  
 Demand Good QA Intelligence: scorecards, open actions, weekly digest, review
 generators, and exportable reports.  
-`https://<your-production-domain>/#pricing`
+`https://demandgoodqa.com/#pricing`
 
 ## 9. 30-second spoken pitch
 
@@ -297,8 +297,7 @@ implemented.
 
 ## 11. Publishing checklist
 
-- Replace every `<your-production-domain>` placeholder with the verified Vercel
-  production domain.
+- Publish every link on `https://demandgoodqa.com`.
 - Confirm the live Stripe Price IDs and prices before publishing.
 - Confirm Terms and Privacy links remain current:
   - `https://courses.demandgoodqa.com/pages/terms`

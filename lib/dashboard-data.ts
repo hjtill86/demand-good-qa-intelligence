@@ -54,6 +54,7 @@ export type LicenseRecord = {
 };
 
 export type DashboardData = {
+  source: "organization" | "empty";
   metrics: DashboardMetrics;
   actions: DashboardAction[];
   trend: number[];
@@ -64,6 +65,30 @@ export type DashboardData = {
 };
 
 const dashboardDataPath = path.join(process.cwd(), "data", "dashboard.json");
+
+export function emptyDashboardData(): DashboardData {
+  return {
+    source: "empty",
+    metrics: {
+      qualityScore: 0,
+      qualityScoreChange: "No baseline",
+      compliantProducts: 0,
+      compliantProductsChange: "No baseline",
+      openActions: 0,
+      actionsDue: 0,
+    },
+    actions: [],
+    trend: [],
+    weeklyDigest: {
+      headline: "No quality data yet.",
+      summary: "Add your company’s records in Manage data. These numbers stay at zero until then.",
+      bullets: [],
+    },
+    supplierRisk: [],
+    regulatoryWatch: [],
+    licenseRecords: [],
+  };
+}
 
 function isDashboardData(value: unknown): value is DashboardData {
   if (!value || typeof value !== "object") return false;
@@ -144,9 +169,11 @@ export async function getDashboardData(): Promise<DashboardData> {
       .eq("organization_id", scope.organizationId);
     if (error) throw new Error(`Dashboard data query failed: ${error.message}`);
     const rows = data ?? [];
+    if (rows.length === 0) return emptyDashboardData();
     const first = (type: string) => rows.find((row) => row.record_type === type)?.payload;
     const list = (type: string) => rows.filter((row) => row.record_type === type).map((row) => row.payload);
     const liveData = {
+      source: "organization" as const,
       metrics: first("metric") ?? { qualityScore: 0, qualityScoreChange: "No baseline", compliantProducts: 0, compliantProductsChange: "No baseline", openActions: 0, actionsDue: 0 },
       actions: list("action"),
       trend: [],
@@ -159,12 +186,14 @@ export async function getDashboardData(): Promise<DashboardData> {
     throw new Error("Shared dashboard data failed validation.");
   }
 
-  const raw = await readFile(dashboardDataPath, "utf8");
-  const parsed: unknown = JSON.parse(raw);
-
-  if (!isDashboardData(parsed)) {
-    throw new Error("Dashboard data failed validation.");
+  if (process.env.DGQI_USE_SAMPLE_DASHBOARD === "true") {
+    const raw = await readFile(dashboardDataPath, "utf8");
+    const parsed: unknown = JSON.parse(raw);
+    if (!isDashboardData(parsed)) {
+      throw new Error("Dashboard data failed validation.");
+    }
+    return { ...parsed, source: "organization" };
   }
 
-  return parsed;
+  return emptyDashboardData();
 }
