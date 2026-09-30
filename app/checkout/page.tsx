@@ -46,11 +46,11 @@ export default async function CheckoutPage({
             <input type="checkbox" name="agreedToTerms" value="yes" required />
             <span>
               I agree to the{" "}
-              <a href="https://courses.demandgoodqa.com/pages/terms" target="_blank" rel="noreferrer">
+              <a href="/terms" target="_blank" rel="noreferrer">
                 Terms and Conditions
               </a>{" "}
               and{" "}
-              <a href="https://courses.demandgoodqa.com/pages/privacy" target="_blank" rel="noreferrer">
+              <a href="/privacy" target="_blank" rel="noreferrer">
                 Privacy Policy
               </a>
               .

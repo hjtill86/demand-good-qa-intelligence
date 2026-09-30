@@ -191,8 +191,8 @@ export default function Home() {
           </div>
           <div className="footer-links">
             <Link href="/login">Member login</Link>
-            <a href="https://courses.demandgoodqa.com/pages/terms" target="_blank" rel="noreferrer">Terms</a>
-            <a href="https://courses.demandgoodqa.com/pages/privacy" target="_blank" rel="noreferrer">Privacy</a>
+            <Link href="/terms">Terms</Link>
+            <Link href="/privacy">Privacy</Link>
             <a href="mailto:htillman@demandgoodqa.com">Contact</a>
           </div>
         </div>

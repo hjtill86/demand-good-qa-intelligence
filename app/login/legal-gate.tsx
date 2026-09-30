@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-const TERMS_URL = "https://courses.demandgoodqa.com/pages/terms";
-const PRIVACY_URL = "https://courses.demandgoodqa.com/pages/privacy";
+const TERMS_URL = "/terms";
+const PRIVACY_URL = "/privacy";
 
 export function LegalGate({ children }: { children: React.ReactNode }) {
   const [agreed, setAgreed] = useState(false);

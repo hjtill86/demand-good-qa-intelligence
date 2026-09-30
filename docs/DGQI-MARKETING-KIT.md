@@ -263,8 +263,8 @@ implemented.
 - Publish every link on `https://demandgoodqa.com`.
 - Confirm the live Stripe Price IDs and prices before publishing.
 - Confirm Terms and Privacy links remain current:
-  - `https://courses.demandgoodqa.com/pages/terms`
-  - `https://courses.demandgoodqa.com/pages/privacy`
+  - `https://demandgoodqa.com/terms`
+  - `https://demandgoodqa.com/privacy`
 - Test both checkout links on mobile and desktop.
 - Do not publish claims that DGQI guarantees compliance, predicts incidents,
   replaces professional advice, has unlimited members, stores uploaded
