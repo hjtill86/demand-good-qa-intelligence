@@ -2,8 +2,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { isClerkConfigured } from "../../../../lib/clerk-config";
-import { getThinkificCourseIdForPlan, getStripeWebhookSecret, type StripePlanKey } from "../../../../lib/integration-config";
-import { fulfillThinkificMembership } from "../../../../lib/thinkific-entitlements";
+import { getStripeWebhookSecret, type StripePlanKey } from "../../../../lib/integration-config";
 
 function asPlan(value: string | null | undefined): StripePlanKey | null {
   return value === "foundation" || value === "most-good" ? value : null;
@@ -99,37 +98,6 @@ export async function POST(request: Request) {
           plan,
           userId: session.metadata?.clerk_user_id,
           email,
-        });
-      }
-      const courseId = plan ? getThinkificCourseIdForPlan(plan) : null;
-
-      if (!email || !courseId) {
-        console.info("Skipping Thinkific fulfillment: missing customer email or mapped course id.", {
-          eventId: event.id,
-          hasEmail: Boolean(email),
-          plan,
-        });
-        break;
-      }
-
-      const nameParts = session.customer_details?.name?.split(" ") ?? [];
-      const result = await fulfillThinkificMembership(email, courseId, {
-        firstName: nameParts[0],
-        lastName: nameParts.slice(1).join(" ") || undefined,
-      });
-
-      if (result.status === "error") {
-        console.error("Thinkific fulfillment failed after Stripe payment.", {
-          eventId: event.id,
-          email,
-          plan,
-          error: result.error,
-        });
-      } else if (result.status === "enrolled") {
-        console.info("Thinkific membership enrolled after Stripe payment.", {
-          eventId: event.id,
-          email,
-          plan,
         });
       }
       break;

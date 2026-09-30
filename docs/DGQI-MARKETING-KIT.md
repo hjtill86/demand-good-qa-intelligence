@@ -72,12 +72,12 @@ Built for quality, regulatory, compliance, and operations leaders.
 ### Foundation CTA
 
 **Start with Foundation →**  
-`https://demandgoodqa.com/checkout?plan=foundation&utm_source=thinkific&utm_campaign=foundation`
+`https://demandgoodqa.com/checkout?plan=foundation&utm_source=site&utm_campaign=foundation`
 
 ### Most Good CTA
 
 **Choose Most Good →**  
-`https://demandgoodqa.com/checkout?plan=most-good&utm_source=thinkific&utm_campaign=most_good`
+`https://demandgoodqa.com/checkout?plan=most-good&utm_source=site&utm_campaign=most_good`
 
 ## 5. Feature benefit copy
 
@@ -134,39 +134,7 @@ records; durable document uploads are not yet enabled.
 Export the dashboard to Excel or use the print-ready PDF view for leadership
 reviews, internal discussions, and quality records.
 
-## 6. Thinkific banner copy
-
-### Option A — concise
-
-**Bring your quality signals together.**  
-Meet Demand Good QA Intelligence, the subscription workspace for quality
-trends, open actions, supplier context, and regulatory watch.  
-**Explore DGQI →**
-
-Link:
-`https://demandgoodqa.com/?utm_source=thinkific&utm_campaign=course_banner`
-
-### Option B — course-member focused
-
-**You finished the learning. Now operationalize it.**  
-Use DGQI to turn quality conversations into a repeatable review rhythm with
-scorecards, weekly decision digests, action priorities, and exportable reports.
-**See Foundation and Most Good →**
-
-Link:
-`https://demandgoodqa.com/#pricing?utm_source=thinkific&utm_campaign=course_banner`
-
-### Option C — Most Good upsell
-
-**Need more context around your quality decisions?**  
-Most Good adds supplier-risk views, regulatory-watch intelligence, and license
-and certification tracking to the DGQI workspace.  
-**Explore Most Good →**
-
-Link:
-`https://demandgoodqa.com/checkout?plan=most-good&utm_source=thinkific&utm_campaign=most_good_banner`
-
-## 7. Email campaign copy
+## 6. Email campaign copy
 
 ### Email 1 — launch announcement
 
@@ -220,7 +188,7 @@ your organization’s regulatory review or professional advice.
 **Explore Most Good — $500/month:**  
 `https://demandgoodqa.com/checkout?plan=most-good&utm_source=email&utm_campaign=most_good`
 
-## 8. Social media copy
+## 7. Social media copy
 
 ### LinkedIn post 1
 
@@ -252,7 +220,7 @@ Demand Good QA Intelligence: scorecards, open actions, weekly digest, review
 generators, and exportable reports.  
 `https://demandgoodqa.com/#pricing`
 
-## 9. 30-second spoken pitch
+## 8. 30-second spoken pitch
 
 “Demand Good QA Intelligence is a subscription workspace for quality,
 regulatory, and operations leaders. It brings quality trends, open actions, and
@@ -262,20 +230,15 @@ regulatory-watch views, and license and certification tracking. Teams can
 export their dashboard to Excel or PDF and use the generated reports in
 management and quarterly business reviews.”
 
-## 10. Frequently asked questions
+## 9. Frequently asked questions
 
 ### Where do customers purchase?
 
-Customers purchase the DGQI subscription on the DGQI site through Stripe.
-Thinkific houses courses and membership content; it is not the subscription
-checkout or dashboard.
+Customers purchase the DGQI subscription on https://demandgoodqa.com through Stripe.
 
 ### Do customers need two logins?
 
-DGQI uses Clerk for portal authentication and keeps customers in the DGQI app.
-Thinkific is used for course content, membership verification, and marketing.
-Customers should use the same email address across Stripe, Clerk, and Thinkific
-so membership verification and enrollment can match correctly.
+No. Members sign in with Clerk on https://demandgoodqa.com/login. Stripe assigns Foundation or Most Good on that same account.
 
 ### Is DGQI regulatory advice?
 
@@ -295,14 +258,13 @@ using the current data boundary. Document storage and scheduled notifications
 are future integrations and should not be advertised as available until
 implemented.
 
-## 11. Publishing checklist
+## 10. Publishing checklist
 
 - Publish every link on `https://demandgoodqa.com`.
 - Confirm the live Stripe Price IDs and prices before publishing.
 - Confirm Terms and Privacy links remain current:
   - `https://courses.demandgoodqa.com/pages/terms`
   - `https://courses.demandgoodqa.com/pages/privacy`
-- Add the Thinkific banner link and test its UTM parameters.
 - Test both checkout links on mobile and desktop.
 - Do not publish claims that DGQI guarantees compliance, predicts incidents,
   replaces professional advice, has unlimited members, stores uploaded

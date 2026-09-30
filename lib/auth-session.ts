@@ -2,7 +2,7 @@ export type MemberSession = {
   name: string;
   email: string;
   role: string;
-  provider: "demo" | "thinkific";
+  provider: "demo";
 };
 
 export function serializeMemberSession(session: MemberSession) {
@@ -23,7 +23,7 @@ export function parseMemberSession(rawValue?: string): MemberSession | null {
       name: parsed.name,
       email: parsed.email,
       role: parsed.role ?? "member",
-      provider: parsed.provider === "demo" || parsed.provider === "thinkific" ? parsed.provider : "demo",
+      provider: "demo",
     };
   } catch {
     return null;
