@@ -105,7 +105,16 @@ export default async function WorkInstructionsPage() {
       {hasMostGood ? (
         <>
           <section className="report-section">
-            <h2>8. Using the License &amp; Certification Vault (Most Good)</h2>
+            <h2>8. Logins (Most Good)</h2>
+            <p>
+              Most Good includes 5 logins, including the person who bought the subscription. Open <b>Logins</b> and add a colleague by email.
+              That person signs in with their own email and sees the same company workspace. The sixth login is declined.
+              Someone named on a training record does not need a login.
+            </p>
+          </section>
+
+          <section className="report-section">
+            <h2>9. Using the License &amp; Certification Vault (Most Good)</h2>
             <ol className="wi-steps">
               <li>Select <b>License vault</b> from the sidebar to see every tracked company license and certification, its jurisdiction, reference number, expiration date, and status.</li>
               <li>Each record has a renewal alert lead time of 30, 60, or 90 days. When a license enters that window, it is flagged <b>Renewal due</b> or <b>Expiring soon</b> and appears in the Overview dashboard&apos;s alert card automatically — no manual check required.</li>
@@ -116,7 +125,7 @@ export default async function WorkInstructionsPage() {
           </section>
 
           <section className="report-section">
-            <h2>9. Reading the Regulatory Watch feed (Most Good)</h2>
+            <h2>10. Reading the Regulatory Watch feed (Most Good)</h2>
             <p>
               This feed is refreshed automatically about once an hour from official FDA (including
               MedWatch), CDC, NIH, WHO, CMS, DHS, Joint Commission, and NABP RSS feeds. Most state
@@ -136,14 +145,14 @@ export default async function WorkInstructionsPage() {
           <p>
             Foundation includes your scorecard, trend, open actions, weekly digest, review generators,
             FMEA, and the Validation Control Center. Upgrading to <b>Most Good</b> adds Supplier Risk Intelligence, the License &amp;
-            Certification Vault with renewal alerts, and the live multi-agency Regulatory Watch feed.
+            Certification Vault with renewal alerts, the live multi-agency Regulatory Watch feed, and up to 5 logins.
           </p>
           <a className="button button-dark" href="/checkout?plan=most-good">Upgrade to Most Good <span>→</span></a>
         </section>
       )}
 
       <section className="report-section">
-        <h2>{hasMostGood ? "10" : "9"}. Exporting your data</h2>
+        <h2>{hasMostGood ? "11" : "9"}. Exporting your data</h2>
         <p>
           Use <b>Export Excel</b> on the Overview dashboard for a workbook of your metrics, actions, and
           weekly digest (plus Supplier Risk, License Vault, and Regulatory Watch sheets on Most Good). Use
@@ -152,7 +161,7 @@ export default async function WorkInstructionsPage() {
       </section>
 
       <section className="report-section">
-        <h2>{hasMostGood ? "11" : "10"}. Getting help</h2>
+        <h2>{hasMostGood ? "12" : "10"}. Getting help</h2>
         <p>
           If your membership is not recognized, verify you signed in with the email used at checkout, then
           contact support from the Demand Good QA Intelligence site. This work instruction is generated from

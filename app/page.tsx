@@ -174,7 +174,7 @@ export default function Home() {
               <li>Everything in Foundation, including the validation suite</li>
               <li>Live RSS regulatory radar</li>
               <li>Supplier risk intelligence</li>
-              <li>Unlimited team members</li>
+              <li>Up to 5 logins</li>
             </ul>
             <Link className="button button-light" href="/checkout?plan=most-good">
               Choose Most Good →

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { isClerkConfigured } from "../../../../lib/clerk-config";
 import { getStripeWebhookSecret, type StripePlanKey } from "../../../../lib/integration-config";
+import { capMostGoodOrganizations, leaveSharedSeat, releaseMostGoodSeats } from "../../../../lib/team-seats";
 
 function asPlan(value: string | null | undefined): StripePlanKey | null {
   return value === "foundation" || value === "most-good" ? value : null;
@@ -32,6 +33,7 @@ async function assignDgqiPlan(input: {
       skipPasswordRequirement: true,
       publicMetadata: { dgqiPlan: input.plan },
     });
+    if (input.plan === "most-good") await capMostGoodOrganizations(created.id);
     console.info("Created a Clerk member for a Stripe subscription.", { plan: input.plan });
     return created.id;
   }
@@ -41,9 +43,12 @@ async function assignDgqiPlan(input: {
     return;
   }
 
+  await leaveSharedSeat(userId);
   await client.users.updateUserMetadata(userId, {
     publicMetadata: { dgqiPlan: input.plan },
   });
+  if (input.plan === "foundation") await releaseMostGoodSeats(userId);
+  if (input.plan === "most-good") await capMostGoodOrganizations(userId);
   console.info("Assigned DGQI plan from Stripe.", { plan: input.plan });
   return userId;
 }

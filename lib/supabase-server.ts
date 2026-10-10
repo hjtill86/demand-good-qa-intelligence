@@ -1,6 +1,8 @@
+import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { isClerkConfigured } from "./clerk-config";
+import { workspaceOrganizationId } from "./team-seats";
 
 export function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,9 +11,14 @@ export function getSupabaseAdmin() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-export async function getDataScope() {
+export const getDataScope = cache(async () => {
   if (!isClerkConfigured()) return null;
   const { userId, orgId } = await auth();
   if (!userId) return null;
-  return { userId, organizationId: orgId ?? `user:${userId}` };
-}
+  try {
+    return { userId, organizationId: await workspaceOrganizationId(userId, orgId) };
+  } catch (error) {
+    console.error("Could not resolve the company workspace.", error);
+    return { userId, organizationId: orgId ?? `user:${userId}` };
+  }
+});

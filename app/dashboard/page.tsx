@@ -49,6 +49,7 @@ export default async function DashboardPage() {
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
           <a href="/dashboard/guide">How to use (work instruction)</a>
+          {hasMostGood ? <a href="/dashboard/team">Logins</a> : null}
         </div>
         <div className="side-bottom">
           <a>Settings</a>
@@ -302,7 +303,7 @@ export default async function DashboardPage() {
               <p>
                 Add supplier risk intelligence across every vendor and a live regulatory watch feed
                 automatically pulled from FDA, CDC, CMS, DHS, and The Joint Commission — plus
-                unlimited team members.
+                up to 5 logins.
               </p>
               <a className="button button-dark" href="/checkout?plan=most-good">
                 Upgrade to Most Good <span>→</span>
