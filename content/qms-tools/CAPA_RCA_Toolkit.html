@@ -496,9 +496,9 @@ function buildWhyTable() {
   for (let i = 1; i <= 5; i++) {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="font-weight:700;color:var(--accent);width:30px">Why ${i}</td>
-      <td><input type="text" placeholder="Why did this happen?"></td>
-      <td><input type="text" placeholder="Answer / finding..."></td>
-      <td><input type="text" placeholder="Data, observation..."></td>`;
+      <td><input type="text" id="whyQ${i}" placeholder="Why did this happen?"></td>
+      <td><input type="text" id="whyA${i}" placeholder="Answer / finding..."></td>
+      <td><input type="text" id="whyE${i}" placeholder="Data, observation..."></td>`;
     tbody.appendChild(tr);
   }
 }

@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { isQmsTool, qmsPersistenceMarkup, readQmsState } from "../../../../lib/qms-state";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +18,13 @@ export async function GET(
 ) {
   const { tool } = await context.params;
   const fileName = tools[tool];
-  if (!fileName) {
+  if (!fileName || !isQmsTool(tool)) {
     return new NextResponse("Not found", { status: 404 });
   }
 
-  const html = await readFile(path.join(process.cwd(), "content", "qms-tools", fileName), "utf8");
+  const file = await readFile(path.join(process.cwd(), "content", "qms-tools", fileName), "utf8");
+  const state = await readQmsState(tool);
+  const html = file.replace("<script>", `${qmsPersistenceMarkup(tool, state)}<script>`);
   return new NextResponse(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",

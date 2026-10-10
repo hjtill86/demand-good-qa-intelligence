@@ -656,7 +656,7 @@ function saveInputs(){
   localStorage.setItem('mrInputs',JSON.stringify(data));
   showMsg('inputMsg','✅ Inputs saved!',true);
 }
-function clearInputs(){if(!confirm('Clear all inputs?'))return;['inp_prevDate','inp_openActions','inp_closedActions','inp_actionSummary','inp_external','inp_internal','inp_csat','inp_complaints','inp_objRate','inp_auditRes','inp_procPerf','inp_ncSummary','inp_hrRes','inp_infraRes','inp_risks','inp_opps','inp_supplierOTD','inp_supplierPPM','inp_supplierSum'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function clearInputs(){if(!confirm('Clear all inputs?'))return;['inp_prevDate','inp_openActions','inp_closedActions','inp_actionSummary','inp_external','inp_internal','inp_csat','inp_complaints','inp_objRate','inp_auditRes','inp_procPerf','inp_ncSummary','inp_hrRes','inp_infraRes','inp_risks','inp_opps','inp_supplierOTD','inp_supplierPPM','inp_supplierSum'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});localStorage.setItem('mrInputs','{}');}
 
 // Restore saved inputs
 const savedInputs=JSON.parse(localStorage.getItem('mrInputs')||'{}');
@@ -669,7 +669,7 @@ function saveMinutes(){
   localStorage.setItem('mrMinutes',JSON.stringify(data));
   showMsg('minuteMsg','✅ Minutes saved!',true);
 }
-function clearMinutes(){['minDate','minPeriod','minChair','minLocation','minAttendees','minAbsent','ms1','ms2','ms3','ms4','ms5','ms6','ms7','ms8','ms9','ms10','minConclusion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function clearMinutes(){['minDate','minPeriod','minChair','minLocation','minAttendees','minAbsent','ms1','ms2','ms3','ms4','ms5','ms6','ms7','ms8','ms9','ms10','minConclusion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});localStorage.setItem('mrMinutes','{}');}
 
 const savedMinutes=JSON.parse(localStorage.getItem('mrMinutes')||'{}');
 Object.entries(savedMinutes).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});

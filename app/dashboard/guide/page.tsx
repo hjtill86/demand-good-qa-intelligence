@@ -67,8 +67,8 @@ export default async function WorkInstructionsPage() {
       <section className="report-section">
         <h2>5. Quality workbenches</h2>
         <p>
-          These tools open from the sidebar. Entries stay in this browser on this device. They are not
-          copied into the shared company data store.
+          These tools open from the sidebar. Saved entries stay with your account until you change or
+          delete them, including when you sign in on another computer.
         </p>
         <ul>
           <li><b>Review board</b> — KPIs, ISO 9001 clause 9.3 inputs, meeting minutes, outputs, and trend charts.</li>

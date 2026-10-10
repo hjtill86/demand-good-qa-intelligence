@@ -336,6 +336,8 @@ function round(v,d=3) { return Math.round(v*10**d)/10**d; }
 
 // ========== X-BAR R ==========
 function buildXbarTable() {
+  const previous = {};
+  document.querySelectorAll('#xbarTable input[id]').forEach(el => { previous[el.id] = el.value; });
   const n = parseInt(document.getElementById('xbarN').value);
   const g = parseInt(document.getElementById('xbarGroups').value);
   let html = '<thead><tr><th>Subgroup</th>';
@@ -348,6 +350,7 @@ function buildXbarTable() {
   }
   html += '</tbody>';
   document.getElementById('xbarTable').innerHTML = html;
+  Object.keys(previous).forEach(id => { const el = document.getElementById(id); if (el) el.value = previous[id]; });
 }
 
 function updateXbarRow(r) {
@@ -487,6 +490,8 @@ function drawHistogram(canvasId, data, bins, usl, lsl, mu, sigma) {
 
 // ========== GAGE R&R ==========
 function buildGageTable() {
+  const previous = {};
+  document.querySelectorAll('#gageTable input[id]').forEach(el => { previous[el.id] = el.value; });
   const ops=parseInt(document.getElementById('gOps').value);
   const parts=parseInt(document.getElementById('gParts').value);
   const trials=parseInt(document.getElementById('gTrials').value);
@@ -501,6 +506,7 @@ function buildGageTable() {
   }
   html+='</tbody>';
   document.getElementById('gageTable').innerHTML=html;
+  Object.keys(previous).forEach(id => { const el = document.getElementById(id); if (el) el.value = previous[id]; });
 }
 
 function calcGageRR() {
