@@ -75,7 +75,7 @@ export default async function WorkInstructionsPage() {
           <li><b>CAPA / RCA</b> — corrective actions, 5-Why, fishbone, action tracker, and risk matrix.</li>
           <li><b>Audit readiness</b> — checklist, evidence register, nonconformance log, schedule, and contacts.</li>
           <li><b>SPC / MSA</b> — X-bar R, I-MR, Cp/Cpk, histogram, control rules, and Gage R&amp;R.</li>
-          <li><b>Controlled documents</b> — SOPs, work instructions, policies, and forms with an approver, effective date, and the retired file from the previous revision.</li>
+          <li><b>Controlled documents</b> — SOPs, work instructions, policies, and forms with an approver, effective date, and the retired file from the previous revision. Downloaded files carry a confidential statement at the bottom.</li>
         </ul>
         <p className="fine-print">Use ← Workspace on each tool to return to the overview. Available on both Foundation and Most Good.</p>
       </section>

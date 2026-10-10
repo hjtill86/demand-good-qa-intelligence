@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { stampConfidentialCopy } from "../../../../lib/confidential-stamp";
+import { issuingOrganizationName } from "../../../../lib/issuing-organization";
 import { readDocumentFile, saveDocumentFile } from "../../../../lib/controlled-documents";
 
 export const dynamic = "force-dynamic";
@@ -7,10 +9,20 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const result = await readDocumentFile(url.searchParams.get("id") ?? "", url.searchParams.get("revision") ?? "");
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
+  const stamped = await stampConfidentialCopy({
+    bytes: result.bytes,
+    fileType: result.fileType,
+    documentNumber: result.documentNumber,
+    revision: result.revision,
+    status: result.revisionStatus,
+    effectiveOn: result.effectiveOn,
+    retiredOn: result.retiredOn,
+    organizationName: await issuingOrganizationName(),
+  });
   const filename = result.fileName.replace(/["\r\n]/g, "");
-  return new NextResponse(new Uint8Array(result.bytes), {
+  return new NextResponse(new Uint8Array(stamped.bytes), {
     headers: {
-      "Content-Type": result.fileType,
+      "Content-Type": stamped.fileType,
       "Content-Disposition": `attachment; filename="${filename}"`,
       "Cache-Control": "private, no-store",
     },

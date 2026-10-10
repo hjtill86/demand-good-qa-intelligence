@@ -350,5 +350,10 @@ export async function readDocumentFile(id: string, revisionId: string) {
     bytes: Buffer.from(await data.arrayBuffer()),
     fileName: revision.fileName,
     fileType: revision.fileType || "application/octet-stream",
+    documentNumber: document.documentNumber,
+    revision: revision.revision,
+    revisionStatus: revision.status,
+    effectiveOn: revision.effectiveOn,
+    retiredOn: revision.retiredOn,
   };
 }

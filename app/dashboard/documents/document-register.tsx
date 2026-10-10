@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { confidentialLines } from "../../../lib/confidential-statement";
 import type { ControlledDocument } from "../../../lib/controlled-documents";
 
 const types = ["SOP", "Work instruction", "Policy", "Form"] as const;
@@ -13,7 +14,15 @@ function fileHref(documentId: string, revisionId: string) {
   return `/api/documents/file?id=${encodeURIComponent(documentId)}&revision=${encodeURIComponent(revisionId)}`;
 }
 
-export function DocumentRegister({ initialDocuments, storageError }: { initialDocuments: ControlledDocument[]; storageError?: string }) {
+export function DocumentRegister({
+  initialDocuments,
+  organizationName = "",
+  storageError,
+}: {
+  initialDocuments: ControlledDocument[];
+  organizationName?: string;
+  storageError?: string;
+}) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [message, setMessage] = useState(storageError ?? "");
   const [pending, setPending] = useState(false);
@@ -225,6 +234,14 @@ export function DocumentRegister({ initialDocuments, storageError }: { initialDo
                   <button type="button" disabled={pending} onClick={() => void act(document.id, { action: "revise", revision: nextRevision })}>Start revision</button>
                 </div>
               ) : null}
+              <p className="doc-confidential">{confidentialLines({
+                documentNumber: document.documentNumber,
+                revision: document.current.revision,
+                status: document.current.status,
+                effectiveOn: document.current.effectiveOn,
+                retiredOn: document.current.retiredOn,
+                organizationName,
+              }).full}</p>
             </div>
           </article>
         ))}
