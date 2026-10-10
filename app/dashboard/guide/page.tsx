@@ -78,6 +78,7 @@ export default async function WorkInstructionsPage() {
           <li><b>Controlled documents</b> — SOPs, work instructions, policies, and forms with an approver, effective date, and the retired file from the previous revision. Downloaded files carry a confidential statement at the bottom.</li>
           <li><b>Training records</b> — who was trained on which revision, with the signed sheet attached. A new revision marks that training as due for retraining. The person does not need a login.</li>
           <li><b>Complaints and deviations</b> — record a complaint or a deviation and a CAPA opens with it. The CAPA stays open until the root cause, corrective action, and verification are saved and the CAPA is closed. Use CAPA / RCA for a 5-Why or fishbone, then write the result on the CAPA.</li>
+          <li><b>Approved suppliers</b> — the supplier, what they are approved to supply, who approved them, and the certificate with its expiration. The certificate shows as expiring inside a 30, 60, or 90 day window, then as expired. Supplier risk scores on the overview are entered separately in Manage data.</li>
         </ul>
         <p className="fine-print">Use ← Workspace on each tool to return to the overview. Available on both Foundation and Most Good.</p>
       </section>

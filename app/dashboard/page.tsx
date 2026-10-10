@@ -47,6 +47,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/documents">Controlled documents</a>
           <a href="/dashboard/training">Training records</a>
           <a href="/dashboard/complaints">Complaints &amp; CAPA</a>
+          <a href="/dashboard/suppliers">Approved suppliers</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
@@ -197,6 +198,12 @@ export default async function DashboardPage() {
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
               <h3>Complaints and deviations</h3>
               <p>Record a complaint or deviation and open the CAPA that has to close it.</p>
+              <b>Open register →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/suppliers">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Approved suppliers</h3>
+              <p>Keep the approval, certificate, and expiration for each supplier in one file.</p>
               <b>Open register →</b>
             </a>
             <a className="generator-card" href="/dashboard/qms/audit-readiness">
