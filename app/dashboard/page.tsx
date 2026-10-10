@@ -44,6 +44,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/quarterly-business-review">Quarterly review</a>
           <a href="/dashboard/fmea">FMEA generator</a>
           <a href="/dashboard/validation">Validation suite</a>
+          <a href="/dashboard/documents">Controlled documents</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
@@ -176,6 +177,12 @@ export default async function DashboardPage() {
               <h3>CAPA / RCA toolkit</h3>
               <p>Log corrective actions, run 5-Why and fishbone analysis, and follow the action tracker.</p>
               <b>Open toolkit →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/documents">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Controlled documents</h3>
+              <p>Approve SOPs and work instructions, then keep the retired revision when the next one takes effect.</p>
+              <b>Open register →</b>
             </a>
             <a className="generator-card" href="/dashboard/qms/audit-readiness">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
