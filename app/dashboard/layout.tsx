@@ -1,7 +1,9 @@
+import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { isClerkConfigured } from "../../lib/clerk-config";
+import { TestBanner } from "./test-banner";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (!isClerkConfigured()) {
     return (
       <main className="auth-page">
@@ -19,5 +21,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  return children;
+  const user = await currentUser().catch(() => null);
+  return (
+    <>
+      {user?.publicMetadata?.dgqiTestAccount === true ? <TestBanner /> : null}
+      {children}
+    </>
+  );
 }

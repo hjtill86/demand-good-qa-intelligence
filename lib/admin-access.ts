@@ -12,6 +12,9 @@ export async function requireAdmin() {
   if (!isClerkConfigured()) return { ok: false as const, status: 401 as const, error: "Authentication required." };
   const user = await currentUser();
   if (!user) return { ok: false as const, status: 401 as const, error: "Authentication required." };
+  if (user.publicMetadata?.dgqiTestAccount === true) {
+    return { ok: false as const, status: 404 as const, error: "This page is not available." };
+  }
   const email = user.primaryEmailAddress?.emailAddress?.trim().toLowerCase() ?? "";
   const allowed = adminEmails();
   if (!email || !allowed.includes(email)) {

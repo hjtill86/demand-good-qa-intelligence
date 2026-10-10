@@ -1,6 +1,7 @@
 import { requireAdmin } from "../../lib/admin-access";
 import { findAccount, listRecentAccounts } from "../../lib/admin-accounts";
 import { AdminConsole } from "./admin-console";
+import { TestWorkspacePanel } from "./test-workspace-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function AdminPage({
           <a href="/dashboard"> ← Workspace</a>
         </p>
       </header>
+      <TestWorkspacePanel />
       <section className="report-section">
         <form className="data-form" action="/admin" method="get">
           <h2>Look up an account</h2>
