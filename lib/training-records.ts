@@ -1,4 +1,6 @@
+import { keepAuditedChange, type AuditDraft } from "./audit-trail";
 import { listControlledDocuments, type ControlledDocument } from "./controlled-documents";
+import { changedFields } from "./part11-records";
 import { getDataScope, getSupabaseAdmin } from "./supabase-server";
 
 const bucket = "dgqi-training";
@@ -115,6 +117,39 @@ async function writeIndex(supabase: Store, organizationId: string, records: Trai
   return { ok: true as const };
 }
 
+function trainingSnapshot(record: TrainingRecord) {
+  return {
+    person: record.personName,
+    role: record.role,
+    trainer: record.trainer,
+    "trained on": record.trainedOn,
+    document: record.documentNumber,
+    title: record.documentTitle,
+    revision: record.revision,
+    file: record.fileName ?? "",
+    "file path": record.filePath ?? "",
+  };
+}
+
+function trainingLabel(record: TrainingRecord) {
+  return `${record.personName} · ${record.documentNumber} Rev ${record.revision}`;
+}
+
+async function persistTraining(
+  store: { supabase: Store; scope: { organizationId: string } },
+  previous: TrainingRecord[],
+  next: TrainingRecord[],
+  draft: AuditDraft,
+) {
+  return keepAuditedChange(
+    store.supabase,
+    store.scope.organizationId,
+    draft,
+    () => writeIndex(store.supabase, store.scope.organizationId, next),
+    () => writeIndex(store.supabase, store.scope.organizationId, previous),
+  );
+}
+
 function findRevision(document: ControlledDocument, revisionId: string) {
   if (document.current.id === revisionId) return document.current;
   return document.history.find((revision) => revision.id === revisionId);
@@ -168,7 +203,14 @@ export async function createTrainingRecord(input: unknown) {
     revisionId: revision.id,
     revision: revision.revision,
   };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, [record, ...records]);
+  const saved = await persistTraining(store, records, [record, ...records], {
+    action: "create",
+    recordType: "training",
+    recordId: record.id,
+    recordLabel: trainingLabel(record),
+    meaning: "",
+    changes: changedFields({}, trainingSnapshot(record)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 201 as const, record };
 }
@@ -179,13 +221,16 @@ export async function deleteTrainingRecord(id: string) {
   const records = await readIndex(store.supabase, store.scope.organizationId);
   const record = records.find((item) => item.id === id);
   if (!record) return { ok: false as const, error: "Training record not found.", status: 404 as const };
-  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
-  const saved = await writeIndex(
-    store.supabase,
-    store.scope.organizationId,
-    records.filter((item) => item.id !== id),
-  );
+  const saved = await persistTraining(store, records, records.filter((item) => item.id !== id), {
+    action: "delete",
+    recordType: "training",
+    recordId: record.id,
+    recordLabel: trainingLabel(record),
+    meaning: "",
+    changes: changedFields(trainingSnapshot(record), {}),
+  });
   if (!saved.ok) return saved;
+  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
   return { ok: true as const, status: 200 as const };
 }
 
@@ -211,16 +256,21 @@ export async function saveTrainingFile(id: string, file: File) {
     upsert: true,
   });
   if (uploadError) return { ok: false as const, error: uploadError.message, status: 500 as const };
-  const previousPath = record.filePath ?? "";
   const next = records.map((item) => item.id === id ? { ...item, fileName, filePath, fileType: mime } : item);
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, next);
+  const updated = next.find((item) => item.id === id) ?? record;
+  const saved = await persistTraining(store, records, next, {
+    action: "update",
+    recordType: "training",
+    recordId: record.id,
+    recordLabel: trainingLabel(record),
+    meaning: "",
+    changes: changedFields(trainingSnapshot(record), trainingSnapshot(updated)),
+  });
   if (!saved.ok) {
     await store.supabase.storage.from(bucket).remove([filePath]);
     return saved;
   }
-  if (previousPath && previousPath !== filePath) await store.supabase.storage.from(bucket).remove([previousPath]);
-  const updated = next.find((item) => item.id === id);
-  return { ok: true as const, status: 200 as const, record: updated ?? record };
+  return { ok: true as const, status: 200 as const, record: updated };
 }
 
 export async function removeTrainingFile(id: string) {
@@ -229,7 +279,6 @@ export async function removeTrainingFile(id: string) {
   const records = await readIndex(store.supabase, store.scope.organizationId);
   const record = records.find((item) => item.id === id);
   if (!record) return { ok: false as const, error: "Training record not found.", status: 404 as const };
-  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
   const next = records.map((item) => {
     if (item.id !== id) return item;
     return {
@@ -245,10 +294,18 @@ export async function removeTrainingFile(id: string) {
       revision: item.revision,
     };
   });
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, next);
+  const updated = next.find((item) => item.id === id) ?? record;
+  const saved = await persistTraining(store, records, next, {
+    action: "update",
+    recordType: "training",
+    recordId: record.id,
+    recordLabel: trainingLabel(record),
+    meaning: "",
+    changes: changedFields(trainingSnapshot(record), trainingSnapshot(updated)),
+  });
   if (!saved.ok) return saved;
-  const updated = next.find((item) => item.id === id);
-  return { ok: true as const, status: 200 as const, record: updated ?? record };
+  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
+  return { ok: true as const, status: 200 as const, record: updated };
 }
 
 export async function readTrainingFile(id: string) {

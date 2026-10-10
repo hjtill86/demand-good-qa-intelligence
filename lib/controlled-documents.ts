@@ -1,4 +1,7 @@
+import { keepAuditedChange, type AuditDraft } from "./audit-trail";
+import { changedFields, documentIsRetained, formatSignature, type RecordSignature } from "./part11-records";
 import { getDataScope, getSupabaseAdmin } from "./supabase-server";
+import { requireSignature } from "./verify-signer";
 
 const bucket = "dgqi-documents";
 const maxBytes = 15 * 1024 * 1024;
@@ -28,6 +31,7 @@ export type DocumentRevision = {
   fileName?: string;
   filePath?: string;
   fileType?: string;
+  signature?: RecordSignature;
 };
 
 export type ControlledDocument = {
@@ -145,6 +149,44 @@ async function writeIndex(supabase: Store, organizationId: string, documents: Co
   return { ok: true as const };
 }
 
+function documentSnapshot(document: ControlledDocument) {
+  return {
+    "document number": document.documentNumber,
+    title: document.title,
+    type: document.documentType,
+    owner: document.owner,
+    revision: document.current.revision,
+    status: document.current.status,
+    approver: document.current.approver,
+    "approved on": document.current.approvedOn,
+    "effective on": document.current.effectiveOn,
+    "retired on": document.current.retiredOn,
+    file: document.current.fileName ?? "",
+    "file path": document.current.filePath ?? "",
+    signature: document.current.signature ? formatSignature(document.current.signature) : "",
+    history: document.history.map((revision) => `Rev ${revision.revision} ${revision.status}`).join("; "),
+  };
+}
+
+function documentLabel(document: ControlledDocument) {
+  return `${document.documentNumber} Rev ${document.current.revision}`;
+}
+
+async function persistDocuments(
+  store: { supabase: Store; scope: { organizationId: string } },
+  previous: ControlledDocument[],
+  next: ControlledDocument[],
+  draft: AuditDraft,
+) {
+  return keepAuditedChange(
+    store.supabase,
+    store.scope.organizationId,
+    draft,
+    () => writeIndex(store.supabase, store.scope.organizationId, next),
+    () => writeIndex(store.supabase, store.scope.organizationId, previous),
+  );
+}
+
 export async function listControlledDocuments() {
   const store = await openStore();
   if ("ok" in store) return store;
@@ -187,7 +229,14 @@ export async function createControlledDocument(input: unknown) {
     },
     history: [],
   };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, [document, ...documents]);
+  const saved = await persistDocuments(store, documents, [document, ...documents], {
+    action: "create",
+    recordType: "document",
+    recordId: document.id,
+    recordLabel: documentLabel(document),
+    meaning: "",
+    changes: changedFields({}, documentSnapshot(document)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 201 as const, document };
 }
@@ -196,14 +245,15 @@ function findDocument(documents: ControlledDocument[], id: string) {
   return documents.find((item) => item.id === id);
 }
 
-export async function approveDocument(id: string, input: { approver?: unknown; effectiveOn?: unknown }) {
+export async function approveDocument(id: string, input: { effectiveOn?: unknown; password?: unknown }) {
   const store = await openStore();
   if ("ok" in store) return store;
-  const approver = text(input.approver, 80);
   const effectiveOn = text(input.effectiveOn, 10);
-  if (!approver || !isDate(effectiveOn) || !effectiveOn) {
-    return { ok: false as const, error: "Approver and effective date are required.", status: 400 as const };
+  if (!isDate(effectiveOn) || !effectiveOn) {
+    return { ok: false as const, error: "An effective date is required.", status: 400 as const };
   }
+  const signed = await requireSignature(input.password, "approval");
+  if (!signed.ok) return signed;
   const documents = await readIndex(store.supabase, store.scope.organizationId);
   const document = findDocument(documents, id);
   if (!document) return { ok: false as const, error: "Document not found.", status: 404 as const };
@@ -213,15 +263,25 @@ export async function approveDocument(id: string, input: { approver?: unknown; e
   if (!document.current.filePath) {
     return { ok: false as const, error: "Upload the file before approving this revision.", status: 400 as const };
   }
+  const previous = structuredClone(documents);
+  const before = documentSnapshot(document);
   document.current = {
     ...document.current,
     status: "Approved",
-    approver,
-    approvedOn: today(),
+    approver: signed.signature.printedName,
+    approvedOn: signed.signature.signedAt.slice(0, 10),
     effectiveOn,
     retiredOn: "",
+    signature: signed.signature,
   };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, documents);
+  const saved = await persistDocuments(store, previous, documents, {
+    action: "sign",
+    recordType: "document",
+    recordId: document.id,
+    recordLabel: documentLabel(document),
+    meaning: "approval",
+    changes: changedFields(before, documentSnapshot(document)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 200 as const, document };
 }
@@ -240,6 +300,8 @@ export async function startNextRevision(id: string, input: { revision?: unknown 
   if (revision.toLowerCase() === document.current.revision.toLowerCase()) {
     return { ok: false as const, error: "The new revision needs a different number.", status: 400 as const };
   }
+  const previous = structuredClone(documents);
+  const before = documentSnapshot(document);
   const retired = { ...document.current, status: "Retired" as const, retiredOn: today() };
   document.history = [retired, ...document.history];
   document.current = {
@@ -251,7 +313,14 @@ export async function startNextRevision(id: string, input: { revision?: unknown 
     effectiveOn: "",
     retiredOn: "",
   };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, documents);
+  const saved = await persistDocuments(store, previous, documents, {
+    action: "update",
+    recordType: "document",
+    recordId: document.id,
+    recordLabel: documentLabel(document),
+    meaning: "",
+    changes: changedFields(before, documentSnapshot(document)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 200 as const, document };
 }
@@ -265,8 +334,17 @@ export async function retireDocument(id: string) {
   if (document.current.status === "Retired") {
     return { ok: false as const, error: "This revision is already retired.", status: 409 as const };
   }
+  const previous = structuredClone(documents);
+  const before = documentSnapshot(document);
   document.current = { ...document.current, status: "Retired", retiredOn: today() };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, documents);
+  const saved = await persistDocuments(store, previous, documents, {
+    action: "update",
+    recordType: "document",
+    recordId: document.id,
+    recordLabel: documentLabel(document),
+    meaning: "",
+    changes: changedFields(before, documentSnapshot(document)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 200 as const, document };
 }
@@ -277,14 +355,20 @@ export async function deleteControlledDocument(id: string) {
   const documents = await readIndex(store.supabase, store.scope.organizationId);
   const document = findDocument(documents, id);
   if (!document) return { ok: false as const, error: "Document not found.", status: 404 as const };
+  if (documentIsRetained([document.current, ...document.history].map((revision) => revision.status))) {
+    return { ok: false as const, error: "Approved and retired revisions stay on the register.", status: 409 as const };
+  }
   const paths = [document.current, ...document.history].flatMap((revision) => revision.filePath ? [revision.filePath] : []);
-  if (paths.length) await store.supabase.storage.from(bucket).remove(paths);
-  const saved = await writeIndex(
-    store.supabase,
-    store.scope.organizationId,
-    documents.filter((item) => item.id !== id),
-  );
+  const saved = await persistDocuments(store, documents, documents.filter((item) => item.id !== id), {
+    action: "delete",
+    recordType: "document",
+    recordId: document.id,
+    recordLabel: documentLabel(document),
+    meaning: "",
+    changes: changedFields(documentSnapshot(document), {}),
+  });
   if (!saved.ok) return saved;
+  if (paths.length) await store.supabase.storage.from(bucket).remove(paths);
   return { ok: true as const, status: 200 as const };
 }
 
@@ -318,9 +402,18 @@ export async function saveDocumentFile(id: string, file: File) {
     upsert: true,
   });
   if (uploadError) return { ok: false as const, error: uploadError.message, status: 500 as const };
+  const previous = structuredClone(documents);
+  const before = documentSnapshot(document);
   const previousPath = document.current.filePath ?? "";
   document.current = { ...document.current, fileName, filePath, fileType: mime };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, documents);
+  const saved = await persistDocuments(store, previous, documents, {
+    action: "update",
+    recordType: "document",
+    recordId: document.id,
+    recordLabel: documentLabel(document),
+    meaning: "",
+    changes: changedFields(before, documentSnapshot(document)),
+  });
   if (!saved.ok) {
     await store.supabase.storage.from(bucket).remove([filePath]);
     return saved;

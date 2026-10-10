@@ -1,5 +1,8 @@
+import { keepAuditedChange, type AuditDraft } from "./audit-trail";
+import { changedFields, formatSignature, signatureList, supplierIsRetained, type RecordSignature } from "./part11-records";
 import { isApproval, isLeadDays, type ApprovalStatus, type LeadDays } from "./supplier-status";
 import { getDataScope, getSupabaseAdmin } from "./supabase-server";
+import { requireSignature } from "./verify-signer";
 
 const bucket = "dgqi-suppliers";
 const maxBytes = 10 * 1024 * 1024;
@@ -25,6 +28,8 @@ export type SupplierFile = {
   certificateNumber: string;
   expiresOn: string;
   leadDays: LeadDays;
+  retained?: boolean;
+  signatures?: RecordSignature[];
   fileName?: string;
   filePath?: string;
   fileType?: string;
@@ -99,6 +104,8 @@ function withoutFile(record: SupplierFile): SupplierFile {
     certificateNumber: record.certificateNumber,
     expiresOn: record.expiresOn,
     leadDays: record.leadDays,
+    retained: record.retained,
+    signatures: record.signatures,
   };
 }
 
@@ -130,12 +137,15 @@ function readInput(input: unknown): SupplierInput | Failure {
   const certificateNumber = text(fields.certificateNumber, 80);
   const expiresOn = text(fields.expiresOn, 10);
   const leadDays = leadDaysOf(fields.leadDays);
-  if (!supplierName || !suppliedItem || !approvedBy || !certificateName || !certificateNumber || !isApproval(approval)) {
+  if (!supplierName || !suppliedItem || !certificateName || !certificateNumber || !isApproval(approval)) {
     return {
       ok: false,
-      error: "Supplier, what they supply, approval, approver, certificate name, and certificate number are required.",
+      error: "Supplier, what they supply, approval, certificate name, and certificate number are required.",
       status: 400,
     };
+  }
+  if (approval !== "Approved" && !approvedBy) {
+    return { ok: false, error: "Enter who recorded this approval.", status: 400 };
   }
   if (!isDate(approvedOn) || !isDate(expiresOn)) {
     return { ok: false, error: "Enter the approval date and the certificate expiration.", status: 400 };
@@ -195,6 +205,74 @@ async function writeIndex(supabase: Store, organizationId: string, records: Supp
   return { ok: true as const };
 }
 
+function supplierSnapshot(record: SupplierFile) {
+  return {
+    supplier: record.supplierName,
+    "supplied item": record.suppliedItem,
+    approval: record.approval,
+    "approved on": record.approvedOn,
+    "approved by": record.approvedBy,
+    certificate: record.certificateName,
+    "certificate number": record.certificateNumber,
+    expires: record.expiresOn,
+    "alert days": String(record.leadDays),
+    file: record.fileName ?? "",
+    "file path": record.filePath ?? "",
+    signatures: signatureList(record.signatures).map(formatSignature).join(" | "),
+  };
+}
+
+function supplierLabel(record: SupplierFile) {
+  return `${record.supplierName} · ${record.certificateNumber}`;
+}
+
+async function persistSuppliers(
+  store: { supabase: Store; scope: { organizationId: string } },
+  previous: SupplierFile[],
+  next: SupplierFile[],
+  draft: AuditDraft,
+) {
+  return keepAuditedChange(
+    store.supabase,
+    store.scope.organizationId,
+    draft,
+    () => writeIndex(store.supabase, store.scope.organizationId, next),
+    () => writeIndex(store.supabase, store.scope.organizationId, previous),
+  );
+}
+
+function passwordOf(input: unknown) {
+  if (!input || typeof input !== "object") return "";
+  const value = (input as { password?: unknown }).password;
+  return typeof value === "string" ? value : "";
+}
+
+async function withApprovalSignature(input: unknown, fields: SupplierInput, existing?: SupplierFile) {
+  const retained = Boolean(existing && supplierIsRetained(existing)) || fields.approval === "Approved";
+  const needsSignature = fields.approval === "Approved" && (!existing || existing.approval !== "Approved" || signatureList(existing.signatures).length === 0);
+  if (!needsSignature) {
+    const approvedBy = fields.approval === "Approved" && existing ? existing.approvedBy : fields.approvedBy;
+    return {
+      ok: true as const,
+      signed: false,
+      recordFields: { ...fields, approvedBy, retained, signatures: existing?.signatures },
+    };
+  }
+  const signed = await requireSignature(passwordOf(input), "approval");
+  if (!signed.ok) return signed;
+  return {
+    ok: true as const,
+    recordFields: {
+      ...fields,
+      approvedBy: signed.signature.printedName,
+      approvedOn: fields.approvedOn || signed.signature.signedAt.slice(0, 10),
+      retained: true,
+      signatures: [...signatureList(existing?.signatures), signed.signature],
+    },
+    signed: true,
+  };
+}
+
 export async function listSupplierFiles() {
   const store = await openStore();
   if ("ok" in store) return store;
@@ -204,14 +282,23 @@ export async function listSupplierFiles() {
 export async function createSupplierFile(input: unknown) {
   const fields = readInput(input);
   if ("ok" in fields) return fields;
+  const signed = await withApprovalSignature(input, fields);
+  if (!signed.ok) return signed;
   const store = await openStore();
   if ("ok" in store) return store;
   const records = await readIndex(store.supabase, store.scope.organizationId);
   if (records.some((record) => sameCertificate(record, fields))) {
     return { ok: false as const, error: "That certificate is already on file for this supplier.", status: 409 as const };
   }
-  const record: SupplierFile = { id: crypto.randomUUID(), ...fields };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, [record, ...records]);
+  const record: SupplierFile = { id: crypto.randomUUID(), ...signed.recordFields };
+  const saved = await persistSuppliers(store, records, [record, ...records], {
+    action: signed.signed ? "sign" : "create",
+    recordType: "supplier",
+    recordId: record.id,
+    recordLabel: supplierLabel(record),
+    meaning: signed.signed ? "approval" : "",
+    changes: changedFields({}, supplierSnapshot(record)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 201 as const, record };
 }
@@ -227,18 +314,23 @@ export async function updateSupplierFile(id: string, input: unknown) {
   if (records.some((item) => item.id !== id && sameCertificate(item, fields))) {
     return { ok: false as const, error: "That certificate is already on file for this supplier.", status: 409 as const };
   }
+  const signed = await withApprovalSignature(input, fields, record);
+  if (!signed.ok) return signed;
   const next: SupplierFile = {
     ...record,
-    ...fields,
+    ...signed.recordFields,
     fileName: record.fileName,
     filePath: record.filePath,
     fileType: record.fileType,
   };
-  const saved = await writeIndex(
-    store.supabase,
-    store.scope.organizationId,
-    records.map((item) => item.id === id ? next : item),
-  );
+  const saved = await persistSuppliers(store, records, records.map((item) => item.id === id ? next : item), {
+    action: signed.signed ? "sign" : "update",
+    recordType: "supplier",
+    recordId: record.id,
+    recordLabel: supplierLabel(next),
+    meaning: signed.signed ? "approval" : "",
+    changes: changedFields(supplierSnapshot(record), supplierSnapshot(next)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 200 as const, record: next };
 }
@@ -249,13 +341,19 @@ export async function deleteSupplierFile(id: string) {
   const records = await readIndex(store.supabase, store.scope.organizationId);
   const record = records.find((item) => item.id === id);
   if (!record) return { ok: false as const, error: "Supplier file not found.", status: 404 as const };
-  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
-  const saved = await writeIndex(
-    store.supabase,
-    store.scope.organizationId,
-    records.filter((item) => item.id !== id),
-  );
+  if (supplierIsRetained(record)) {
+    return { ok: false as const, error: "An approved supplier file stays on the register.", status: 409 as const };
+  }
+  const saved = await persistSuppliers(store, records, records.filter((item) => item.id !== id), {
+    action: "delete",
+    recordType: "supplier",
+    recordId: record.id,
+    recordLabel: supplierLabel(record),
+    meaning: "",
+    changes: changedFields(supplierSnapshot(record), {}),
+  });
   if (!saved.ok) return saved;
+  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
   return { ok: true as const, status: 200 as const };
 }
 
@@ -281,16 +379,21 @@ export async function saveSupplierCertificate(id: string, file: File) {
     upsert: true,
   });
   if (uploadError) return { ok: false as const, error: uploadError.message, status: 500 as const };
-  const previousPath = record.filePath ?? "";
   const next = records.map((item) => item.id === id ? { ...item, fileName, filePath, fileType: mime } : item);
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, next);
+  const updated = next.find((item) => item.id === id) ?? record;
+  const saved = await persistSuppliers(store, records, next, {
+    action: "update",
+    recordType: "supplier",
+    recordId: record.id,
+    recordLabel: supplierLabel(record),
+    meaning: "",
+    changes: changedFields(supplierSnapshot(record), supplierSnapshot(updated)),
+  });
   if (!saved.ok) {
     await store.supabase.storage.from(bucket).remove([filePath]);
     return saved;
   }
-  if (previousPath && previousPath !== filePath) await store.supabase.storage.from(bucket).remove([previousPath]);
-  const updated = next.find((item) => item.id === id);
-  return { ok: true as const, status: 200 as const, record: updated ?? record };
+  return { ok: true as const, status: 200 as const, record: updated };
 }
 
 export async function removeSupplierCertificate(id: string) {
@@ -299,12 +402,22 @@ export async function removeSupplierCertificate(id: string) {
   const records = await readIndex(store.supabase, store.scope.organizationId);
   const record = records.find((item) => item.id === id);
   if (!record) return { ok: false as const, error: "Supplier file not found.", status: 404 as const };
-  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
+  if (supplierIsRetained(record)) {
+    return { ok: false as const, error: "The certificate on an approved supplier file stays stored. Upload a replacement to add a newer file.", status: 409 as const };
+  }
   const next = records.map((item) => item.id === id ? withoutFile(item) : item);
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, next);
+  const updated = next.find((item) => item.id === id) ?? record;
+  const saved = await persistSuppliers(store, records, next, {
+    action: "update",
+    recordType: "supplier",
+    recordId: record.id,
+    recordLabel: supplierLabel(record),
+    meaning: "",
+    changes: changedFields(supplierSnapshot(record), supplierSnapshot(updated)),
+  });
   if (!saved.ok) return saved;
-  const updated = next.find((item) => item.id === id);
-  return { ok: true as const, status: 200 as const, record: updated ?? record };
+  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
+  return { ok: true as const, status: 200 as const, record: updated };
 }
 
 export async function readSupplierCertificate(id: string) {

@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { listAuditEvents } from "../../../lib/audit-trail";
 import { buildAuditPacket } from "../../../lib/audit-packet";
 import { isClerkConfigured } from "../../../lib/clerk-config";
 import { listControlledDocuments } from "../../../lib/controlled-documents";
@@ -20,17 +21,18 @@ export async function GET() {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
-  const [documents, training, events, suppliers] = await Promise.all([
+  const [documents, training, events, suppliers, auditEvents] = await Promise.all([
     listControlledDocuments(),
     listTrainingRecords(),
     listQualityEvents(),
     listSupplierFiles(),
+    listAuditEvents(),
   ]);
-  const failure = [documents, training, events, suppliers].find((result) => !result.ok);
+  const failure = [documents, training, events, suppliers, auditEvents].find((result) => !result.ok);
   if (failure && !failure.ok) {
     return NextResponse.json({ error: failure.error }, { status: failure.status });
   }
-  if (!documents.ok || !training.ok || !events.ok || !suppliers.ok) {
+  if (!documents.ok || !training.ok || !events.ok || !suppliers.ok || !auditEvents.ok) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   }
 
@@ -57,6 +59,8 @@ export async function GET() {
     suppliers: suppliers.records,
     licenses,
     supplierRisk,
+    auditEvents: auditEvents.events,
+    auditTruncated: auditEvents.truncated,
   });
 
   return new NextResponse(new Uint8Array(buffer), {

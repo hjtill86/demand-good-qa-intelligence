@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { confidentialLines } from "../../../lib/confidential-statement";
 import type { ControlledDocument } from "../../../lib/controlled-documents";
+import { documentIsRetained, formatSignature } from "../../../lib/part11-records";
 
 const types = ["SOP", "Work instruction", "Policy", "Form"] as const;
 
@@ -30,7 +31,7 @@ export function DocumentRegister({
   const [file, setFile] = useState<File | null>(null);
   const [fileKey, setFileKey] = useState(0);
   const [approvingId, setApprovingId] = useState<string | null>(null);
-  const [approver, setApprover] = useState("");
+  const [password, setPassword] = useState("");
   const [effectiveOn, setEffectiveOn] = useState("");
   const [revisingId, setRevisingId] = useState<string | null>(null);
   const [nextRevision, setNextRevision] = useState("");
@@ -109,6 +110,7 @@ export function DocumentRegister({
       return;
     }
     replace(result.document);
+    setPassword("");
     setApprovingId(null);
     setRevisingId(null);
     setMessage("Document updated.");
@@ -176,7 +178,7 @@ export function DocumentRegister({
               <span>{document.documentType} · Owner {document.owner || "—"} · Rev {document.current.revision}</span>
               <span>
                 <i className={statusClass(document.current.status)}>{document.current.status}</i>
-                {document.current.approver ? ` · Approved by ${document.current.approver} on ${document.current.approvedOn}` : ""}
+                {document.current.signature ? ` · Signed ${formatSignature(document.current.signature)}` : document.current.approver ? ` · Approved by ${document.current.approver} on ${document.current.approvedOn}` : ""}
                 {document.current.effectiveOn ? ` · Effective ${document.current.effectiveOn}` : ""}
                 {document.current.retiredOn ? ` · Retired ${document.current.retiredOn}` : ""}
               </span>
@@ -190,6 +192,7 @@ export function DocumentRegister({
                   {document.history.map((revision) => (
                     <li key={revision.id}>
                       Rev {revision.revision} · Retired {revision.retiredOn || "—"}
+                      {revision.signature ? ` · Signed ${formatSignature(revision.signature)}` : revision.approver ? ` · Approved by ${revision.approver}` : ""}
                       {revision.fileName ? <> · <a href={fileHref(document.id, revision.id)}>{revision.fileName}</a></> : null}
                     </li>
                   ))}
@@ -219,13 +222,17 @@ export function DocumentRegister({
                 {document.current.status !== "Retired" ? (
                   <button type="button" disabled={pending} onClick={() => void act(document.id, { action: "retire" })}>Retire</button>
                 ) : null}
-                <button type="button" disabled={pending} onClick={() => void remove(document.id)}>Delete</button>
+                {documentIsRetained([document.current, ...document.history].map((revision) => revision.status)) ? (
+                  <span>Approved and retired revisions stay on the register.</span>
+                ) : (
+                  <button type="button" disabled={pending} onClick={() => void remove(document.id)}>Delete draft</button>
+                )}
               </div>
               {approvingId === document.id ? (
                 <div className="doc-actions">
-                  <input value={approver} onChange={(event) => setApprover(event.target.value)} placeholder="Approver" />
+                  <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Your password" />
                   <input type="date" value={effectiveOn} onChange={(event) => setEffectiveOn(event.target.value)} />
-                  <button type="button" disabled={pending} onClick={() => void act(document.id, { action: "approve", approver, effectiveOn })}>Confirm approval</button>
+                  <button type="button" disabled={pending} onClick={() => void act(document.id, { action: "approve", password, effectiveOn })}>Sign approval</button>
                 </div>
               ) : null}
               {revisingId === document.id ? (

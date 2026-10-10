@@ -15,7 +15,7 @@ export default async function ComplaintsPage() {
         <h1>Complaints and deviations</h1>
         <p className="fine-print">
           Record a customer complaint or an internal deviation. Saving it opens a CAPA on the same record.
-          The CAPA stays open until the root cause, corrective action, and a way to verify it are recorded.
+          The CAPA stays open until the root cause, corrective action, and a way to verify it are recorded. Closing it asks for the password on this account. A closed CAPA stays on the register.
           <a href="/dashboard"> ← Workspace</a>
         </p>
       </header>

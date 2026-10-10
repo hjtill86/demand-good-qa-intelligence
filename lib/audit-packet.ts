@@ -3,6 +3,7 @@ import type { ControlledDocument } from "./controlled-documents";
 import type { LicenseRecord } from "./dashboard-data";
 import type { SupplierRisk } from "./dashboard-data";
 import { eventStatus } from "./event-status";
+import { formatSignature, formatUtc, signatureList, type AuditEvent } from "./part11-records";
 import type { QualityEvent } from "./quality-events";
 import { certificateStatus } from "./supplier-status";
 import type { SupplierFile } from "./supplier-files";
@@ -21,6 +22,8 @@ export type AuditPacketInput = {
   suppliers: SupplierFile[];
   licenses: AuditLicense[] | null;
   supplierRisk: SupplierRisk[] | null;
+  auditEvents: AuditEvent[];
+  auditTruncated: boolean;
 };
 
 function yesNo(value: string | undefined) {
@@ -75,6 +78,10 @@ export async function buildAuditPacket(input: AuditPacketInput) {
   if (input.licenses) coverRows.push({ item: "License and certification records", detail: input.licenses.length });
   if (input.supplierRisk) coverRows.push({ item: "Supplier risk scores", detail: input.supplierRisk.length });
   coverRows.push({
+    item: "Audit trail entries in this packet",
+    detail: input.auditTruncated ? `${input.auditEvents.length} (latest 100; older entries remain in the workspace)` : input.auditEvents.length,
+  });
+  coverRows.push({
     item: "Files",
     detail: "This packet lists each record and whether a file is attached. Open the record in the workspace to download the file.",
   });
@@ -95,6 +102,7 @@ export async function buildAuditPacket(input: AuditPacketInput) {
       register: revision.register,
       status: revision.status,
       approver: revision.approver,
+      signature: revision.signature ? formatSignature(revision.signature) : "",
       approvedOn: revision.approvedOn,
       effectiveOn: revision.effectiveOn,
       retiredOn: revision.retiredOn,
@@ -110,6 +118,7 @@ export async function buildAuditPacket(input: AuditPacketInput) {
     { header: "Register", key: "register", width: 12 },
     { header: "Status", key: "status", width: 14 },
     { header: "Approver", key: "approver", width: 22 },
+    { header: "Signature", key: "signature", width: 42 },
     { header: "Approved", key: "approvedOn", width: 14 },
     { header: "Effective", key: "effectiveOn", width: 14 },
     { header: "Retired", key: "retiredOn", width: 14 },
@@ -158,6 +167,7 @@ export async function buildAuditPacket(input: AuditPacketInput) {
       dueOn: record.dueOn,
       status: eventStatus(record, input.preparedOn),
       closedOn: record.closedOn,
+      signatures: signatureList(record.signatures).map(formatSignature).join(" | "),
       containment: record.containment,
       rootCause: record.rootCause,
       correctiveAction: record.correctiveAction,
@@ -178,6 +188,7 @@ export async function buildAuditPacket(input: AuditPacketInput) {
     { header: "Target", key: "dueOn", width: 14 },
     { header: "Status", key: "status", width: 16 },
     { header: "Closed", key: "closedOn", width: 14 },
+    { header: "Closure signature", key: "signatures", width: 42 },
     { header: "Containment", key: "containment", width: 36 },
     { header: "Root cause", key: "rootCause", width: 36 },
     { header: "Corrective action", key: "correctiveAction", width: 36 },
@@ -195,6 +206,7 @@ export async function buildAuditPacket(input: AuditPacketInput) {
       approval: record.approval,
       approvedOn: record.approvedOn,
       approvedBy: record.approvedBy,
+      signatures: signatureList(record.signatures).map(formatSignature).join(" | "),
       certificateName: record.certificateName,
       certificateNumber: record.certificateNumber,
       expiresOn: record.expiresOn,
@@ -208,6 +220,7 @@ export async function buildAuditPacket(input: AuditPacketInput) {
     { header: "Approval", key: "approval", width: 14 },
     { header: "Approved", key: "approvedOn", width: 14 },
     { header: "Approved by", key: "approvedBy", width: 22 },
+    { header: "Signature", key: "signatures", width: 42 },
     { header: "Certificate", key: "certificateName", width: 24 },
     { header: "Certificate number", key: "certificateNumber", width: 22 },
     { header: "Expires", key: "expiresOn", width: 14 },
@@ -255,6 +268,34 @@ export async function buildAuditPacket(input: AuditPacketInput) {
       note: record.note,
     })));
   }
+
+  const auditRows = input.auditEvents.flatMap((event) => {
+    const base = {
+      at: formatUtc(event.at),
+      person: event.printedName,
+      email: event.email,
+      actor: event.actorEmail ? `${event.actorName} (${event.actorEmail})` : "",
+      action: event.action,
+      meaning: event.meaning,
+      recordType: event.recordType,
+      record: event.recordLabel,
+    };
+    if (event.changes.length === 0) return [{ ...base, field: "", before: "", after: "" }];
+    return event.changes.map((change) => ({ ...base, field: change.field, before: change.before, after: change.after }));
+  });
+  addSheet(workbook, "Audit trail", [
+    { header: "Time UTC", key: "at", width: 24 },
+    { header: "Person", key: "person", width: 24 },
+    { header: "Email", key: "email", width: 28 },
+    { header: "Administrator session", key: "actor", width: 32 },
+    { header: "Action", key: "action", width: 12 },
+    { header: "Meaning", key: "meaning", width: 14 },
+    { header: "Record type", key: "recordType", width: 14 },
+    { header: "Record", key: "record", width: 32 },
+    { header: "Field", key: "field", width: 22 },
+    { header: "Previous value", key: "before", width: 36 },
+    { header: "New value", key: "after", width: 36 },
+  ], auditRows);
 
   return Buffer.from(await workbook.xlsx.writeBuffer());
 }

@@ -51,6 +51,8 @@ export default async function DashboardPage() {
           <a href="/dashboard/complaints">Complaints &amp; CAPA</a>
           <a href="/dashboard/suppliers">Approved suppliers</a>
           <a href="/dashboard/audit-packet">Auditor packet</a>
+          <a href="/dashboard/audit-trail">Audit trail</a>
+          <a href="/dashboard/part-11">Part 11 package</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
@@ -214,8 +216,14 @@ export default async function DashboardPage() {
             <a className="generator-card" href="/dashboard/audit-packet">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
               <h3>Auditor packet</h3>
-              <p>Download one workbook of the document register, training, CAPAs, and approved suppliers.</p>
+              <p>Download one workbook of the document register, training, CAPAs, approved suppliers, and the audit trail.</p>
               <b>Open packet →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/audit-trail">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Audit trail</h3>
+              <p>See who changed a record, when it changed in UTC, and the previous value.</p>
+              <b>Open trail →</b>
             </a>
             <a className="generator-card" href="/dashboard/qms/audit-readiness">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>

@@ -8,6 +8,7 @@ import {
   type EventDisplayStatus,
   type IntakeKind,
 } from "../../../lib/event-status";
+import { eventDeleteBlocked, formatSignature, signatureList } from "../../../lib/part11-records";
 import type { QualityEvent } from "../../../lib/quality-events";
 
 function localToday() {
@@ -275,8 +276,11 @@ function EventCard({
   onDelete: (id: string) => Promise<void>;
 }) {
   const [draft, setDraft] = useState(record);
+  const [password, setPassword] = useState("");
   const status = eventStatus(record, today);
   const closed = record.status === "Closed";
+  const locked = eventDeleteBlocked(record);
+  const signatures = signatureList(record.signatures);
 
   async function send(action: "save" | "close" | "reopen") {
     onPending(true);
@@ -284,7 +288,7 @@ function EventCard({
     const response = await fetch(`/api/complaints/${record.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(action === "reopen" ? { action } : { ...draft, action, closedOn: action === "close" ? today : "" }),
+      body: JSON.stringify(action === "reopen" ? { action } : { ...draft, action, password: action === "close" ? password : "" }),
     });
     const result = await response.json().catch(() => ({}));
     onPending(false);
@@ -294,6 +298,7 @@ function EventCard({
     }
     const next = result.record as QualityEvent;
     setDraft(next);
+    setPassword("");
     onReplace(next);
     onMessage(action === "close" ? `${next.capaNumber} closed.` : action === "reopen" ? `${next.capaNumber} reopened.` : `${next.capaNumber} saved.`);
   }
@@ -305,6 +310,7 @@ function EventCard({
       <span>Opened {record.openedOn} by {record.reportedBy} · {record.source}</span>
       {record.productOrProcess ? <span>{record.productOrProcess}</span> : null}
       <span><i className={statusClass(status)}>{status}</i>{closed && record.closedOn ? ` · Closed ${record.closedOn}` : ""}</span>
+      {signatures.map((signature) => <span key={`${signature.signedAt}-${signature.userId}`}>Signed {formatSignature(signature)}</span>)}
       {record.fileName ? (
         <a href={`/api/complaints/file?id=${encodeURIComponent(record.id)}`}>{record.fileName}</a>
       ) : (
@@ -373,7 +379,11 @@ function EventCard({
             </label>
           </div>
           <button className="button button-dark" type="submit" disabled={pending}>Save CAPA</button>
-          <button className="button button-outline" type="button" disabled={pending} onClick={() => void send("close")}>Close CAPA</button>
+          <label>
+            <span>Password to sign the closure</span>
+            <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} />
+          </label>
+          <button className="button button-outline" type="button" disabled={pending} onClick={() => void send("close")}>Sign and close CAPA</button>
         </form>
       )}
       <div className="doc-actions">
@@ -390,10 +400,14 @@ function EventCard({
             }}
           />
         </label>
-        {record.fileName ? (
+        {record.fileName && !closed ? (
           <button type="button" disabled={pending} onClick={() => void onRemoveFile(record.id)}>Remove evidence</button>
         ) : null}
-        <button type="button" disabled={pending} onClick={() => void onDelete(record.id)}>Delete</button>
+        {locked ? (
+          <span>This CAPA stays on the register.</span>
+        ) : (
+          <button type="button" disabled={pending} onClick={() => void onDelete(record.id)}>Delete</button>
+        )}
       </div>
     </article>
   );

@@ -67,19 +67,22 @@ export default async function WorkInstructionsPage() {
       <section className="report-section">
         <h2>5. Quality workbenches</h2>
         <p>
-          These tools open from the sidebar. Saved entries stay with your account until you change or
-          delete them, including when you sign in on another computer.
+          These tools open from the sidebar. Saved entries stay with your account, including when you
+          sign in on another computer. Approved documents, closed CAPAs, and signed supplier approvals
+          stay on the register. Other changes keep the previous value in the audit trail.
         </p>
         <ul>
           <li><b>Review board</b> — KPIs, ISO 9001 clause 9.3 inputs, meeting minutes, outputs, and trend charts.</li>
           <li><b>CAPA / RCA</b> — corrective actions, 5-Why, fishbone, action tracker, and risk matrix.</li>
           <li><b>Audit readiness</b> — checklist, evidence register, nonconformance log, schedule, and contacts.</li>
           <li><b>SPC / MSA</b> — X-bar R, I-MR, Cp/Cpk, histogram, control rules, and Gage R&amp;R.</li>
-          <li><b>Controlled documents</b> — SOPs, work instructions, policies, and forms with an approver, effective date, and the retired file from the previous revision. Downloaded files carry a confidential statement at the bottom.</li>
+          <li><b>Controlled documents</b> — SOPs, work instructions, policies, and forms. Approving a revision asks for your password and stores your name, the meaning “approval,” and the UTC time. Retired revisions stay. Downloaded files carry a confidential statement at the bottom.</li>
           <li><b>Training records</b> — who was trained on which revision, with the signed sheet attached. A new revision marks that training as due for retraining. The person does not need a login.</li>
-          <li><b>Complaints and deviations</b> — record a complaint or a deviation and a CAPA opens with it. The CAPA stays open until the root cause, corrective action, and verification are saved and the CAPA is closed. Use CAPA / RCA for a 5-Why or fishbone, then write the result on the CAPA.</li>
-          <li><b>Approved suppliers</b> — the supplier, what they are approved to supply, who approved them, and the certificate with its expiration. The certificate shows as expiring inside a 30, 60, or 90 day window, then as expired. Supplier risk scores on the overview are entered separately in Manage data.</li>
-          <li><b>Auditor packet</b> — one workbook of the document register, training records, complaints and CAPAs, and approved suppliers. Most Good also includes the license vault and supplier risk scores. It is a snapshot of those registers on the day you download it.</li>
+          <li><b>Complaints and deviations</b> — record a complaint or a deviation and a CAPA opens with it. The CAPA stays open until the root cause, corrective action, and verification are saved and you sign the closure with your password. A closed CAPA stays on the register. Use CAPA / RCA for a 5-Why or fishbone, then write the result on the CAPA.</li>
+          <li><b>Approved suppliers</b> — the supplier, what they are approved to supply, and the certificate with its expiration. Marking the file Approved asks for your password. That file then stays on the register. The certificate shows as expiring inside a 30, 60, or 90 day window, then as expired. Supplier risk scores on the overview are entered separately in Manage data.</li>
+          <li><b>Audit trail</b> — each create, change, deletion, and signature on the registers above, with the person, the UTC time, and the previous value. Entries are added by the system and are not edited.</li>
+          <li><b>Auditor packet</b> — one workbook of the document register, training records, complaints and CAPAs, approved suppliers, and the audit trail. Most Good also includes the license vault and supplier risk scores. It is a snapshot of those registers on the day you download it.</li>
+          <li><b>Part 11 package</b> — the written description of these controls and the tests still to be run and signed. The package does not by itself make a record Part 11 compliant.</li>
         </ul>
         <p className="fine-print">Use ← Workspace on each tool to return to the overview. Available on both Foundation and Most Good.</p>
       </section>
@@ -162,7 +165,7 @@ export default async function WorkInstructionsPage() {
           weekly digest (plus Supplier Risk, License Vault, and Regulatory Watch sheets on Most Good). Use
           <b> Export PDF</b> for a print-ready version of the same data you can save or share. Use
           <b> Auditor packet</b> for one workbook of the document register, training records, complaints and CAPAs,
-          and approved suppliers.
+          approved suppliers, and the audit trail.
         </p>
       </section>
 

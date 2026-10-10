@@ -13,7 +13,7 @@ export default async function DocumentsPage() {
         <span className="eyebrow">FOUNDATION + MOST GOOD</span>
         <h1>Controlled documents</h1>
         <p className="fine-print">
-          Keep the current SOP, work instruction, policy, or form, who approved it, and every retired revision.
+          Keep the current SOP, work instruction, policy, or form, who signed the approval, and every retired revision. Approval asks for the password on this account. Approved and retired revisions stay on the register.
           Each downloaded file adds the confidential statement at the bottom.
           <a href="/dashboard"> ← Workspace</a>
         </p>

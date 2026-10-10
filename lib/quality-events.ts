@@ -1,5 +1,8 @@
+import { keepAuditedChange, type AuditDraft } from "./audit-trail";
 import { complaintSources, deviationSources, intakeKinds, type IntakeKind } from "./event-status";
+import { changedFields, eventDeleteBlocked, formatSignature, signatureList, type RecordSignature } from "./part11-records";
 import { getDataScope, getSupabaseAdmin } from "./supabase-server";
+import { requireSignature } from "./verify-signer";
 
 const bucket = "dgqi-events";
 const maxBytes = 10 * 1024 * 1024;
@@ -34,6 +37,8 @@ export type QualityEvent = {
   verification: string;
   status: "Open" | "Closed";
   closedOn: string;
+  closedOnce?: boolean;
+  signatures?: RecordSignature[];
   fileName?: string;
   filePath?: string;
   fileType?: string;
@@ -138,7 +143,53 @@ function withoutFile(record: QualityEvent): QualityEvent {
     verification: record.verification,
     status: record.status,
     closedOn: record.closedOn,
+    closedOnce: record.closedOnce,
+    signatures: record.signatures,
   };
+}
+
+function eventSnapshot(record: QualityEvent) {
+  return {
+    number: record.number,
+    type: record.kind,
+    title: record.title,
+    "opened on": record.openedOn,
+    "reported by": record.reportedBy,
+    source: record.source,
+    "product or process": record.productOrProcess,
+    capa: record.capaNumber,
+    owner: record.owner,
+    "target date": record.dueOn,
+    containment: record.containment,
+    "root cause": record.rootCause,
+    "corrective action": record.correctiveAction,
+    "preventive action": record.preventiveAction,
+    verification: record.verification,
+    status: record.status,
+    "closed on": record.closedOn,
+    file: record.fileName ?? "",
+    "file path": record.filePath ?? "",
+    signatures: signatureList(record.signatures).map(formatSignature).join(" | "),
+  };
+}
+
+function eventLabel(record: QualityEvent) {
+  return `${record.number} / ${record.capaNumber}`;
+}
+
+async function persistEvents(
+  store: { supabase: Store; scope: { organizationId: string } },
+  previous: QualityEvent[],
+  next: QualityEvent[],
+  draft: AuditDraft,
+) {
+  return keepAuditedChange(
+    store.supabase,
+    store.scope.organizationId,
+    draft,
+    () => writeIndex(store.supabase, store.scope.organizationId, next),
+    () => writeIndex(store.supabase, store.scope.organizationId, previous),
+  );
 }
 
 async function openStore(): Promise<{ scope: { organizationId: string; userId: string }; supabase: Store } | Failure> {
@@ -238,7 +289,14 @@ export async function createQualityEvent(input: unknown) {
     status: "Open",
     closedOn: "",
   };
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, [record, ...records]);
+  const saved = await persistEvents(store, records, [record, ...records], {
+    action: "create",
+    recordType: "complaint",
+    recordId: record.id,
+    recordLabel: eventLabel(record),
+    meaning: "",
+    changes: changedFields({}, eventSnapshot(record)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 201 as const, record };
 }
@@ -258,12 +316,15 @@ export async function updateQualityEvent(id: string, input: unknown) {
     if (record.status === "Open") {
       return { ok: false as const, error: "This CAPA is already open.", status: 409 as const };
     }
-    const reopened: QualityEvent = { ...record, status: "Open", closedOn: "" };
-    const saved = await writeIndex(
-      store.supabase,
-      store.scope.organizationId,
-      records.map((item) => item.id === id ? reopened : item),
-    );
+    const reopened: QualityEvent = { ...record, status: "Open", closedOn: "", closedOnce: true };
+    const saved = await persistEvents(store, records, records.map((item) => item.id === id ? reopened : item), {
+      action: "update",
+      recordType: "complaint",
+      recordId: record.id,
+      recordLabel: eventLabel(record),
+      meaning: "",
+      changes: changedFields(eventSnapshot(record), eventSnapshot(reopened)),
+    });
     if (!saved.ok) return saved;
     return { ok: true as const, status: 200 as const, record: reopened };
   }
@@ -293,7 +354,12 @@ export async function updateQualityEvent(id: string, input: unknown) {
       status: 400 as const,
     };
   }
-  const closedOn = action === "close" ? (isDate(text(fields.closedOn, 10)) ? text(fields.closedOn, 10) : new Date().toISOString().slice(0, 10)) : "";
+  let signature = null;
+  if (action === "close") {
+    const signed = await requireSignature(fields.password, "closure");
+    if (!signed.ok) return signed;
+    signature = signed.signature;
+  }
   const next: QualityEvent = {
     ...record,
     title,
@@ -307,13 +373,18 @@ export async function updateQualityEvent(id: string, input: unknown) {
     preventiveAction,
     verification,
     status: action === "close" ? "Closed" : "Open",
-    closedOn: action === "close" ? closedOn : "",
+    closedOn: signature ? signature.signedAt.slice(0, 10) : "",
+    closedOnce: signature ? true : record.closedOnce,
+    signatures: signature ? [...signatureList(record.signatures), signature] : record.signatures,
   };
-  const saved = await writeIndex(
-    store.supabase,
-    store.scope.organizationId,
-    records.map((item) => item.id === id ? next : item),
-  );
+  const saved = await persistEvents(store, records, records.map((item) => item.id === id ? next : item), {
+    action: signature ? "sign" : "update",
+    recordType: "complaint",
+    recordId: record.id,
+    recordLabel: eventLabel(record),
+    meaning: signature ? "closure" : "",
+    changes: changedFields(eventSnapshot(record), eventSnapshot(next)),
+  });
   if (!saved.ok) return saved;
   return { ok: true as const, status: 200 as const, record: next };
 }
@@ -324,13 +395,19 @@ export async function deleteQualityEvent(id: string) {
   const records = await readIndex(store.supabase, store.scope.organizationId);
   const record = records.find((item) => item.id === id);
   if (!record) return { ok: false as const, error: "Complaint or deviation not found.", status: 404 as const };
-  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
-  const saved = await writeIndex(
-    store.supabase,
-    store.scope.organizationId,
-    records.filter((item) => item.id !== id),
-  );
+  if (eventDeleteBlocked(record)) {
+    return { ok: false as const, error: "A closed CAPA stays on the register, including after it is reopened.", status: 409 as const };
+  }
+  const saved = await persistEvents(store, records, records.filter((item) => item.id !== id), {
+    action: "delete",
+    recordType: "complaint",
+    recordId: record.id,
+    recordLabel: eventLabel(record),
+    meaning: "",
+    changes: changedFields(eventSnapshot(record), {}),
+  });
   if (!saved.ok) return saved;
+  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
   return { ok: true as const, status: 200 as const };
 }
 
@@ -340,6 +417,9 @@ export async function saveEventFile(id: string, file: File) {
   const records = await readIndex(store.supabase, store.scope.organizationId);
   const record = records.find((item) => item.id === id);
   if (!record) return { ok: false as const, error: "Complaint or deviation not found.", status: 404 as const };
+  if (record.status === "Closed") {
+    return { ok: false as const, error: "Reopen the CAPA before changing its evidence.", status: 409 as const };
+  }
   const fileName = safeFileName(file.name);
   const mime = mimeByExtension[extensionOf(fileName)];
   const jpegAlias = mime === "image/jpeg" && file.type === "image/jpg";
@@ -356,16 +436,21 @@ export async function saveEventFile(id: string, file: File) {
     upsert: true,
   });
   if (uploadError) return { ok: false as const, error: uploadError.message, status: 500 as const };
-  const previousPath = record.filePath ?? "";
   const next = records.map((item) => item.id === id ? { ...item, fileName, filePath, fileType: mime } : item);
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, next);
+  const updated = next.find((item) => item.id === id) ?? record;
+  const saved = await persistEvents(store, records, next, {
+    action: "update",
+    recordType: "complaint",
+    recordId: record.id,
+    recordLabel: eventLabel(record),
+    meaning: "",
+    changes: changedFields(eventSnapshot(record), eventSnapshot(updated)),
+  });
   if (!saved.ok) {
     await store.supabase.storage.from(bucket).remove([filePath]);
     return saved;
   }
-  if (previousPath && previousPath !== filePath) await store.supabase.storage.from(bucket).remove([previousPath]);
-  const updated = next.find((item) => item.id === id);
-  return { ok: true as const, status: 200 as const, record: updated ?? record };
+  return { ok: true as const, status: 200 as const, record: updated };
 }
 
 export async function removeEventFile(id: string) {
@@ -374,12 +459,22 @@ export async function removeEventFile(id: string) {
   const records = await readIndex(store.supabase, store.scope.organizationId);
   const record = records.find((item) => item.id === id);
   if (!record) return { ok: false as const, error: "Complaint or deviation not found.", status: 404 as const };
-  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
+  if (record.status === "Closed") {
+    return { ok: false as const, error: "Reopen the CAPA before changing its evidence.", status: 409 as const };
+  }
   const next = records.map((item) => item.id === id ? withoutFile(item) : item);
-  const saved = await writeIndex(store.supabase, store.scope.organizationId, next);
+  const updated = next.find((item) => item.id === id) ?? record;
+  const saved = await persistEvents(store, records, next, {
+    action: "update",
+    recordType: "complaint",
+    recordId: record.id,
+    recordLabel: eventLabel(record),
+    meaning: "",
+    changes: changedFields(eventSnapshot(record), eventSnapshot(updated)),
+  });
   if (!saved.ok) return saved;
-  const updated = next.find((item) => item.id === id);
-  return { ok: true as const, status: 200 as const, record: updated ?? record };
+  if (record.filePath) await store.supabase.storage.from(bucket).remove([record.filePath]);
+  return { ok: true as const, status: 200 as const, record: updated };
 }
 
 export async function readEventFile(id: string) {

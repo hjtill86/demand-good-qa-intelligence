@@ -9,6 +9,7 @@ import {
   type CertificateStatus,
   type LeadDays,
 } from "../../../lib/supplier-status";
+import { formatSignature, signatureList, supplierIsRetained } from "../../../lib/part11-records";
 import type { SupplierFile } from "../../../lib/supplier-files";
 
 function localToday() {
@@ -83,6 +84,7 @@ export function SupplierRegister({
   const [file, setFile] = useState<File | null>(null);
   const [fileKey, setFileKey] = useState(0);
   const [form, setForm] = useState<SupplierForm>(emptyForm);
+  const [password, setPassword] = useState("");
   const today = localToday();
 
   function replace(record: SupplierFile) {
@@ -96,7 +98,7 @@ export function SupplierRegister({
     const response = await fetch("/api/suppliers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, password }),
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
@@ -121,6 +123,7 @@ export function SupplierRegister({
     }
     setRecords((current) => [record, ...current]);
     setForm(emptyForm);
+    setPassword("");
     setFile(null);
     setFileKey((key) => key + 1);
     setPending(false);
@@ -188,7 +191,7 @@ export function SupplierRegister({
       <section className="report-section">
         <form onSubmit={createRecord} className="data-form">
           <h2>New supplier file</h2>
-          <SupplierFields form={form} onChange={setForm} fileKey={fileKey} onFile={setFile} />
+          <SupplierFields form={form} onChange={setForm} fileKey={fileKey} onFile={setFile} password={password} onPassword={setPassword} />
           <button className="button button-dark" type="submit" disabled={pending}>Save supplier file</button>
         </form>
         <p className="fine-print">Supplier risk scores on the overview are entered in Manage data. This register holds the approval and the certificate.</p>
@@ -224,11 +227,15 @@ function SupplierFields({
   onChange,
   fileKey,
   onFile,
+  password = "",
+  onPassword,
 }: {
   form: SupplierForm;
   onChange: (form: SupplierForm) => void;
   fileKey?: number;
   onFile?: (file: File | null) => void;
+  password?: string;
+  onPassword?: (password: string) => void;
 }) {
   return (
     <div className="data-form-grid">
@@ -253,10 +260,17 @@ function SupplierFields({
         <span>Approved on</span>
         <input type="date" value={form.approvedOn} onChange={(event) => onChange({ ...form, approvedOn: event.target.value })} />
       </label>
-      <label>
-        <span>Approved by</span>
-        <input value={form.approvedBy} onChange={(event) => onChange({ ...form, approvedBy: event.target.value })} placeholder="Quality manager" />
-      </label>
+      {form.approval === "Approved" && onPassword ? (
+        <label>
+          <span>Password to sign the approval</span>
+          <input type="password" autoComplete="current-password" value={password} onChange={(event) => onPassword?.(event.target.value)} />
+        </label>
+      ) : (
+        <label>
+          <span>Recorded by</span>
+          <input value={form.approvedBy} disabled={form.approval === "Approved"} onChange={(event) => onChange({ ...form, approvedBy: event.target.value })} placeholder="Quality manager" />
+        </label>
+      )}
       <label>
         <span>Certificate</span>
         <input value={form.certificateName} onChange={(event) => onChange({ ...form, certificateName: event.target.value })} placeholder="ISO 9001" />
@@ -310,7 +324,10 @@ function SupplierCard({
   onDelete: (id: string) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<SupplierForm>(formFrom(record));
+  const [password, setPassword] = useState("");
   const status = certificateStatus(record, today);
+  const retained = supplierIsRetained(record);
+  const signatures = signatureList(record.signatures);
 
   async function save(event: FormEvent) {
     event.preventDefault();
@@ -319,7 +336,7 @@ function SupplierCard({
     const response = await fetch(`/api/suppliers/${record.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(draft),
+      body: JSON.stringify({ ...draft, password }),
     });
     const result = await response.json().catch(() => ({}));
     onPending(false);
@@ -329,6 +346,7 @@ function SupplierCard({
     }
     const next = result.record as SupplierFile;
     setDraft(formFrom(next));
+    setPassword("");
     onReplace(next);
     onMessage(`${next.supplierName} updated.`);
   }
@@ -338,6 +356,7 @@ function SupplierCard({
       <b>{record.supplierName} · {record.certificateName}</b>
       <span>{record.suppliedItem} · {record.certificateNumber}</span>
       <span>Approved {record.approvedOn} by {record.approvedBy} · {record.approval}</span>
+      {signatures.map((signature) => <span key={`${signature.signedAt}-${signature.userId}`}>Signed {formatSignature(signature)}</span>)}
       <span>Expires {record.expiresOn} · {record.leadDays}-day alert</span>
       <span><i className={statusClass(status)}>{status}</i></span>
       {record.fileName ? (
@@ -347,7 +366,12 @@ function SupplierCard({
       )}
       <form className="data-form" onSubmit={save}>
         <h2>Update file</h2>
-        <SupplierFields form={draft} onChange={setDraft} />
+        <SupplierFields
+          form={draft}
+          onChange={setDraft}
+          password={password}
+          onPassword={draft.approval === "Approved" && (record.approval !== "Approved" || signatures.length === 0) ? setPassword : undefined}
+        />
         <button className="button button-dark" type="submit" disabled={pending}>Save changes</button>
       </form>
       <div className="doc-actions">
@@ -364,10 +388,14 @@ function SupplierCard({
             }}
           />
         </label>
-        {record.fileName ? (
+        {record.fileName && !retained ? (
           <button type="button" disabled={pending} onClick={() => void onRemoveFile(record.id)}>Remove certificate</button>
         ) : null}
-        <button type="button" disabled={pending} onClick={() => void onDelete(record.id)}>Delete</button>
+        {retained ? (
+          <span>This approved file stays on the register.</span>
+        ) : (
+          <button type="button" disabled={pending} onClick={() => void onDelete(record.id)}>Delete</button>
+        )}
       </div>
     </article>
   );
