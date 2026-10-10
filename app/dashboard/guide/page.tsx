@@ -65,7 +65,22 @@ export default async function WorkInstructionsPage() {
       </section>
 
       <section className="report-section">
-        <h2>5. Generating a Quarterly Business Review (QBR)</h2>
+        <h2>5. Quality workbenches</h2>
+        <p>
+          These tools open from the sidebar. Entries stay in this browser on this device. They are not
+          copied into the shared company data store.
+        </p>
+        <ul>
+          <li><b>Review board</b> — KPIs, ISO 9001 clause 9.3 inputs, meeting minutes, outputs, and trend charts.</li>
+          <li><b>CAPA / RCA</b> — corrective actions, 5-Why, fishbone, action tracker, and risk matrix.</li>
+          <li><b>Audit readiness</b> — checklist, evidence register, nonconformance log, schedule, and contacts.</li>
+          <li><b>SPC / MSA</b> — X-bar R, I-MR, Cp/Cpk, histogram, control rules, and Gage R&amp;R.</li>
+        </ul>
+        <p className="fine-print">Use ← Workspace on each tool to return to the overview. Available on both Foundation and Most Good.</p>
+      </section>
+
+      <section className="report-section">
+        <h2>6. Generating a Quarterly Business Review (QBR)</h2>
         <ol className="wi-steps">
           <li>Select <b>Quarterly review</b> from the sidebar or the Overview dashboard.</li>
           <li>Review the executive scorecard, quarter-in-review summary, and priority risks/commitments table.</li>
@@ -77,7 +92,7 @@ export default async function WorkInstructionsPage() {
       </section>
 
       <section className="report-section">
-        <h2>6. Using the Validation Control Center</h2>
+        <h2>7. Using the Validation Control Center</h2>
         <ol className="wi-steps">
           <li>From the sidebar or Overview, select <b>Validation suite</b>.</li>
           <li>On <b>IQ/OQ/PQ generator</b>, enter the system name, choose IQ, OQ, or PQ, describe the test objective, then compile the protocol.</li>
@@ -89,7 +104,7 @@ export default async function WorkInstructionsPage() {
       {hasMostGood ? (
         <>
           <section className="report-section">
-            <h2>7. Using the License &amp; Certification Vault (Most Good)</h2>
+            <h2>8. Using the License &amp; Certification Vault (Most Good)</h2>
             <ol className="wi-steps">
               <li>Select <b>License vault</b> from the sidebar to see every tracked company license and certification, its jurisdiction, reference number, expiration date, and status.</li>
               <li>Each record has a renewal alert lead time of 30, 60, or 90 days. When a license enters that window, it is flagged <b>Renewal due</b> or <b>Expiring soon</b> and appears in the Overview dashboard&apos;s alert card automatically — no manual check required.</li>
@@ -99,7 +114,7 @@ export default async function WorkInstructionsPage() {
           </section>
 
           <section className="report-section">
-            <h2>8. Reading the Regulatory Watch feed (Most Good)</h2>
+            <h2>9. Reading the Regulatory Watch feed (Most Good)</h2>
             <p>
               This feed is refreshed automatically about once an hour from official FDA (including
               MedWatch), CDC, NIH, WHO, CMS, DHS, Joint Commission, and NABP RSS feeds. Most state
@@ -115,7 +130,7 @@ export default async function WorkInstructionsPage() {
         </>
       ) : (
         <section className="report-section upsell-card">
-          <h2>7. Unlock Most Good</h2>
+          <h2>8. Unlock Most Good</h2>
           <p>
             Foundation includes your scorecard, trend, open actions, weekly digest, review generators,
             FMEA, and the Validation Control Center. Upgrading to <b>Most Good</b> adds Supplier Risk Intelligence, the License &amp;
@@ -126,7 +141,7 @@ export default async function WorkInstructionsPage() {
       )}
 
       <section className="report-section">
-        <h2>{hasMostGood ? "9" : "8"}. Exporting your data</h2>
+        <h2>{hasMostGood ? "10" : "9"}. Exporting your data</h2>
         <p>
           Use <b>Export Excel</b> on the Overview dashboard for a workbook of your metrics, actions, and
           weekly digest (plus Supplier Risk, License Vault, and Regulatory Watch sheets on Most Good). Use
@@ -135,7 +150,7 @@ export default async function WorkInstructionsPage() {
       </section>
 
       <section className="report-section">
-        <h2>{hasMostGood ? "10" : "9"}. Getting help</h2>
+        <h2>{hasMostGood ? "11" : "10"}. Getting help</h2>
         <p>
           If your membership is not recognized, verify you signed in with the email used at checkout, then
           contact support from the Demand Good QA Intelligence site. This work instruction is generated from

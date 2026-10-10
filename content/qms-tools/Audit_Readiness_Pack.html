@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Readiness Pack</title>
+<style>
+  :root {
+    --primary: #1b3a2f;
+    --accent: #27ae60;
+    --accent2: #2ecc71;
+    --warn: #e67e22;
+    --danger: #c0392b;
+    --info: #2980b9;
+    --light: #f2f8f5;
+    --border: #c8ddd4;
+    --text: #1e2d27;
+    --muted: #6b8a7a;
+    --card: #fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--text); }
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header span { font-size: 0.85rem; opacity: 0.72; }
+  .badge { background: var(--accent); color: #fff; border-radius: 12px; padding: 2px 10px; font-size: 0.78rem; margin-left: 8px; }
+  nav {
+    background: #fff;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    overflow-x: auto;
+  }
+  nav button {
+    background: none; border: none;
+    border-bottom: 3px solid transparent;
+    padding: 14px 18px; font-size: 0.91rem; font-weight: 600;
+    cursor: pointer; color: var(--muted); transition: all 0.2s; white-space: nowrap;
+  }
+  nav button.active { border-bottom-color: var(--accent); color: var(--accent); }
+  nav button:hover:not(.active) { background: var(--light); color: var(--text); }
+  .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .card {
+    background: var(--card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .card h2 { font-size: 1.05rem; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  input, select, textarea {
+    border: 1px solid var(--border); border-radius: 6px; padding: 8px 11px;
+    font-size: 0.92rem; font-family: inherit; color: var(--text); background: #fafcfb; transition: border 0.2s; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+  textarea { resize: vertical; min-height: 68px; }
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 20px; border-radius: 7px; border: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #1e8449; }
+  .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-outline:hover { background: var(--light); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-warn { background: var(--warn); color: #fff; }
+  .btn-sm { padding: 5px 12px; font-size: 0.82rem; }
+  .btn-info { background: var(--info); color: #fff; }
+  /* Stats */
+  .stats-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+  .stat-card { flex: 1; min-width: 120px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; text-align: center; }
+  .stat-card .num { font-size: 2rem; font-weight: 800; color: var(--primary); }
+  .stat-card .lbl { font-size: 0.76rem; color: var(--muted); text-transform: uppercase; margin-top: 3px; }
+  /* Checklist */
+  .checklist-section { margin-bottom: 20px; }
+  .checklist-section h3 { font-size: 0.98rem; font-weight: 700; color: var(--primary); background: #e8f5ee; padding: 9px 14px; border-radius: 7px 7px 0 0; border: 1px solid var(--border); border-bottom: none; display: flex; justify-content: space-between; align-items: center; }
+  .checklist-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border: 1px solid var(--border); border-top: none;
+    background: #fff; transition: background 0.15s;
+  }
+  .checklist-item:last-child { border-radius: 0 0 7px 7px; }
+  .checklist-item:hover { background: #f2f8f5; }
+  .checklist-item input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+  .checklist-item label { font-size: 0.91rem; font-weight: 400; color: var(--text); text-transform: none; letter-spacing: 0; cursor: pointer; flex: 1; }
+  .checklist-item label.checked { text-decoration: line-through; color: var(--muted); }
+  .checklist-item .priority-tag { font-size: 0.72rem; font-weight: 700; border-radius: 10px; padding: 2px 9px; flex-shrink: 0; }
+  .p-critical { background: #fcecea; color: var(--danger); border: 1px solid #f1948a; }
+  .p-major { background: #fdf2e9; color: var(--warn); border: 1px solid #f0b36b; }
+  .p-minor { background: #eafaf1; color: var(--accent); border: 1px solid #82e0aa; }
+  /* Evidence table */
+  .evidence-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .evidence-table th { background: var(--primary); color: #fff; padding: 10px 14px; text-align: left; font-size: 0.83rem; }
+  .evidence-table td { border: 1px solid var(--border); padding: 9px 12px; font-size: 0.88rem; vertical-align: middle; }
+  .evidence-table tr:nth-child(even) { background: #f4faf7; }
+  .evidence-table td input, .evidence-table td select { border: none; background: transparent; font-size: 0.88rem; width: 100%; }
+  .evidence-table td input:focus, .evidence-table td select:focus { outline: 1px solid var(--accent); border-radius: 3px; background: #fff; }
+  /* Status badges */
+  .status-badge { border-radius: 20px; padding: 3px 11px; font-size: 0.76rem; font-weight: 700; white-space: nowrap; }
+  .s-ready { background: #eafaf1; color: var(--accent); border: 1px solid #82e0aa; }
+  .s-partial { background: #fef9e7; color: #d68910; border: 1px solid #f7dc6f; }
+  .s-missing { background: #fcecea; color: var(--danger); border: 1px solid #f1948a; }
+  /* Progress */
+  .progress-wrap { background: #dbe8e1; border-radius: 20px; height: 12px; width: 100%; overflow: hidden; }
+  .progress-bar { background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 20px; height: 12px; transition: width 0.5s; }
+  .info-box { background: #e8f5ee; border-left: 4px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.9rem; color: var(--primary); }
+  /* Audit calendar */
+  .audit-row { display: flex; gap: 10px; align-items: center; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; background: #fafcfb; margin-bottom: 8px; flex-wrap: wrap; }
+  .audit-row .ar-info { flex: 1; min-width: 200px; }
+  .audit-row .ar-info strong { display: block; font-size: 0.95rem; }
+  .audit-row .ar-info span { font-size: 0.82rem; color: var(--muted); }
+  /* NC Log */
+  .nc-item { border: 1px solid var(--border); border-radius: 8px; padding: 13px 16px; margin-bottom: 9px; background: #fafcfb; }
+  .nc-item .nc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .nc-item .nc-head strong { font-size: 0.94rem; }
+  @media (max-width:700px) { .form-grid, .form-grid.three { grid-template-columns: 1fr; } .stats-row { flex-direction: column; } }
+  @media print { nav, .btn, .no-print { display: none !important; } .tab-content { display: block !important; } .card { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<header>
+  <a href="/dashboard" style="color:#fff;font-weight:700;font-size:0.85rem;margin-right:8px;white-space:nowrap">← Workspace</a>
+  <div>
+    <h1>📋 Audit Readiness Pack <span class="badge">Quality Module</span></h1>
+    <span>Internal &amp; External Audit Preparation · Evidence Management · NC Log</span>
+  </div>
+  <div style="margin-left:auto"><button class="btn btn-outline" onclick="window.print()" style="color:#fff;border-color:#fff">🖨 Print</button></div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('overview')">📊 Overview</button>
+  <button onclick="showTab('checklist')">✅ Readiness Checklist</button>
+  <button onclick="showTab('evidence')">📂 Evidence Register</button>
+  <button onclick="showTab('nc-log')">⚠️ NC Log</button>
+  <button onclick="showTab('schedule')">📅 Audit Schedule</button>
+  <button onclick="showTab('contacts')">👥 Contacts</button>
+</nav>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <div id="tab-overview" class="tab-content active">
+    <div class="section-title">Audit Readiness Overview</div>
+    <div class="stats-row" id="overviewStats">
+      <div class="stat-card"><div class="num" id="ovTotal">0</div><div class="lbl">Total Checklist Items</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--accent)" id="ovComplete">0</div><div class="lbl">Complete</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--warn)" id="ovPending">0</div><div class="lbl">Pending</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--info)" id="ovEvidence">0</div><div class="lbl">Evidence Items</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--danger)" id="ovNC">0</div><div class="lbl">Open NCs</div></div>
+    </div>
+    <div class="card">
+      <h2>📈 Overall Readiness</h2>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">
+        <div class="progress-wrap" style="flex:1"><div class="progress-bar" id="overallBar" style="width:0%"></div></div>
+        <span id="overallPct" style="font-size:1.4rem;font-weight:800;color:var(--primary)">0%</span>
+      </div>
+      <p style="font-size:0.87rem;color:var(--muted)">Percentage based on completed checklist items. Complete all critical items before audit date.</p>
+    </div>
+    <div class="card">
+      <h2>🏷 Audit Details</h2>
+      <div class="form-grid three">
+        <div class="form-group"><label>Audit Type</label>
+          <select id="auditType">
+            <option>ISO 9001:2015 Surveillance</option><option>ISO 9001:2015 Recertification</option>
+            <option>ISO 14001 Environmental</option><option>AS9100D Aerospace</option>
+            <option>IATF 16949 Automotive</option><option>Internal Audit</option>
+            <option>Customer Audit</option><option>Regulatory Inspection</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Audit Body / Auditor</label><input type="text" id="auditBody" placeholder="Certification body or auditor name"></div>
+        <div class="form-group"><label>Audit Date</label><input type="date" id="auditDate"></div>
+        <div class="form-group"><label>Lead Auditee</label><input type="text" id="auditLead" placeholder="Name"></div>
+        <div class="form-group"><label>Scope</label><input type="text" id="auditScope" placeholder="Departments / processes in scope"></div>
+        <div class="form-group"><label>Previous Audit Result</label>
+          <select id="prevResult"><option>Certified / Passed</option><option>Minor NCs</option><option>Major NCs</option><option>Not Applicable</option></select>
+        </div>
+        <div class="form-group full"><label>Audit Objectives</label><textarea id="auditObj" placeholder="What are the objectives and focus areas for this audit?"></textarea></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="saveAuditDetails()">💾 Save Details</button>
+      <span id="auditMsg" style="font-size:0.9rem;margin-left:12px"></span>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div id="tab-checklist" class="tab-content">
+    <div class="section-title">Audit Readiness Checklist</div>
+    <div class="info-box">Check off each item as you prepare. Critical items must be complete before the audit date. Progress is saved automatically.</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div class="progress-wrap" style="flex:1;min-width:200px"><div class="progress-bar" id="checklistBar" style="width:0%"></div></div>
+      <span id="checklistPct" style="font-weight:800;font-size:1.1rem;color:var(--primary);margin-left:14px">0%</span>
+      <button class="btn btn-outline btn-sm no-print" onclick="resetChecklist()">🔄 Reset</button>
+    </div>
+    <div id="checklistWrap"></div>
+  </div>
+
+  <!-- EVIDENCE REGISTER -->
+  <div id="tab-evidence" class="tab-content">
+    <div class="section-title">Evidence Register</div>
+    <div class="info-box">Track documents, records, and evidence items required for the audit. Mark status and assign owners.</div>
+    <div class="card no-print">
+      <h2>➕ Add Evidence Item</h2>
+      <div class="form-grid three">
+        <div class="form-group full"><label>Document / Evidence Description</label><input type="text" id="evDesc" placeholder="e.g. Calibration records for CMM-001"></div>
+        <div class="form-group"><label>Document Number / Ref</label><input type="text" id="evRef" placeholder="DOC-001"></div>
+        <div class="form-group"><label>Revision</label><input type="text" id="evRev" placeholder="Rev A"></div>
+        <div class="form-group"><label>Owner</label><input type="text" id="evOwner" placeholder="Name"></div>
+        <div class="form-group"><label>Status</label>
+          <select id="evStatus"><option value="Ready">Ready</option><option value="Partial">Partial</option><option value="Missing">Missing</option></select>
+        </div>
+        <div class="form-group"><label>Location / Drive Path</label><input type="text" id="evLocation" placeholder="Folder or server path"></div>
+        <div class="form-group full"><label>Notes</label><input type="text" id="evNotes" placeholder="Any additional notes..."></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="addEvidence()">➕ Add Item</button>
+    </div>
+    <div class="card">
+      <h2>📂 Evidence Register</h2>
+      <div style="margin-bottom:10px;display:flex;gap:10px;flex-wrap:wrap;" class="no-print">
+        <input type="text" id="evFilter" placeholder="Search..." style="max-width:200px" oninput="renderEvidence()">
+        <select id="evStatusFilter" onchange="renderEvidence()" style="max-width:140px">
+          <option value="">All Statuses</option><option value="Ready">Ready</option><option value="Partial">Partial</option><option value="Missing">Missing</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto"><table class="evidence-table" id="evidenceTable">
+        <thead><tr><th>#</th><th>Description</th><th>Doc Ref</th><th>Rev</th><th>Owner</th><th>Status</th><th>Location</th><th class="no-print">Actions</th></tr></thead>
+        <tbody id="evidenceBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">No evidence items yet.</td></tr></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- NC LOG -->
+  <div id="tab-nc-log" class="tab-content">
+    <div class="section-title">Non-Conformance Log</div>
+    <div class="card no-print">
+      <h2>➕ Log Non-Conformance</h2>
+      <div class="form-grid three">
+        <div class="form-group"><label>NC Number</label><input type="text" id="ncNum" placeholder="NC-2026-001"></div>
+        <div class="form-group"><label>Date Found</label><input type="date" id="ncDate"></div>
+        <div class="form-group"><label>NC Type</label>
+          <select id="ncType"><option>Major</option><option>Minor</option><option>Observation</option><option>OFI</option></select>
+        </div>
+        <div class="form-group full"><label>NC Description</label><textarea id="ncDesc" placeholder="Describe the non-conformance in detail..."></textarea></div>
+        <div class="form-group"><label>Clause / Requirement</label><input type="text" id="ncClause" placeholder="e.g. ISO 9001 Cl. 8.4"></div>
+        <div class="form-group"><label>Raised By</label><input type="text" id="ncRaisedBy" placeholder="Auditor / Inspector name"></div>
+        <div class="form-group"><label>Responsible Owner</label><input type="text" id="ncOwner" placeholder="Name"></div>
+        <div class="form-group"><label>Target Close Date</label><input type="date" id="ncDue"></div>
+        <div class="form-group full"><label>Proposed Correction</label><textarea id="ncCorrection" placeholder="Immediate correction to address the finding..."></textarea></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="addNC()">📝 Log NC</button>
+    </div>
+    <div class="card">
+      <h2>📋 NC Register</h2>
+      <div id="ncList"><div style="text-align:center;color:var(--muted);padding:22px">No NCs logged.</div></div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div id="tab-schedule" class="tab-content">
+    <div class="section-title">Audit Schedule</div>
+    <div class="card no-print">
+      <h2>➕ Add Audit Event</h2>
+      <div class="form-grid three">
+        <div class="form-group"><label>Audit / Activity</label><input type="text" id="schName" placeholder="e.g. Opening Meeting"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="schDate"></div>
+        <div class="form-group"><label>Time</label><input type="time" id="schTime"></div>
+        <div class="form-group"><label>Duration</label><input type="text" id="schDuration" placeholder="e.g. 1 hour"></div>
+        <div class="form-group"><label>Location / Room</label><input type="text" id="schLoc" placeholder="Room or virtual link"></div>
+        <div class="form-group"><label>Participants</label><input type="text" id="schPart" placeholder="Names / roles"></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="addSchedule()">➕ Add to Schedule</button>
+    </div>
+    <div class="card">
+      <h2>📅 Audit Agenda</h2>
+      <div id="scheduleList"><div style="text-align:center;color:var(--muted);padding:22px">No events scheduled.</div></div>
+    </div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div id="tab-contacts" class="tab-content">
+    <div class="section-title">Audit Contact Directory</div>
+    <div class="card no-print">
+      <h2>➕ Add Contact</h2>
+      <div class="form-grid three">
+        <div class="form-group"><label>Name</label><input type="text" id="ctName" placeholder="Full name"></div>
+        <div class="form-group"><label>Role</label><input type="text" id="ctRole" placeholder="e.g. Quality Manager"></div>
+        <div class="form-group"><label>Department</label><input type="text" id="ctDept" placeholder="Department"></div>
+        <div class="form-group"><label>Phone</label><input type="text" id="ctPhone" placeholder="Phone number"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="ctEmail" placeholder="email@company.com"></div>
+        <div class="form-group"><label>Audit Area</label><input type="text" id="ctArea" placeholder="e.g. Production, QMS, EHS"></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="addContact()">➕ Add Contact</button>
+    </div>
+    <div class="card">
+      <h2>👥 Contact Directory</h2>
+      <div id="contactList"><div style="text-align:center;color:var(--muted);padding:22px">No contacts added.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- NAV ----
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  updateOverview();
+}
+
+// ---- CHECKLIST DATA ----
+const CHECKLIST_DATA = [
+  { section: '📄 Document Control', items: [
+    { text: 'Document Control Procedure is current and approved', p: 'critical' },
+    { text: 'Document Master List is up to date', p: 'critical' },
+    { text: 'Obsolete documents removed from use', p: 'major' },
+    { text: 'External documents identified and controlled', p: 'major' },
+    { text: 'Records retention schedule defined', p: 'minor' },
+  ]},
+  { section: '🎯 Management Responsibility', items: [
+    { text: 'Quality Policy communicated and displayed', p: 'critical' },
+    { text: 'Quality Objectives documented and measurable', p: 'critical' },
+    { text: 'Management Review minutes available (last 12 months)', p: 'critical' },
+    { text: 'Organizational chart is current', p: 'major' },
+    { text: 'Roles & responsibilities defined', p: 'major' },
+  ]},
+  { section: '🔧 Operations', items: [
+    { text: 'Process maps / flow charts available for key processes', p: 'critical' },
+    { text: 'Work instructions available at point of use', p: 'major' },
+    { text: 'Equipment maintenance records up to date', p: 'major' },
+    { text: 'Change control records in place', p: 'major' },
+    { text: 'Customer requirements documented and communicated', p: 'critical' },
+  ]},
+  { section: '📐 Measurement & Calibration', items: [
+    { text: 'Calibration records available for all measuring equipment', p: 'critical' },
+    { text: 'Calibration certificates traceable to national standards', p: 'critical' },
+    { text: 'Overdue calibrations identified and acted upon', p: 'critical' },
+    { text: 'MSA studies performed where applicable', p: 'major' },
+  ]},
+  { section: '👩‍🎓 Training & Competence', items: [
+    { text: 'Training matrix / competence matrix current', p: 'critical' },
+    { text: 'Training records on file for all personnel', p: 'major' },
+    { text: 'New employee onboarding records complete', p: 'major' },
+    { text: 'Training effectiveness evaluations on file', p: 'minor' },
+  ]},
+  { section: '🤝 Supplier Management', items: [
+    { text: 'Approved Supplier List is current', p: 'critical' },
+    { text: 'Supplier evaluation records available', p: 'major' },
+    { text: 'Purchase orders reference appropriate quality requirements', p: 'major' },
+    { text: 'Incoming inspection records in place', p: 'major' },
+  ]},
+  { section: '📦 Product / Service Quality', items: [
+    { text: 'Inspection and test records available', p: 'critical' },
+    { text: 'Control plans / inspection plans in place', p: 'major' },
+    { text: 'Nonconforming product/service procedure current', p: 'critical' },
+    { text: 'Customer complaints log maintained', p: 'major' },
+    { text: 'CAPA records complete and effective', p: 'critical' },
+  ]},
+  { section: '🔍 Internal Audits', items: [
+    { text: 'Internal audit schedule covers all processes', p: 'critical' },
+    { text: 'Internal audit reports available (last cycle)', p: 'critical' },
+    { text: 'All internal NCs have CAPAs raised', p: 'critical' },
+    { text: 'Auditor qualification/training records on file', p: 'major' },
+  ]},
+];
+
+let checkState = JSON.parse(localStorage.getItem('auditCheckState') || '{}');
+
+function buildChecklist() {
+  const wrap = document.getElementById('checklistWrap');
+  wrap.innerHTML = '';
+  CHECKLIST_DATA.forEach((section, si) => {
+    const secDiv = document.createElement('div');
+    secDiv.className = 'checklist-section';
+    const checked = section.items.filter((_, ii) => checkState[`${si}_${ii}`]).length;
+    secDiv.innerHTML = `<h3>${section.section} <span style="font-size:0.82rem;font-weight:500">${checked}/${section.items.length} complete</span></h3>`;
+    section.items.forEach((item, ii) => {
+      const key = `${si}_${ii}`;
+      const isChecked = !!checkState[key];
+      const pClass = item.p === 'critical' ? 'p-critical' : item.p === 'major' ? 'p-major' : 'p-minor';
+      const pLabel = item.p.charAt(0).toUpperCase() + item.p.slice(1);
+      const row = document.createElement('div');
+      row.className = 'checklist-item';
+      row.innerHTML = `
+        <input type="checkbox" id="chk_${key}" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}', this)">
+        <label for="chk_${key}" class="${isChecked ? 'checked' : ''}">${item.text}</label>
+        <span class="priority-tag ${pClass}">${pLabel}</span>`;
+      secDiv.appendChild(row);
+    });
+    wrap.appendChild(secDiv);
+  });
+  updateChecklistProgress();
+}
+
+function toggleCheck(key, el) {
+  checkState[key] = el.checked;
+  localStorage.setItem('auditCheckState', JSON.stringify(checkState));
+  const lbl = el.nextElementSibling;
+  if (lbl) lbl.className = el.checked ? 'checked' : '';
+  updateChecklistProgress();
+  buildChecklist();
+}
+
+function updateChecklistProgress() {
+  let total = 0, done = 0;
+  CHECKLIST_DATA.forEach((s, si) => s.items.forEach((_, ii) => { total++; if (checkState[`${si}_${ii}`]) done++; }));
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const bar = document.getElementById('checklistBar');
+  const pctEl = document.getElementById('checklistPct');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  updateOverview();
+}
+
+function resetChecklist() {
+  if (!confirm('Reset all checklist items?')) return;
+  checkState = {};
+  localStorage.setItem('auditCheckState', JSON.stringify(checkState));
+  buildChecklist();
+}
+
+// ---- EVIDENCE ----
+let evidence = JSON.parse(localStorage.getItem('auditEvidence') || '[]');
+function addEvidence() {
+  const desc = document.getElementById('evDesc').value.trim();
+  if (!desc) { alert('Description required.'); return; }
+  evidence.push({
+    id: Date.now(),
+    desc, ref: document.getElementById('evRef').value,
+    rev: document.getElementById('evRev').value,
+    owner: document.getElementById('evOwner').value,
+    status: document.getElementById('evStatus').value,
+    location: document.getElementById('evLocation').value,
+    notes: document.getElementById('evNotes').value
+  });
+  localStorage.setItem('auditEvidence', JSON.stringify(evidence));
+  ['evDesc','evRef','evRev','evOwner','evLocation','evNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('evStatus').value = 'Ready';
+  renderEvidence();
+  updateOverview();
+}
+
+function renderEvidence() {
+  const filter = (document.getElementById('evFilter')?.value || '').toLowerCase();
+  const sf = document.getElementById('evStatusFilter')?.value || '';
+  const body = document.getElementById('evidenceBody');
+  const filtered = evidence.filter(e => {
+    if (sf && e.status !== sf) return false;
+    if (filter && !JSON.stringify(e).toLowerCase().includes(filter)) return false;
+    return true;
+  });
+  if (!filtered.length) { body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:18px">No evidence items.</td></tr>'; return; }
+  const sc = { Ready: 's-ready', Partial: 's-partial', Missing: 's-missing' };
+  body.innerHTML = filtered.map((e, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${e.desc}</td>
+      <td>${e.ref || '—'}</td>
+      <td>${e.rev || '—'}</td>
+      <td>${e.owner || '—'}</td>
+      <td><span class="status-badge ${sc[e.status] || 's-partial'}">${e.status}</span></td>
+      <td>${e.location || '—'}</td>
+      <td class="no-print"><button class="btn btn-danger btn-sm" onclick="deleteEvidence(${e.id})">🗑</button></td>
+    </tr>`).join('');
+}
+
+function deleteEvidence(id) {
+  if (!confirm('Remove this evidence item?')) return;
+  evidence = evidence.filter(e => e.id !== id);
+  localStorage.setItem('auditEvidence', JSON.stringify(evidence));
+  renderEvidence(); updateOverview();
+}
+
+// ---- NC LOG ----
+let ncs = JSON.parse(localStorage.getItem('auditNCs') || '[]');
+function addNC() {
+  const num = document.getElementById('ncNum').value.trim();
+  if (!num) { alert('NC Number required.'); return; }
+  ncs.push({
+    id: Date.now(), num,
+    date: document.getElementById('ncDate').value,
+    type: document.getElementById('ncType').value,
+    desc: document.getElementById('ncDesc').value,
+    clause: document.getElementById('ncClause').value,
+    raisedBy: document.getElementById('ncRaisedBy').value,
+    owner: document.getElementById('ncOwner').value,
+    due: document.getElementById('ncDue').value,
+    correction: document.getElementById('ncCorrection').value,
+    status: 'Open'
+  });
+  localStorage.setItem('auditNCs', JSON.stringify(ncs));
+  ['ncNum','ncDate','ncClause','ncRaisedBy','ncOwner','ncDue','ncDesc','ncCorrection'].forEach(id => document.getElementById(id).value = '');
+  renderNCs(); updateOverview();
+}
+
+function renderNCs() {
+  const list = document.getElementById('ncList');
+  if (!ncs.length) { list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:22px">No NCs logged.</div>'; return; }
+  const typeColor = { Major: 'var(--danger)', Minor: 'var(--warn)', Observation: 'var(--info)', OFI: 'var(--accent)' };
+  list.innerHTML = ncs.map(nc => `
+    <div class="nc-item">
+      <div class="nc-head">
+        <strong>${nc.num} — <span style="color:${typeColor[nc.type]}">${nc.type}</span></strong>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="status-badge ${nc.status==='Closed'?'s-ready':'s-missing'}">${nc.status}</span>
+          ${nc.status==='Open'?`<button class="btn btn-primary btn-sm" onclick="closeNC(${nc.id})">✅ Close</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteNC(${nc.id})">🗑</button>
+        </div>
+      </div>
+      <div style="font-size:0.88rem;color:var(--text);margin-bottom:5px">${nc.desc}</div>
+      <div style="font-size:0.8rem;color:var(--muted)">Clause: ${nc.clause||'—'} | Raised by: ${nc.raisedBy||'—'} | Owner: ${nc.owner||'—'} | Due: ${nc.due||'—'}</div>
+      ${nc.correction ? `<div style="font-size:0.85rem;margin-top:7px;color:var(--primary)"><strong>Correction:</strong> ${nc.correction}</div>` : ''}
+    </div>`).join('');
+}
+
+function closeNC(id) { const nc = ncs.find(n => n.id === id); if (nc) { nc.status = 'Closed'; localStorage.setItem('auditNCs', JSON.stringify(ncs)); renderNCs(); updateOverview(); } }
+function deleteNC(id) { if (!confirm('Delete this NC?')) return; ncs = ncs.filter(n => n.id !== id); localStorage.setItem('auditNCs', JSON.stringify(ncs)); renderNCs(); updateOverview(); }
+
+// ---- SCHEDULE ----
+let schedule = JSON.parse(localStorage.getItem('auditSchedule') || '[]');
+function addSchedule() {
+  const name = document.getElementById('schName').value.trim();
+  if (!name) { alert('Activity name required.'); return; }
+  schedule.push({ id: Date.now(), name, date: document.getElementById('schDate').value, time: document.getElementById('schTime').value, duration: document.getElementById('schDuration').value, loc: document.getElementById('schLoc').value, part: document.getElementById('schPart').value });
+  localStorage.setItem('auditSchedule', JSON.stringify(schedule));
+  ['schName','schDate','schTime','schDuration','schLoc','schPart'].forEach(id => document.getElementById(id).value = '');
+  renderSchedule();
+}
+
+function renderSchedule() {
+  const list = document.getElementById('scheduleList');
+  if (!schedule.length) { list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:22px">No events scheduled.</div>'; return; }
+  const sorted = [...schedule].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  list.innerHTML = sorted.map(s => `
+    <div class="audit-row">
+      <div style="font-size:1.5rem">📅</div>
+      <div class="ar-info">
+        <strong>${s.name}</strong>
+        <span>${s.date || '—'} ${s.time || ''} ${s.duration ? '· ' + s.duration : ''}</span>
+        <span>📍 ${s.loc || '—'} | 👥 ${s.part || '—'}</span>
+      </div>
+      <button class="btn btn-danger btn-sm no-print" onclick="deleteSchedule(${s.id})">🗑</button>
+    </div>`).join('');
+}
+
+function deleteSchedule(id) { schedule = schedule.filter(s => s.id !== id); localStorage.setItem('auditSchedule', JSON.stringify(schedule)); renderSchedule(); }
+
+// ---- CONTACTS ----
+let contacts = JSON.parse(localStorage.getItem('auditContacts') || '[]');
+function addContact() {
+  const name = document.getElementById('ctName').value.trim();
+  if (!name) { alert('Name required.'); return; }
+  contacts.push({ id: Date.now(), name, role: document.getElementById('ctRole').value, dept: document.getElementById('ctDept').value, phone: document.getElementById('ctPhone').value, email: document.getElementById('ctEmail').value, area: document.getElementById('ctArea').value });
+  localStorage.setItem('auditContacts', JSON.stringify(contacts));
+  ['ctName','ctRole','ctDept','ctPhone','ctEmail','ctArea'].forEach(id => document.getElementById(id).value = '');
+  renderContacts();
+}
+
+function renderContacts() {
+  const list = document.getElementById('contactList');
+  if (!contacts.length) { list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:22px">No contacts added.</div>'; return; }
+  list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">` +
+    contacts.map(c => `<div style="border:1px solid var(--border);border-radius:9px;padding:14px;background:#fafcfb">
+      <div style="font-weight:700;font-size:0.98rem;margin-bottom:3px">👤 ${c.name}</div>
+      <div style="font-size:0.84rem;color:var(--muted);margin-bottom:6px">${c.role || ''} ${c.dept ? '· ' + c.dept : ''}</div>
+      ${c.phone ? `<div style="font-size:0.85rem">📞 ${c.phone}</div>` : ''}
+      ${c.email ? `<div style="font-size:0.85rem">✉️ ${c.email}</div>` : ''}
+      ${c.area ? `<div style="font-size:0.82rem;color:var(--info);margin-top:5px">🏷 ${c.area}</div>` : ''}
+      <button class="btn btn-danger btn-sm no-print" style="margin-top:8px" onclick="deleteContact(${c.id})">🗑 Remove</button>
+    </div>`).join('') + '</div>';
+}
+
+function deleteContact(id) { contacts = contacts.filter(c => c.id !== id); localStorage.setItem('auditContacts', JSON.stringify(contacts)); renderContacts(); }
+
+// ---- OVERVIEW ----
+function saveAuditDetails() {
+  const details = { type: document.getElementById('auditType').value, body: document.getElementById('auditBody').value, date: document.getElementById('auditDate').value, lead: document.getElementById('auditLead').value, scope: document.getElementById('auditScope').value, prev: document.getElementById('prevResult').value, obj: document.getElementById('auditObj').value };
+  localStorage.setItem('auditDetails', JSON.stringify(details));
+  const msg = document.getElementById('auditMsg');
+  msg.textContent = '✅ Saved!'; msg.style.color = 'var(--accent)';
+  setTimeout(() => msg.textContent = '', 2500);
+}
+
+function loadAuditDetails() {
+  const d = JSON.parse(localStorage.getItem('auditDetails') || 'null');
+  if (!d) return;
+  Object.entries({ auditType: d.type, auditBody: d.body, auditDate: d.date, auditLead: d.lead, auditScope: d.scope, prevResult: d.prev, auditObj: d.obj }).forEach(([id, val]) => { const el = document.getElementById(id); if (el && val) el.value = val; });
+}
+
+function updateOverview() {
+  let total = 0, done = 0;
+  CHECKLIST_DATA.forEach((s, si) => s.items.forEach((_, ii) => { total++; if (checkState[`${si}_${ii}`]) done++; }));
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const bar = document.getElementById('overallBar');
+  const pctEl = document.getElementById('overallPct');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  const t = document.getElementById('ovTotal'); if (t) t.textContent = total;
+  const c = document.getElementById('ovComplete'); if (c) c.textContent = done;
+  const p = document.getElementById('ovPending'); if (p) p.textContent = total - done;
+  const ev = document.getElementById('ovEvidence'); if (ev) ev.textContent = evidence.length;
+  const nc = document.getElementById('ovNC'); if (nc) nc.textContent = ncs.filter(n => n.status === 'Open').length;
+  const cb = document.getElementById('checklistBar'); if (cb) cb.style.width = pct + '%';
+  const cp = document.getElementById('checklistPct'); if (cp) cp.textContent = pct + '%';
+}
+
+// ---- INIT ----
+loadAuditDetails();
+buildChecklist();
+renderEvidence();
+renderNCs();
+renderSchedule();
+renderContacts();
+updateOverview();
+</script>
+</body>
+</html>

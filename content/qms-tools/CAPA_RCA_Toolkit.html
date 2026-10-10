@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAPA / RCA Toolkit</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #2e86de;
+    --success: #27ae60;
+    --warn: #e67e22;
+    --danger: #c0392b;
+    --light: #f4f7fc;
+    --border: #d0dce8;
+    --text: #1e2d3d;
+    --muted: #6b7e91;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--text); }
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.5px; }
+  header span { font-size: 0.85rem; opacity: 0.75; }
+  .badge { background: var(--accent); color: #fff; border-radius: 12px; padding: 2px 10px; font-size: 0.78rem; margin-left: 8px; }
+  nav {
+    background: #fff;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    overflow-x: auto;
+  }
+  nav button {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 14px 20px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  nav button.active { border-bottom-color: var(--accent); color: var(--accent); }
+  nav button:hover:not(.active) { background: var(--light); color: var(--text); }
+  .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .card h2 { font-size: 1.05rem; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .icon { font-size: 1.2rem; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 0.82rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  input, select, textarea {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 11px;
+    font-size: 0.93rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fafcff;
+    transition: border 0.2s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+  textarea { resize: vertical; min-height: 72px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    border-radius: 7px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #1a6bbf; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { background: #1e8449; }
+  .btn-warn { background: var(--warn); color: #fff; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-outline:hover { background: var(--light); }
+  .btn-sm { padding: 5px 12px; font-size: 0.82rem; }
+  .section-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+  /* Fishbone */
+  .fishbone-wrap { overflow-x: auto; }
+  svg.fishbone { width: 100%; min-width: 700px; height: 380px; }
+  .fishbone-label { font-family: 'Segoe UI', Arial, sans-serif; }
+  /* 5 Why Table */
+  .why-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .why-table th { background: var(--primary); color: #fff; padding: 10px 14px; text-align: left; font-size: 0.85rem; }
+  .why-table td { border: 1px solid var(--border); padding: 8px 10px; vertical-align: top; }
+  .why-table tr:nth-child(even) { background: #f7fafd; }
+  .why-table td input { border: none; background: transparent; width: 100%; font-size: 0.92rem; }
+  .why-table td input:focus { outline: 1px solid var(--accent); border-radius: 3px; }
+  /* CAPA List */
+  .capa-list { margin-top: 10px; }
+  .capa-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    background: #fafcff;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .capa-item .info { flex: 1; }
+  .capa-item .info strong { font-size: 0.97rem; display: block; margin-bottom: 3px; }
+  .capa-item .info span { font-size: 0.83rem; color: var(--muted); }
+  .status-badge {
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .status-open { background: #fdf2e9; color: var(--warn); border: 1px solid #f0b36b; }
+  .status-closed { background: #eafaf1; color: var(--success); border: 1px solid #82e0aa; }
+  .status-overdue { background: #fcecea; color: var(--danger); border: 1px solid #f1948a; }
+  /* Severity matrix */
+  .matrix-table { border-collapse: collapse; width: 100%; }
+  .matrix-table th, .matrix-table td { border: 1px solid var(--border); padding: 10px; text-align: center; font-size: 0.85rem; }
+  .matrix-table th { background: var(--primary); color: #fff; }
+  .sev-low { background: #eafaf1; color: #1e8449; font-weight: 700; }
+  .sev-med { background: #fef9e7; color: #d68910; font-weight: 700; }
+  .sev-high { background: #fdf2e9; color: #ca6f1e; font-weight: 700; }
+  .sev-crit { background: #fcecea; color: #c0392b; font-weight: 700; }
+  /* Action items */
+  .action-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .action-row input { flex: 1; }
+  .action-row select { width: 130px; }
+  .action-row .due { width: 140px; }
+  .progress-bar-wrap { background: #e8eef5; border-radius: 20px; height: 10px; flex: 1; }
+  .progress-bar { background: var(--accent); border-radius: 20px; height: 10px; transition: width 0.4s; }
+  .stats-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stat-card {
+    flex: 1; min-width: 140px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-align: center;
+  }
+  .stat-card .num { font-size: 2rem; font-weight: 800; color: var(--primary); }
+  .stat-card .lbl { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; margin-top: 3px; }
+  @media (max-width: 700px) {
+    .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+    .stats-row { flex-direction: column; }
+  }
+  .print-btn { float: right; }
+  @media print {
+    nav, header .print-btn, .btn, .no-print { display: none !important; }
+    .tab-content { display: block !important; }
+    .card { break-inside: avoid; }
+  }
+  .info-box { background: #eaf3fb; border-left: 4px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.9rem; color: var(--primary); }
+</style>
+</head>
+<body>
+<header>
+  <a href="/dashboard" style="color:#fff;font-weight:700;font-size:0.85rem;margin-right:8px;white-space:nowrap">← Workspace</a>
+  <div>
+    <h1>🔧 CAPA / RCA Toolkit <span class="badge">Quality Module</span></h1>
+    <span>Corrective &amp; Preventive Action · Root Cause Analysis</span>
+  </div>
+  <div style="margin-left:auto">
+    <button class="btn btn-outline print-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('dashboard')">📊 Dashboard</button>
+  <button onclick="showTab('new-capa')">➕ New CAPA</button>
+  <button onclick="showTab('5why')">🔍 5-Why Analysis</button>
+  <button onclick="showTab('fishbone')">🐟 Fishbone Diagram</button>
+  <button onclick="showTab('actions')">✅ Action Tracker</button>
+  <button onclick="showTab('matrix')">⚠️ Risk Matrix</button>
+</nav>
+
+<div class="container">
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab-content active">
+    <div class="section-title">CAPA Overview Dashboard</div>
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">Total CAPAs</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--warn)" id="statOpen">0</div><div class="lbl">Open</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--danger)" id="statOverdue">0</div><div class="lbl">Overdue</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--success)" id="statClosed">0</div><div class="lbl">Closed</div></div>
+    </div>
+    <div class="card">
+      <h2><span class="icon">📋</span> CAPA Register</h2>
+      <div style="margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;" class="no-print">
+        <input type="text" id="filterText" placeholder="Search CAPAs..." style="max-width:220px" oninput="renderList()">
+        <select id="filterStatus" onchange="renderList()" style="max-width:140px">
+          <option value="">All Statuses</option>
+          <option value="Open">Open</option>
+          <option value="Closed">Closed</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+      </div>
+      <div class="capa-list" id="capaList">
+        <div style="text-align:center;color:var(--muted);padding:28px;font-size:0.95rem;">No CAPAs yet. Click <strong>➕ New CAPA</strong> to add one.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW CAPA -->
+  <div id="tab-new-capa" class="tab-content">
+    <div class="section-title">New CAPA Record</div>
+    <div class="card">
+      <h2><span class="icon">🗂</span> CAPA Identification</h2>
+      <div class="form-grid three">
+        <div class="form-group"><label>CAPA Number</label><input type="text" id="capaNum" placeholder="CAPA-2026-001"></div>
+        <div class="form-group"><label>Date Opened</label><input type="date" id="capaDate"></div>
+        <div class="form-group"><label>Source</label>
+          <select id="capaSource">
+            <option>Internal Audit</option><option>Customer Complaint</option><option>Supplier Issue</option>
+            <option>Process Deviation</option><option>Management Review</option><option>Regulatory</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Owner / Responsible</label><input type="text" id="capaOwner" placeholder="Name"></div>
+        <div class="form-group"><label>Department</label><input type="text" id="capaDept" placeholder="Department"></div>
+        <div class="form-group"><label>Target Closure Date</label><input type="date" id="capaDue"></div>
+        <div class="form-group full"><label>Problem / Non-Conformance Description</label><textarea id="capaProblem" placeholder="Describe the issue, what happened, where, when..."></textarea></div>
+        <div class="form-group full"><label>Immediate Containment Actions</label><textarea id="capaContain" placeholder="What actions were taken immediately to contain the issue?"></textarea></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2><span class="icon">🔍</span> Root Cause</h2>
+      <div class="form-group" style="margin-bottom:10px"><label>Root Cause Method</label>
+        <select id="capaRcaMethod">
+          <option>5-Why Analysis</option><option>Fishbone / Ishikawa</option><option>Fault Tree Analysis</option>
+          <option>FMEA</option><option>8D Problem Solving</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Root Cause Statement</label><textarea id="capaRootCause" placeholder="State the verified root cause..."></textarea></div>
+    </div>
+    <div class="card">
+      <h2><span class="icon">✅</span> Corrective &amp; Preventive Actions</h2>
+      <div class="form-group" style="margin-bottom:10px"><label>Corrective Action(s)</label><textarea id="capaCA" placeholder="Actions to eliminate the root cause..."></textarea></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Preventive Action(s)</label><textarea id="capaPA" placeholder="Actions to prevent recurrence in similar processes..."></textarea></div>
+      <div class="form-group"><label>Effectiveness Verification Method</label><textarea id="capaVerify" placeholder="How will you verify the actions worked?"></textarea></div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveCapa()">💾 Save CAPA</button>
+      <button class="btn btn-outline" onclick="clearCapa()">🗑 Clear</button>
+    </div>
+    <div id="capaMsg" style="margin-top:12px;font-size:0.93rem;"></div>
+  </div>
+
+  <!-- 5-WHY -->
+  <div id="tab-5why" class="tab-content">
+    <div class="section-title">5-Why Root Cause Analysis</div>
+    <div class="info-box">Start with the problem statement, then ask "Why?" five times to drill down to the true root cause. Link to a CAPA record when complete.</div>
+    <div class="card">
+      <div class="form-group" style="margin-bottom:14px"><label>Problem Statement</label><textarea id="whyProblem" placeholder="State the observed problem clearly..." style="min-height:56px"></textarea></div>
+      <table class="why-table">
+        <thead><tr><th>#</th><th>Why Question</th><th>Answer / Finding</th><th>Evidence / Data</th></tr></thead>
+        <tbody id="whyBody"></tbody>
+      </table>
+      <div style="margin-top:14px" class="form-group"><label>Root Cause Conclusion</label><textarea id="whyConclusion" placeholder="Final root cause conclusion after the 5-Why exercise..."></textarea></div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-success" onclick="exportWhy()">📥 Copy to Clipboard</button>
+        <button class="btn btn-outline" onclick="clearWhy()">🗑 Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FISHBONE -->
+  <div id="tab-fishbone" class="tab-content">
+    <div class="section-title">Fishbone (Ishikawa) Diagram</div>
+    <div class="info-box">Enter the effect (problem) and causes under each of the 6M categories. The diagram updates live.</div>
+    <div class="card">
+      <div class="form-group" style="margin-bottom:16px;max-width:420px"><label>Effect (Problem)</label><input type="text" id="fbEffect" placeholder="Main problem / defect" oninput="drawFishbone()"></div>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-group"><label>🔧 Machine</label><textarea id="fbMachine" placeholder="One cause per line" oninput="drawFishbone()"></textarea></div>
+        <div class="form-group"><label>👷 Man (People)</label><textarea id="fbMan" placeholder="One cause per line" oninput="drawFishbone()"></textarea></div>
+        <div class="form-group"><label>📋 Method</label><textarea id="fbMethod" placeholder="One cause per line" oninput="drawFishbone()"></textarea></div>
+        <div class="form-group"><label>🧪 Material</label><textarea id="fbMaterial" placeholder="One cause per line" oninput="drawFishbone()"></textarea></div>
+        <div class="form-group"><label>🌡 Environment</label><textarea id="fbEnv" placeholder="One cause per line" oninput="drawFishbone()"></textarea></div>
+        <div class="form-group"><label>📐 Measurement</label><textarea id="fbMeasure" placeholder="One cause per line" oninput="drawFishbone()"></textarea></div>
+      </div>
+      <div class="fishbone-wrap">
+        <svg class="fishbone" id="fishboneSvg"></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION TRACKER -->
+  <div id="tab-actions" class="tab-content">
+    <div class="section-title">Action Item Tracker</div>
+    <div class="card">
+      <h2><span class="icon">➕</span> Add Action</h2>
+      <div class="form-grid three">
+        <div class="form-group full" style="max-width:none"><label>Action Description</label><input type="text" id="actDesc" placeholder="Describe the corrective / preventive action..."></div>
+        <div class="form-group"><label>Owner</label><input type="text" id="actOwner" placeholder="Name"></div>
+        <div class="form-group"><label>Due Date</label><input type="date" id="actDue"></div>
+        <div class="form-group"><label>Priority</label>
+          <select id="actPriority"><option>High</option><option>Medium</option><option>Low</option></select>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="addAction()">➕ Add Action</button>
+    </div>
+    <div class="card">
+      <h2><span class="icon">📋</span> Action Register</h2>
+      <div id="actionList">
+        <div style="text-align:center;color:var(--muted);padding:22px;font-size:0.93rem;">No actions yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RISK MATRIX -->
+  <div id="tab-matrix" class="tab-content">
+    <div class="section-title">Risk / Severity Matrix</div>
+    <div class="card">
+      <h2><span class="icon">⚠️</span> Risk Priority Assessment</h2>
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:16px;">Select Likelihood and Severity to determine the Risk Priority Number (RPN).</p>
+      <div class="form-grid" style="max-width:420px;margin-bottom:20px">
+        <div class="form-group">
+          <label>Likelihood (1–5)</label>
+          <select id="matLikely" onchange="calcRPN()">
+            <option value="1">1 – Remote</option><option value="2">2 – Unlikely</option>
+            <option value="3">3 – Possible</option><option value="4">4 – Likely</option><option value="5">5 – Almost Certain</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Severity (1–5)</label>
+          <select id="matSeverity" onchange="calcRPN()">
+            <option value="1">1 – Negligible</option><option value="2">2 – Minor</option>
+            <option value="3">3 – Moderate</option><option value="4">4 – Major</option><option value="5">5 – Catastrophic</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Detectability (1–5)</label>
+          <select id="matDetect" onchange="calcRPN()">
+            <option value="1">1 – Almost Certain Detection</option><option value="2">2 – High</option>
+            <option value="3">3 – Moderate</option><option value="4">4 – Low</option><option value="5">5 – Almost Impossible</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>RPN Score</label>
+          <div id="rpnDisplay" style="font-size:2rem;font-weight:800;padding:4px 0;"></div>
+        </div>
+      </div>
+      <h2 style="margin-bottom:14px"><span class="icon">🗺</span> Risk Matrix (Likelihood × Severity)</h2>
+      <table class="matrix-table" id="riskMatrix"></table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- TAB NAVIGATION ----
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'fishbone') drawFishbone();
+  if (id === 'matrix') { buildMatrix(); calcRPN(); }
+  if (id === '5why') buildWhyTable();
+}
+
+// ---- CAPA STORAGE ----
+let capas = JSON.parse(localStorage.getItem('capas') || '[]');
+let actions = JSON.parse(localStorage.getItem('capaActions') || '[]');
+
+function saveCapa() {
+  const num = document.getElementById('capaNum').value.trim();
+  if (!num) { showMsg('capaMsg', 'CAPA Number is required.', 'error'); return; }
+  const capa = {
+    id: Date.now(),
+    num, date: document.getElementById('capaDate').value,
+    source: document.getElementById('capaSource').value,
+    owner: document.getElementById('capaOwner').value,
+    dept: document.getElementById('capaDept').value,
+    due: document.getElementById('capaDue').value,
+    problem: document.getElementById('capaProblem').value,
+    contain: document.getElementById('capaContain').value,
+    rcaMethod: document.getElementById('capaRcaMethod').value,
+    rootCause: document.getElementById('capaRootCause').value,
+    ca: document.getElementById('capaCA').value,
+    pa: document.getElementById('capaPA').value,
+    verify: document.getElementById('capaVerify').value,
+    status: 'Open'
+  };
+  capas.push(capa);
+  localStorage.setItem('capas', JSON.stringify(capas));
+  showMsg('capaMsg', `✅ CAPA ${num} saved successfully!`, 'success');
+  clearCapa();
+  renderList();
+  updateStats();
+}
+
+function clearCapa() {
+  ['capaNum','capaDate','capaOwner','capaDept','capaDue','capaProblem','capaContain','capaRootCause','capaCA','capaPA','capaVerify'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+  setTimeout(() => el.textContent = '', 3000);
+}
+
+function renderList() {
+  const filter = document.getElementById('filterText').value.toLowerCase();
+  const statusF = document.getElementById('filterStatus').value;
+  const list = document.getElementById('capaList');
+  if (!capas.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:28px;font-size:0.95rem;">No CAPAs yet. Click <strong>➕ New CAPA</strong> to add one.</div>';
+    return;
+  }
+  const today = new Date().toISOString().slice(0,10);
+  let html = '';
+  capas.filter(c => {
+    if (statusF && c.status !== statusF) return false;
+    if (filter && !JSON.stringify(c).toLowerCase().includes(filter)) return false;
+    return true;
+  }).forEach(c => {
+    const isOverdue = c.status === 'Open' && c.due && c.due < today;
+    const displayStatus = isOverdue ? 'Overdue' : c.status;
+    const badge = displayStatus === 'Open' ? 'status-open' : displayStatus === 'Closed' ? 'status-closed' : 'status-overdue';
+    html += `<div class="capa-item">
+      <div class="info">
+        <strong>${c.num} — ${c.source}</strong>
+        <span>Owner: ${c.owner || '—'} | Dept: ${c.dept || '—'} | Due: ${c.due || '—'}</span>
+        <div style="margin-top:5px;font-size:0.88rem;color:var(--text)">${c.problem.substring(0,120)}${c.problem.length>120?'…':''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <span class="status-badge ${badge}">${displayStatus}</span>
+        <div style="display:flex;gap:6px">
+          ${c.status==='Open'?`<button class="btn btn-success btn-sm" onclick="closeCapa(${c.id})">✅ Close</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteCapa(${c.id})">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  list.innerHTML = html || '<div style="color:var(--muted);padding:14px;">No matching CAPAs.</div>';
+}
+
+function closeCapa(id) {
+  const c = capas.find(x => x.id === id);
+  if (c) { c.status = 'Closed'; localStorage.setItem('capas', JSON.stringify(capas)); renderList(); updateStats(); }
+}
+
+function deleteCapa(id) {
+  if (!confirm('Delete this CAPA?')) return;
+  capas = capas.filter(x => x.id !== id);
+  localStorage.setItem('capas', JSON.stringify(capas));
+  renderList(); updateStats();
+}
+
+function updateStats() {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('statTotal').textContent = capas.length;
+  document.getElementById('statOpen').textContent = capas.filter(c => c.status === 'Open' && (!c.due || c.due >= today)).length;
+  document.getElementById('statOverdue').textContent = capas.filter(c => c.status === 'Open' && c.due && c.due < today).length;
+  document.getElementById('statClosed').textContent = capas.filter(c => c.status === 'Closed').length;
+}
+
+// ---- 5-WHY ----
+function buildWhyTable() {
+  const tbody = document.getElementById('whyBody');
+  if (tbody.children.length > 0) return;
+  for (let i = 1; i <= 5; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-weight:700;color:var(--accent);width:30px">Why ${i}</td>
+      <td><input type="text" placeholder="Why did this happen?"></td>
+      <td><input type="text" placeholder="Answer / finding..."></td>
+      <td><input type="text" placeholder="Data, observation..."></td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+function exportWhy() {
+  const prob = document.getElementById('whyProblem').value;
+  const rows = document.querySelectorAll('#whyBody tr');
+  let text = `5-Why Analysis\nProblem: ${prob}\n\n`;
+  rows.forEach((r, i) => {
+    const inputs = r.querySelectorAll('input');
+    text += `Why ${i+1}: ${inputs[0].value}\n  Answer: ${inputs[1].value}\n  Evidence: ${inputs[2].value}\n\n`;
+  });
+  text += `Root Cause: ${document.getElementById('whyConclusion').value}`;
+  navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+}
+
+function clearWhy() {
+  document.getElementById('whyProblem').value = '';
+  document.getElementById('whyConclusion').value = '';
+  document.querySelectorAll('#whyBody input').forEach(i => i.value = '');
+}
+
+// ---- FISHBONE ----
+function drawFishbone() {
+  const svg = document.getElementById('fishboneSvg');
+  const W = svg.clientWidth || 800, H = 380;
+  const cx = W * 0.82, cy = H / 2;
+  const spineLen = cx - 60;
+  const cats = [
+    { id: 'fbMachine', label: 'Machine', side: 'top', pos: 0.18 },
+    { id: 'fbMethod', label: 'Method', side: 'top', pos: 0.45 },
+    { id: 'fbEnv', label: 'Environment', side: 'top', pos: 0.72 },
+    { id: 'fbMan', label: 'Man', side: 'bottom', pos: 0.18 },
+    { id: 'fbMaterial', label: 'Material', side: 'bottom', pos: 0.45 },
+    { id: 'fbMeasure', label: 'Measurement', side: 'bottom', pos: 0.72 },
+  ];
+  const effect = document.getElementById('fbEffect').value || 'Effect';
+  let svgContent = `<defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#1a3a5c"/>
+    </marker></defs>`;
+  // Spine
+  svgContent += `<line x1="40" y1="${cy}" x2="${cx}" y2="${cy}" stroke="#1a3a5c" stroke-width="3" marker-end="url(#arrowhead)"/>`;
+  // Effect box
+  svgContent += `<rect x="${cx}" y="${cy-28}" width="120" height="56" rx="8" fill="#2e86de"/>
+    <text x="${cx+60}" y="${cy+5}" text-anchor="middle" fill="white" font-size="13" font-weight="bold" class="fishbone-label">${effect.substring(0,16)}</text>`;
+
+  cats.forEach(cat => {
+    const bx = 40 + cat.pos * spineLen;
+    const isTop = cat.side === 'top';
+    const dy = isTop ? -100 : 100;
+    const causes = (document.getElementById(cat.id).value || '').split('\n').filter(l => l.trim());
+    // Branch line
+    svgContent += `<line x1="${bx}" y1="${cy}" x2="${bx + (isTop?-30:0) - 10}" y2="${cy + dy}" stroke="#6b7e91" stroke-width="2"/>`;
+    // Label
+    svgContent += `<text x="${bx + (isTop?-42:-10)}" y="${cy + dy + (isTop?-10:20)}" text-anchor="middle" fill="#1a3a5c" font-size="12" font-weight="bold" class="fishbone-label">${cat.label}</text>`;
+    // Causes
+    causes.slice(0,4).forEach((cause, i) => {
+      const cx2 = bx + (isTop?-30:0) - 10 + (i+1) * (isTop ? -22 : 18);
+      const cy2 = cy + dy + (isTop ? -30 - i*16 : 36 + i*16);
+      svgContent += `<text x="${cx2}" y="${cy2}" text-anchor="middle" fill="#34495e" font-size="10" class="fishbone-label">${cause.trim().substring(0,18)}</text>`;
+      svgContent += `<line x1="${bx + (isTop?-30:0) - 10}" y1="${cy + dy}" x2="${cx2}" y2="${cy2 + (isTop?4:-4)}" stroke="#b0c4d8" stroke-width="1.2"/>`;
+    });
+  });
+  svg.innerHTML = svgContent;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+// ---- ACTION TRACKER ----
+function addAction() {
+  const desc = document.getElementById('actDesc').value.trim();
+  if (!desc) { alert('Action description required.'); return; }
+  const action = {
+    id: Date.now(),
+    desc,
+    owner: document.getElementById('actOwner').value,
+    due: document.getElementById('actDue').value,
+    priority: document.getElementById('actPriority').value,
+    status: 'Open',
+    progress: 0
+  };
+  actions.push(action);
+  localStorage.setItem('capaActions', JSON.stringify(actions));
+  ['actDesc','actOwner','actDue'].forEach(id => document.getElementById(id).value = '');
+  renderActions();
+}
+
+function renderActions() {
+  const list = document.getElementById('actionList');
+  if (!actions.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:22px;font-size:0.93rem;">No actions yet.</div>';
+    return;
+  }
+  const today = new Date().toISOString().slice(0,10);
+  const prioColor = { High: 'var(--danger)', Medium: 'var(--warn)', Low: 'var(--success)' };
+  list.innerHTML = actions.map(a => {
+    const isOverdue = a.status === 'Open' && a.due && a.due < today;
+    return `<div class="capa-item" style="flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;width:100%">
+        <div class="info">
+          <strong>${a.desc}</strong>
+          <span>Owner: ${a.owner || '—'} | Due: ${a.due || '—'} | Priority: <span style="color:${prioColor[a.priority]};font-weight:700">${a.priority}</span></span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="status-badge ${isOverdue?'status-overdue':a.status==='Closed'?'status-closed':'status-open'}">${isOverdue?'Overdue':a.status}</span>
+          ${a.status==='Open'?`<button class="btn btn-success btn-sm" onclick="closeAction(${a.id})">✅</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteAction(${a.id})">🗑</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:8px;width:100%">
+        <span style="font-size:0.8rem;color:var(--muted)">Progress:</span>
+        <input type="range" min="0" max="100" value="${a.progress}" style="flex:1" onchange="updateProgress(${a.id},this.value)">
+        <span style="font-size:0.85rem;font-weight:700;min-width:36px">${a.progress}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function closeAction(id) {
+  const a = actions.find(x => x.id === id);
+  if (a) { a.status = 'Closed'; a.progress = 100; localStorage.setItem('capaActions', JSON.stringify(actions)); renderActions(); }
+}
+function deleteAction(id) {
+  if (!confirm('Delete this action?')) return;
+  actions = actions.filter(x => x.id !== id);
+  localStorage.setItem('capaActions', JSON.stringify(actions));
+  renderActions();
+}
+function updateProgress(id, val) {
+  const a = actions.find(x => x.id === id);
+  if (a) { a.progress = parseInt(val); localStorage.setItem('capaActions', JSON.stringify(actions)); renderActions(); }
+}
+
+// ---- RISK MATRIX ----
+function buildMatrix() {
+  const labels = ['Negligible', 'Minor', 'Moderate', 'Major', 'Catastrophic'];
+  const likeLabels = ['Almost Certain', 'Likely', 'Possible', 'Unlikely', 'Remote'];
+  let html = '<tr><th>Likelihood ↓ / Severity →</th>';
+  labels.forEach(l => html += `<th>${l}</th>`);
+  html += '</tr>';
+  for (let l = 5; l >= 1; l--) {
+    html += `<tr><th>${likeLabels[5-l]}</th>`;
+    for (let s = 1; s <= 5; s++) {
+      const rpn = l * s;
+      let cls = rpn <= 4 ? 'sev-low' : rpn <= 9 ? 'sev-med' : rpn <= 16 ? 'sev-high' : 'sev-crit';
+      let label = rpn <= 4 ? 'LOW' : rpn <= 9 ? 'MEDIUM' : rpn <= 16 ? 'HIGH' : 'CRITICAL';
+      html += `<td class="${cls}">${rpn}<br><small>${label}</small></td>`;
+    }
+    html += '</tr>';
+  }
+  document.getElementById('riskMatrix').innerHTML = html;
+}
+
+function calcRPN() {
+  const l = parseInt(document.getElementById('matLikely').value);
+  const s = parseInt(document.getElementById('matSeverity').value);
+  const d = parseInt(document.getElementById('matDetect').value);
+  const rpn = l * s * d;
+  const el = document.getElementById('rpnDisplay');
+  el.textContent = rpn;
+  el.style.color = rpn <= 10 ? 'var(--success)' : rpn <= 50 ? 'var(--warn)' : 'var(--danger)';
+}
+
+// ---- INIT ----
+buildWhyTable();
+renderList();
+renderActions();
+updateStats();
+drawFishbone();
+buildMatrix();
+calcRPN();
+window.addEventListener('resize', drawFishbone);
+</script>
+</body>
+</html>

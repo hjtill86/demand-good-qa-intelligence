@@ -37,6 +37,10 @@ export default async function DashboardPage() {
           <span>WORKSPACE</span>
           <a className="active">Overview</a>
           <a href="/dashboard/management-review">Management review</a>
+          <a href="/dashboard/qms/management-review">Review board</a>
+          <a href="/dashboard/qms/capa">CAPA / RCA</a>
+          <a href="/dashboard/qms/audit-readiness">Audit readiness</a>
+          <a href="/dashboard/qms/spc-msa">SPC / MSA</a>
           <a href="/dashboard/quarterly-business-review">Quarterly review</a>
           <a href="/dashboard/fmea">FMEA generator</a>
           <a href="/dashboard/validation">Validation suite</a>
@@ -160,6 +164,30 @@ export default async function DashboardPage() {
               <h3>Management review generator</h3>
               <p>Prepare a structured quality-management review with current scorecards, risks, and decision fields.</p>
               <b>Generate review →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/qms/management-review">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Management review board</h3>
+              <p>Track KPIs, review inputs, meeting minutes, outputs, and trends. Saved in this browser.</p>
+              <b>Open board →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/qms/capa">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>CAPA / RCA toolkit</h3>
+              <p>Log corrective actions, run 5-Why and fishbone analysis, and follow the action tracker.</p>
+              <b>Open toolkit →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/qms/audit-readiness">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Audit readiness pack</h3>
+              <p>Work the readiness checklist, evidence register, nonconformance log, schedule, and contacts.</p>
+              <b>Open pack →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/qms/spc-msa">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>SPC / MSA tools</h3>
+              <p>Build X-bar R and I-MR charts, calculate Cp/Cpk, and run a Gage R&amp;R study.</p>
+              <b>Open tools →</b>
             </a>
             <a className="generator-card" href="/dashboard/quarterly-business-review">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>

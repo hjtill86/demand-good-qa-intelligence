@@ -19,6 +19,8 @@ export default async function ManagementReviewPage() {
         <h1>Management review</h1>
         <p className="fine-print">
           Prepared {reviewDate}. Review, add meeting decisions, then print or save this page as a PDF.
+          For the interactive KPI board, minutes, and trend charts, open the{" "}
+          <a href="/dashboard/qms/management-review">management review board</a>.
         </p>
       </header>
 

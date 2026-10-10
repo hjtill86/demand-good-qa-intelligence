@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Management Review Dashboard</title>
+<style>
+  :root {
+    --primary: #1a2a4a;
+    --accent: #2563eb;
+    --accent2: #3b82f6;
+    --success: #16a34a;
+    --warn: #d97706;
+    --danger: #dc2626;
+    --info: #0891b2;
+    --light: #f0f4ff;
+    --border: #c7d5f0;
+    --text: #1e2d45;
+    --muted: #64748b;
+    --card: #fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--text); }
+  header { background: var(--primary); color: #fff; padding: 18px 32px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header .sub { font-size: 0.84rem; opacity: 0.72; margin-top: 2px; }
+  .badge { background: var(--accent); color: #fff; border-radius: 12px; padding: 2px 10px; font-size: 0.78rem; margin-left: 8px; }
+  .header-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .header-meta { font-size: 0.82rem; opacity: 0.75; text-align: right; }
+  nav { background: #fff; border-bottom: 2px solid var(--border); display: flex; padding: 0 24px; overflow-x: auto; }
+  nav button { background: none; border: none; border-bottom: 3px solid transparent; padding: 13px 18px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--muted); transition: all 0.2s; white-space: nowrap; }
+  nav button.active { border-bottom-color: var(--accent); color: var(--accent); }
+  nav button:hover:not(.active) { background: var(--light); color: var(--text); }
+  .container { max-width: 1200px; margin: 0 auto; padding: 26px 20px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 22px 26px; margin-bottom: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  .card h2 { font-size: 1rem; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .section-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 0.79rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  input, select, textarea { border: 1px solid var(--border); border-radius: 7px; padding: 8px 11px; font-size: 0.92rem; font-family: inherit; color: var(--text); background: #f8faff; transition: border 0.2s; width: 100%; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+  textarea { resize: vertical; min-height: 68px; }
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 20px; border-radius: 7px; border: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-warn { background: var(--warn); color: #fff; }
+  .btn-sm { padding: 5px 13px; font-size: 0.82rem; }
+  /* KPI Cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; text-align: center; position: relative; overflow: hidden; }
+  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent); }
+  .kpi-card.green::before { background: var(--success); }
+  .kpi-card.amber::before { background: var(--warn); }
+  .kpi-card.red::before { background: var(--danger); }
+  .kpi-card.blue::before { background: var(--info); }
+  .kpi-card .num { font-size: 2.2rem; font-weight: 800; color: var(--primary); line-height: 1; }
+  .kpi-card .unit { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+  .kpi-card .lbl { font-size: 0.76rem; color: var(--muted); text-transform: uppercase; margin-top: 6px; letter-spacing: 0.4px; }
+  .kpi-card .trend { font-size: 0.8rem; margin-top: 6px; font-weight: 600; }
+  .trend-up { color: var(--success); }
+  .trend-down { color: var(--danger); }
+  .trend-flat { color: var(--warn); }
+  /* Status badges */
+  .status-badge { border-radius: 20px; padding: 3px 12px; font-size: 0.76rem; font-weight: 700; white-space: nowrap; display: inline-block; }
+  .s-green { background: #dcfce7; color: var(--success); border: 1px solid #86efac; }
+  .s-amber { background: #fef3c7; color: var(--warn); border: 1px solid #fcd34d; }
+  .s-red { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; }
+  .s-blue { background: #e0f2fe; color: var(--info); border: 1px solid #7dd3fc; }
+  /* Table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .data-table th { background: var(--primary); color: #fff; padding: 10px 14px; text-align: left; font-size: 0.82rem; font-weight: 600; }
+  .data-table td { border: 1px solid var(--border); padding: 9px 13px; vertical-align: middle; }
+  .data-table tr:nth-child(even) { background: #f5f8ff; }
+  .data-table tr:hover { background: #eef3ff; }
+  .data-table td input, .data-table td select { border: none; background: transparent; font-size: 0.88rem; width: 100%; }
+  /* Progress bars */
+  .progress-wrap { background: #e2e8f0; border-radius: 20px; height: 10px; overflow: hidden; }
+  .progress-bar { border-radius: 20px; height: 10px; transition: width 0.5s; }
+  .pb-green { background: linear-gradient(90deg, var(--success), #4ade80); }
+  .pb-amber { background: linear-gradient(90deg, var(--warn), #fbbf24); }
+  .pb-red { background: linear-gradient(90deg, var(--danger), #f87171); }
+  .pb-blue { background: linear-gradient(90deg, var(--info), #38bdf8); }
+  /* Canvas */
+  canvas { width: 100% !important; border-radius: 8px; }
+  /* Meeting minutes */
+  .minute-section { background: #f8faff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; }
+  .minute-section h4 { font-size: 0.92rem; color: var(--primary); margin-bottom: 8px; font-weight: 700; }
+  /* Action items */
+  .action-item { border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; background: #fafcff; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .action-item .ai-info { flex: 1; min-width: 200px; }
+  .action-item .ai-info strong { display: block; font-size: 0.93rem; margin-bottom: 3px; }
+  .action-item .ai-info span { font-size: 0.81rem; color: var(--muted); }
+  /* Review items */
+  .review-section { margin-bottom: 18px; }
+  .review-section h3 { font-size: 0.95rem; font-weight: 700; color: var(--primary); background: #eef3ff; padding: 9px 14px; border-radius: 7px 7px 0 0; border: 1px solid var(--border); border-bottom: none; }
+  .review-row { border: 1px solid var(--border); border-top: none; padding: 10px 14px; background: #fff; display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .review-row:last-child { border-radius: 0 0 7px 7px; }
+  .review-row label { min-width: 220px; font-size: 0.9rem; font-weight: 500; color: var(--text); text-transform: none; letter-spacing: 0; margin-top: 4px; }
+  .info-box { background: #eff6ff; border-left: 4px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.9rem; color: var(--primary); }
+  /* Trend chart placeholder */
+  .chart-wrap { position: relative; }
+  @media (max-width:800px) { .kpi-grid { grid-template-columns: 1fr 1fr; } .form-grid, .form-grid.three, .form-grid.four { grid-template-columns: 1fr; } }
+  @media (max-width:480px) { .kpi-grid { grid-template-columns: 1fr; } }
+  @media print { nav, .btn, .no-print { display: none !important; } .tab-content { display: block !important; } .card { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<header>
+  <a href="/dashboard" style="color:#fff;font-weight:700;font-size:0.85rem;margin-right:8px;white-space:nowrap">← Workspace</a>
+  <div>
+    <h1>📊 Management Review Dashboard <span class="badge">QMS</span></h1>
+    <div class="sub">Quality Management System · Executive Performance Review · ISO 9001 Cl. 9.3</div>
+  </div>
+  <div class="header-right">
+    <div class="header-meta" id="headerMeta"></div>
+    <button class="btn btn-outline" onclick="window.print()" style="color:#fff;border-color:#fff">🖨 Print</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('dashboard')">📊 Dashboard</button>
+  <button onclick="showTab('kpis')">🎯 KPI Tracker</button>
+  <button onclick="showTab('inputs')">📥 Review Inputs</button>
+  <button onclick="showTab('minutes')">📝 Meeting Minutes</button>
+  <button onclick="showTab('outputs')">📤 Outputs &amp; Actions</button>
+  <button onclick="showTab('trends')">📈 Trend Charts</button>
+</nav>
+
+<div class="container">
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab-content active">
+    <div class="section-title">
+      <span>Executive Dashboard</span>
+      <span id="reviewPeriodLabel" style="font-size:0.85rem;color:var(--muted);font-weight:500"></span>
+    </div>
+
+    <div class="kpi-grid" id="kpiDashGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap" class="chart-row">
+      <div class="card">
+        <h2>📊 Quality Objectives Status</h2>
+        <canvas id="objChart" height="220"></canvas>
+      </div>
+      <div class="card">
+        <h2>📈 CAPA Status Summary</h2>
+        <canvas id="capaChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🚦 Overall QMS Health</h2>
+      <div id="qmsHealth"></div>
+    </div>
+  </div>
+
+  <!-- KPI TRACKER -->
+  <div id="tab-kpis" class="tab-content">
+    <div class="section-title">KPI Tracker</div>
+    <div class="card no-print">
+      <h2>➕ Add / Update KPI</h2>
+      <div class="form-grid four">
+        <div class="form-group"><label>KPI Name</label><input type="text" id="kpiName" placeholder="e.g. Customer Satisfaction"></div>
+        <div class="form-group"><label>Category</label>
+          <select id="kpiCat">
+            <option>Customer</option><option>Quality</option><option>Delivery</option>
+            <option>Supplier</option><option>Safety</option><option>Process</option><option>Financial</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Target</label><input type="number" id="kpiTarget" step="any" placeholder="Target value"></div>
+        <div class="form-group"><label>Unit</label><input type="text" id="kpiUnit" placeholder="%, ppm, days…"></div>
+        <div class="form-group"><label>Actual Value</label><input type="number" id="kpiActual" step="any" placeholder="Current actual"></div>
+        <div class="form-group"><label>Direction (better is)</label>
+          <select id="kpiDir"><option value="higher">Higher ↑</option><option value="lower">Lower ↓</option></select>
+        </div>
+        <div class="form-group"><label>Period</label><input type="text" id="kpiPeriod" placeholder="e.g. Q3 2026"></div>
+        <div class="form-group"><label>Owner</label><input type="text" id="kpiOwner" placeholder="Responsible"></div>
+        <div class="form-group full"><label>Comments</label><input type="text" id="kpiComments" placeholder="Notes or context..."></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="addKPI()">💾 Save KPI</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🎯 KPI Register</h2>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="kpiTable">
+          <thead><tr><th>KPI</th><th>Category</th><th>Target</th><th>Actual</th><th>Unit</th><th>Period</th><th>Owner</th><th>Status</th><th>Progress</th><th class="no-print">Del</th></tr></thead>
+          <tbody id="kpiBody"><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:22px">No KPIs added yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEW INPUTS -->
+  <div id="tab-inputs" class="tab-content">
+    <div class="section-title">Management Review Inputs (ISO 9001 Cl. 9.3.2)</div>
+    <div class="info-box">Complete all input sections before the management review meeting. These feed directly into the meeting agenda and outputs.</div>
+
+    <div class="review-section">
+      <h3>📋 a) Status of Actions from Previous Reviews</h3>
+      <div class="review-row">
+        <label>Previous review date</label>
+        <input type="date" id="inp_prevDate" style="max-width:180px">
+        <label>Open actions from last review</label>
+        <input type="number" id="inp_openActions" style="max-width:80px" placeholder="0">
+        <label>Closed actions</label>
+        <input type="number" id="inp_closedActions" style="max-width:80px" placeholder="0">
+      </div>
+      <div class="review-row"><label style="min-width:100%">Summary of outstanding items</label><textarea id="inp_actionSummary" style="width:100%" placeholder="List any incomplete actions from previous review and their current status..."></textarea></div>
+    </div>
+
+    <div class="review-section">
+      <h3>📊 b) Changes in External &amp; Internal Issues</h3>
+      <div class="review-row"><label style="min-width:100%">External changes (market, regulatory, technology, competition)</label><textarea id="inp_external" style="width:100%" placeholder="Describe relevant external context changes..."></textarea></div>
+      <div class="review-row"><label style="min-width:100%">Internal changes (org structure, processes, resources, capabilities)</label><textarea id="inp_internal" style="width:100%" placeholder="Describe relevant internal context changes..."></textarea></div>
+    </div>
+
+    <div class="review-section">
+      <h3>🎯 c) QMS Performance &amp; Effectiveness</h3>
+      <div class="review-row"><label>Customer satisfaction score</label><input type="text" id="inp_csat" style="max-width:120px" placeholder="e.g. 92%"></div>
+      <div class="review-row"><label>Number of customer complaints (period)</label><input type="number" id="inp_complaints" style="max-width:80px" placeholder="0"></div>
+      <div class="review-row"><label>Quality objective achievement rate</label><input type="text" id="inp_objRate" style="max-width:120px" placeholder="e.g. 80%"></div>
+      <div class="review-row"><label>Internal audit results / findings</label><textarea id="inp_auditRes" style="width:100%" placeholder="Summary of internal audit findings, NCs, and trends..."></textarea></div>
+      <div class="review-row"><label>Process performance summary</label><textarea id="inp_procPerf" style="width:100%" placeholder="Key process metrics — yield, OTD, scrap, efficiency..."></textarea></div>
+      <div class="review-row"><label>Nonconformities &amp; corrective actions summary</label><textarea id="inp_ncSummary" style="width:100%" placeholder="NC volume, trends, open CAPAs, overdue items..."></textarea></div>
+    </div>
+
+    <div class="review-section">
+      <h3>📦 d) Adequacy of Resources</h3>
+      <div class="review-row"><label>Human resources adequacy</label><textarea id="inp_hrRes" style="width:100%" placeholder="Headcount, skill gaps, training needs..."></textarea></div>
+      <div class="review-row"><label>Infrastructure &amp; equipment adequacy</label><textarea id="inp_infraRes" style="width:100%" placeholder="Equipment condition, calibration status, facilities..."></textarea></div>
+    </div>
+
+    <div class="review-section">
+      <h3>⚠️ e) Risk &amp; Opportunities</h3>
+      <div class="review-row"><label style="min-width:100%">Key risks identified (and mitigation status)</label><textarea id="inp_risks" style="width:100%" placeholder="Top risks to QMS effectiveness and business objectives..."></textarea></div>
+      <div class="review-row"><label style="min-width:100%">Opportunities identified for improvement</label><textarea id="inp_opps" style="width:100%" placeholder="Process improvements, technology adoption, market opportunities..."></textarea></div>
+    </div>
+
+    <div class="review-section">
+      <h3>🤝 f) Supplier &amp; External Provider Performance</h3>
+      <div class="review-row"><label>On-time delivery performance</label><input type="text" id="inp_supplierOTD" style="max-width:120px" placeholder="e.g. 94%"></div>
+      <div class="review-row"><label>Supplier quality (PPM / reject rate)</label><input type="text" id="inp_supplierPPM" style="max-width:120px" placeholder="e.g. 450 PPM"></div>
+      <div class="review-row"><label>Supplier performance summary</label><textarea id="inp_supplierSum" style="width:100%" placeholder="Summary of supplier scorecards and issues..."></textarea></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="saveInputs()">💾 Save Inputs</button>
+      <button class="btn btn-outline" onclick="clearInputs()">🗑 Clear</button>
+    </div>
+    <span id="inputMsg" style="font-size:0.9rem;margin-left:14px"></span>
+  </div>
+
+  <!-- MEETING MINUTES -->
+  <div id="tab-minutes" class="tab-content">
+    <div class="section-title">Management Review Meeting Minutes</div>
+    <div class="card">
+      <h2>📅 Meeting Details</h2>
+      <div class="form-grid three">
+        <div class="form-group"><label>Review Date</label><input type="date" id="minDate"></div>
+        <div class="form-group"><label>Review Period Covered</label><input type="text" id="minPeriod" placeholder="e.g. Q3 2026 (Jul–Sep)"></div>
+        <div class="form-group"><label>Meeting Chair</label><input type="text" id="minChair" placeholder="Name / Title"></div>
+        <div class="form-group"><label>Location / Platform</label><input type="text" id="minLocation" placeholder="e.g. Boardroom / Teams"></div>
+        <div class="form-group full"><label>Attendees</label><textarea id="minAttendees" style="min-height:52px" placeholder="Name — Title, Name — Title..."></textarea></div>
+        <div class="form-group full"><label>Apologies / Absent</label><input type="text" id="minAbsent" placeholder="Names"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📋 Agenda &amp; Discussion</h2>
+      <div id="minuteSections">
+        <div class="minute-section"><h4>1. Opening &amp; Quality Policy Review</h4><textarea id="ms1" style="width:100%;min-height:68px" placeholder="Discussion, decisions, key points..."></textarea></div>
+        <div class="minute-section"><h4>2. Status of Previous Action Items</h4><textarea id="ms2" style="width:100%;min-height:68px" placeholder="Review of open and closed actions from last meeting..."></textarea></div>
+        <div class="minute-section"><h4>3. QMS Performance Review (KPIs, Objectives, Audits)</h4><textarea id="ms3" style="width:100%;min-height:80px" placeholder="Discussion of KPI performance, audit results, process metrics..."></textarea></div>
+        <div class="minute-section"><h4>4. Customer Satisfaction &amp; Complaints</h4><textarea id="ms4" style="width:100%;min-height:68px" placeholder="Customer feedback trends, complaint analysis, satisfaction scores..."></textarea></div>
+        <div class="minute-section"><h4>5. Nonconformances &amp; CAPA Review</h4><textarea id="ms5" style="width:100%;min-height:68px" placeholder="NC trends, CAPA effectiveness, overdue items..."></textarea></div>
+        <div class="minute-section"><h4>6. Supplier Performance</h4><textarea id="ms6" style="width:100%;min-height:68px" placeholder="Supplier scorecard review, issues, approved supplier list updates..."></textarea></div>
+        <div class="minute-section"><h4>7. Risk &amp; Opportunities</h4><textarea id="ms7" style="width:100%;min-height:68px" placeholder="Risk register review, new risks identified, opportunity updates..."></textarea></div>
+        <div class="minute-section"><h4>8. Resource Adequacy</h4><textarea id="ms8" style="width:100%;min-height:68px" placeholder="Staffing, training, equipment, infrastructure review..."></textarea></div>
+        <div class="minute-section"><h4>9. Improvement Opportunities</h4><textarea id="ms9" style="width:100%;min-height:68px" placeholder="Proposed improvements to QMS, processes, products/services..."></textarea></div>
+        <div class="minute-section"><h4>10. Any Other Business</h4><textarea id="ms10" style="width:100%;min-height:56px" placeholder="Additional items raised..."></textarea></div>
+      </div>
+      <div class="form-group" style="margin-top:14px"><label>Meeting Conclusion / Summary</label><textarea id="minConclusion" style="min-height:72px" placeholder="Overall conclusions, decisions made, next review scheduled for..."></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="saveMinutes()">💾 Save Minutes</button>
+        <button class="btn btn-outline btn-sm" onclick="clearMinutes()">🗑 Clear</button>
+      </div>
+      <span id="minuteMsg" style="font-size:0.9rem;margin-left:12px"></span>
+    </div>
+  </div>
+
+  <!-- OUTPUTS -->
+  <div id="tab-outputs" class="tab-content">
+    <div class="section-title">Review Outputs &amp; Action Items (ISO 9001 Cl. 9.3.3)</div>
+    <div class="info-box">Record decisions and action items arising from the management review. Each action requires an owner and due date.</div>
+    <div class="card no-print">
+      <h2>➕ Add Output / Action</h2>
+      <div class="form-grid three">
+        <div class="form-group full"><label>Action / Decision Description</label><input type="text" id="outDesc" placeholder="Describe the required action or decision made..."></div>
+        <div class="form-group"><label>Output Category</label>
+          <select id="outCat">
+            <option>QMS Improvement</option><option>Process Improvement</option><option>Resource Provision</option>
+            <option>Product / Service Improvement</option><option>Customer Satisfaction</option>
+            <option>Risk Mitigation</option><option>Objective Amendment</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Owner</label><input type="text" id="outOwner" placeholder="Responsible person"></div>
+        <div class="form-group"><label>Due Date</label><input type="date" id="outDue"></div>
+        <div class="form-group"><label>Priority</label>
+          <select id="outPriority"><option>High</option><option>Medium</option><option>Low</option></select>
+        </div>
+        <div class="form-group"><label>Linked Review Period</label><input type="text" id="outPeriod" placeholder="e.g. Q3 2026"></div>
+        <div class="form-group full"><label>Success Criteria / Measure</label><input type="text" id="outSuccess" placeholder="How will completion be verified?"></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="addOutput()">➕ Add Action</button>
+    </div>
+    <div class="card">
+      <h2>📋 Output &amp; Action Register</h2>
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap" class="no-print">
+        <input type="text" id="outFilter" placeholder="Search..." style="max-width:200px" oninput="renderOutputs()">
+        <select id="outStatusF" onchange="renderOutputs()" style="max-width:140px">
+          <option value="">All</option><option value="Open">Open</option><option value="Closed">Closed</option><option value="Overdue">Overdue</option>
+        </select>
+      </div>
+      <div id="outputList"><div style="text-align:center;color:var(--muted);padding:22px">No outputs recorded yet.</div></div>
+    </div>
+  </div>
+
+  <!-- TRENDS -->
+  <div id="tab-trends" class="tab-content">
+    <div class="section-title">Trend Analysis</div>
+    <div class="card">
+      <h2>📈 Add Trend Data Point</h2>
+      <div class="form-grid four">
+        <div class="form-group"><label>Metric Name</label>
+          <select id="trendMetric">
+            <option>Customer Satisfaction (%)</option><option>Internal Defect Rate (PPM)</option>
+            <option>On-Time Delivery (%)</option><option>Supplier PPM</option>
+            <option>Open CAPAs</option><option>Scrap Rate (%)</option><option>Training Completion (%)</option>
+            <option>Audit Findings</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Period</label><input type="text" id="trendPeriod" placeholder="Q1 2026"></div>
+        <div class="form-group"><label>Value</label><input type="number" id="trendVal" step="any" placeholder="Value"></div>
+        <div class="form-group"><label>Target</label><input type="number" id="trendTarget" step="any" placeholder="Target"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="addTrend()">➕ Add Data Point</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📊 Select Metric to View</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <select id="trendView" onchange="drawTrend()" style="max-width:280px">
+          <option>Customer Satisfaction (%)</option><option>Internal Defect Rate (PPM)</option>
+          <option>On-Time Delivery (%)</option><option>Supplier PPM</option>
+          <option>Open CAPAs</option><option>Scrap Rate (%)</option>
+          <option>Training Completion (%)</option><option>Audit Findings</option>
+        </select>
+      </div>
+      <canvas id="trendChart" height="220"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- State ----
+let kpis = JSON.parse(localStorage.getItem('mrKPIs') || '[]');
+let outputs = JSON.parse(localStorage.getItem('mrOutputs') || '[]');
+let trends = JSON.parse(localStorage.getItem('mrTrends') || '[]');
+
+// ---- Header ----
+document.getElementById('headerMeta').innerHTML = 'Period: ' + new Date().toLocaleDateString('en-US',{year:'numeric',month:'long'});
+
+// ---- Tab Nav ----
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='kpis') renderKPIs();
+  if(id==='outputs') renderOutputs();
+  if(id==='trends') drawTrend();
+}
+
+// ---- Utils ----
+function round(v,d=2){return Math.round(v*10**d)/10**d;}
+function showMsg(id,text,ok){const el=document.getElementById(id);if(!el)return;el.textContent=text;el.style.color=ok?'var(--success)':'var(--danger)';setTimeout(()=>el.textContent='',3000);}
+
+// ---- KPI ----
+function addKPI(){
+  const name=document.getElementById('kpiName').value.trim();
+  if(!name){alert('KPI name required.');return;}
+  const target=parseFloat(document.getElementById('kpiTarget').value);
+  const actual=parseFloat(document.getElementById('kpiActual').value);
+  const dir=document.getElementById('kpiDir').value;
+  let status='amber';
+  if(!isNaN(target)&&!isNaN(actual)){
+    const pct=dir==='higher'?actual/target:target/actual;
+    status=pct>=1?'green':pct>=0.85?'amber':'red';
+  }
+  kpis.push({id:Date.now(),name,cat:document.getElementById('kpiCat').value,target,actual,unit:document.getElementById('kpiUnit').value,dir,period:document.getElementById('kpiPeriod').value,owner:document.getElementById('kpiOwner').value,comments:document.getElementById('kpiComments').value,status});
+  localStorage.setItem('mrKPIs',JSON.stringify(kpis));
+  ['kpiName','kpiTarget','kpiActual','kpiUnit','kpiPeriod','kpiOwner','kpiComments'].forEach(id=>document.getElementById(id).value='');
+  renderKPIs(); renderDashboard();
+}
+
+function renderKPIs(){
+  const body=document.getElementById('kpiBody');
+  if(!kpis.length){body.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:22px">No KPIs added yet.</td></tr>';return;}
+  const sc={green:'s-green',amber:'s-amber',red:'s-red'};
+  const label={green:'On Target',amber:'At Risk',red:'Off Target'};
+  body.innerHTML=kpis.map(k=>{
+    const pct=!isNaN(k.target)&&k.target!==0?Math.min(100,Math.round((k.dir==='higher'?k.actual/k.target:k.target/k.actual)*100)):0;
+    const pc=k.status==='green'?'pb-green':k.status==='amber'?'pb-amber':'pb-red';
+    return `<tr>
+      <td><strong>${k.name}</strong>${k.comments?`<div style="font-size:0.78rem;color:var(--muted)">${k.comments}</div>`:''}</td>
+      <td>${k.cat}</td>
+      <td>${isNaN(k.target)?'—':k.target} ${k.unit||''}</td>
+      <td><strong>${isNaN(k.actual)?'—':k.actual} ${k.unit||''}</strong></td>
+      <td>${k.unit||''}</td>
+      <td>${k.period||'—'}</td>
+      <td>${k.owner||'—'}</td>
+      <td><span class="status-badge ${sc[k.status]||'s-amber'}">${label[k.status]||'—'}</span></td>
+      <td><div class="progress-wrap" style="min-width:80px"><div class="progress-bar ${pc}" style="width:${pct}%"></div></div><div style="font-size:0.76rem;color:var(--muted);margin-top:3px">${pct}%</div></td>
+      <td class="no-print"><button class="btn btn-danger btn-sm" onclick="deleteKPI(${k.id})">🗑</button></td>
+    </tr>`;}).join('');
+}
+
+function deleteKPI(id){if(!confirm('Delete?'))return;kpis=kpis.filter(k=>k.id!==id);localStorage.setItem('mrKPIs',JSON.stringify(kpis));renderKPIs();renderDashboard();}
+
+// ---- OUTPUTS ----
+function addOutput(){
+  const desc=document.getElementById('outDesc').value.trim();
+  if(!desc){alert('Description required.');return;}
+  outputs.push({id:Date.now(),desc,cat:document.getElementById('outCat').value,owner:document.getElementById('outOwner').value,due:document.getElementById('outDue').value,priority:document.getElementById('outPriority').value,period:document.getElementById('outPeriod').value,success:document.getElementById('outSuccess').value,status:'Open',progress:0});
+  localStorage.setItem('mrOutputs',JSON.stringify(outputs));
+  ['outDesc','outOwner','outDue','outPeriod','outSuccess'].forEach(id=>document.getElementById(id).value='');
+  renderOutputs();
+}
+
+function renderOutputs(){
+  const filter=(document.getElementById('outFilter')?.value||'').toLowerCase();
+  const sf=document.getElementById('outStatusF')?.value||'';
+  const today=new Date().toISOString().slice(0,10);
+  const list=document.getElementById('outputList');
+  const prioColor={High:'var(--danger)',Medium:'var(--warn)',Low:'var(--success)'};
+  const filtered=outputs.filter(o=>{
+    const isOD=o.status==='Open'&&o.due&&o.due<today;
+    const ds=isOD?'Overdue':o.status;
+    if(sf&&ds!==sf)return false;
+    if(filter&&!JSON.stringify(o).toLowerCase().includes(filter))return false;
+    return true;
+  });
+  if(!filtered.length){list.innerHTML='<div style="text-align:center;color:var(--muted);padding:22px">No outputs match the filter.</div>';return;}
+  list.innerHTML=filtered.map(o=>{
+    const isOD=o.status==='Open'&&o.due&&o.due<today;
+    const ds=isOD?'Overdue':o.status;
+    const sc=ds==='Open'?'s-blue':ds==='Closed'?'s-green':'s-red';
+    return `<div class="action-item">
+      <div class="ai-info">
+        <strong>${o.desc}</strong>
+        <span>📁 ${o.cat} | 👤 ${o.owner||'—'} | 📅 Due: ${o.due||'—'} | Priority: <span style="color:${prioColor[o.priority]};font-weight:700">${o.priority}</span></span>
+        ${o.success?`<div style="font-size:0.8rem;color:var(--muted);margin-top:3px">✅ Measure: ${o.success}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <span class="status-badge ${sc}">${ds}</span>
+        <div style="display:flex;gap:6px">
+          ${o.status==='Open'?`<button class="btn btn-success btn-sm" onclick="closeOutput(${o.id})">✅ Complete</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteOutput(${o.id})">🗑</button>
+        </div>
+      </div>
+    </div>`;}).join('');
+}
+
+function closeOutput(id){const o=outputs.find(x=>x.id===id);if(o){o.status='Closed';localStorage.setItem('mrOutputs',JSON.stringify(outputs));renderOutputs();renderDashboard();}}
+function deleteOutput(id){if(!confirm('Delete?'))return;outputs=outputs.filter(x=>x.id!==id);localStorage.setItem('mrOutputs',JSON.stringify(outputs));renderOutputs();}
+
+// ---- DASHBOARD ----
+function renderDashboard(){
+  const green=kpis.filter(k=>k.status==='green').length;
+  const amber=kpis.filter(k=>k.status==='amber').length;
+  const red=kpis.filter(k=>k.status==='red').length;
+  const today=new Date().toISOString().slice(0,10);
+  const openOut=outputs.filter(o=>o.status==='Open').length;
+  const overdueOut=outputs.filter(o=>o.status==='Open'&&o.due&&o.due<today).length;
+  document.getElementById('kpiDashGrid').innerHTML=`
+    <div class="kpi-card green"><div class="num">${green}</div><div class="lbl">KPIs On Target</div><div class="trend trend-up">🟢 Meeting objectives</div></div>
+    <div class="kpi-card amber"><div class="num">${amber}</div><div class="lbl">KPIs At Risk</div><div class="trend trend-flat">🟡 Action needed</div></div>
+    <div class="kpi-card red"><div class="num">${red}</div><div class="lbl">KPIs Off Target</div><div class="trend trend-down">🔴 Escalate</div></div>
+    <div class="kpi-card blue"><div class="num">${kpis.length}</div><div class="lbl">Total KPIs Tracked</div></div>
+    <div class="kpi-card ${openOut>0?'amber':'green'}"><div class="num">${openOut}</div><div class="lbl">Open Actions</div></div>
+    <div class="kpi-card ${overdueOut>0?'red':'green'}"><div class="num">${overdueOut}</div><div class="lbl">Overdue Actions</div></div>`;
+
+  // Objectives donut
+  drawPie('objChart',['On Target','At Risk','Off Target'],[green,amber,red],['#16a34a','#d97706','#dc2626']);
+  // CAPA bar (simulated from outputs)
+  const capaCats=outputs.reduce((acc,o)=>{acc[o.cat]=(acc[o.cat]||0)+1;return acc;},{});
+  const labels=Object.keys(capaCats), vals=Object.values(capaCats);
+  drawBar('capaChart',labels,vals,'#2563eb');
+
+  // QMS Health
+  const total=kpis.length||1;
+  const score=Math.round((green*100+amber*60)/total);
+  const healthColor=score>=80?'var(--success)':score>=60?'var(--warn)':'var(--danger)';
+  const healthLabel=score>=80?'Good':'Needs Attention';
+  document.getElementById('qmsHealth').innerHTML=`
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div class="progress-wrap" style="height:20px"><div class="progress-bar ${score>=80?'pb-green':score>=60?'pb-amber':'pb-red'}" style="width:${score}%;height:20px"></div></div>
+      </div>
+      <div style="font-size:2rem;font-weight:800;color:${healthColor}">${score}%</div>
+      <span class="status-badge ${score>=80?'s-green':score>=60?'s-amber':'s-red'}" style="font-size:0.95rem;padding:6px 16px">${healthLabel}</span>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-top:10px">${kpis.length} KPIs tracked. ${green} on target, ${amber} at risk, ${red} off target.</p>`;
+}
+
+function drawPie(canvasId, labels, data, colors){
+  const canvas=document.getElementById(canvasId);
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||400;
+  const H=canvas.height=parseInt(canvas.getAttribute('height')||220);
+  const W=canvas.width;
+  ctx.clearRect(0,0,W,H);
+  const total=data.reduce((a,b)=>a+b,0)||1;
+  const cx=W*0.4, cy=H/2, r=Math.min(cx,cy)-20;
+  let angle=-Math.PI/2;
+  data.forEach((v,i)=>{
+    if(v===0)return;
+    const slice=v/total*Math.PI*2;
+    ctx.fillStyle=colors[i]; ctx.beginPath();
+    ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,angle,angle+slice); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    angle+=slice;
+  });
+  // Legend
+  labels.forEach((l,i)=>{
+    const y=cy-((labels.length-1)/2*22)+i*22;
+    ctx.fillStyle=colors[i]; ctx.fillRect(W*0.82-10,y-8,14,14); ctx.strokeStyle='#ccc'; ctx.lineWidth=0.5; ctx.strokeRect(W*0.82-10,y-8,14,14);
+    ctx.fillStyle='#333'; ctx.font='11px Segoe UI'; ctx.textAlign='left';
+    ctx.fillText(`${l}: ${data[i]}`,W*0.82+8,y+4);
+  });
+}
+
+function drawBar(canvasId, labels, data, color){
+  const canvas=document.getElementById(canvasId);
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||400;
+  const H=canvas.height=parseInt(canvas.getAttribute('height')||220);
+  const W=canvas.width;
+  ctx.clearRect(0,0,W,H);
+  if(!data.length){ctx.fillStyle='#999';ctx.font='13px Segoe UI';ctx.textAlign='center';ctx.fillText('No data yet',W/2,H/2);return;}
+  const pad={top:20,right:20,bottom:50,left:40};
+  const maxV=Math.max(...data)*1.2||1;
+  const bw=(W-pad.left-pad.right)/data.length*0.6;
+  const gap=(W-pad.left-pad.right)/data.length;
+  data.forEach((v,i)=>{
+    const x=pad.left+i*gap+(gap-bw)/2;
+    const barH=v/maxV*(H-pad.top-pad.bottom);
+    const y=H-pad.bottom-barH;
+    ctx.fillStyle=color+'cc'; ctx.fillRect(x,y,bw,barH);
+    ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.strokeRect(x,y,bw,barH);
+    ctx.fillStyle='#333'; ctx.font='10px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(v,x+bw/2,y-5);
+    const lbl=labels[i]||'';
+    ctx.fillStyle='#666'; ctx.font='9px Segoe UI';
+    ctx.fillText(lbl.substring(0,12),x+bw/2,H-pad.bottom+14);
+  });
+}
+
+// ---- TRENDS ----
+function addTrend(){
+  const metric=document.getElementById('trendMetric').value;
+  const period=document.getElementById('trendPeriod').value.trim();
+  const val=parseFloat(document.getElementById('trendVal').value);
+  const target=parseFloat(document.getElementById('trendTarget').value);
+  if(!period||isNaN(val)){alert('Period and value required.');return;}
+  trends.push({metric,period,val,target:isNaN(target)?null:target});
+  localStorage.setItem('mrTrends',JSON.stringify(trends));
+  ['trendPeriod','trendVal','trendTarget'].forEach(id=>document.getElementById(id).value='');
+  drawTrend();
+}
+
+function drawTrend(){
+  const metric=document.getElementById('trendView')?.value;
+  if(!metric)return;
+  const data=trends.filter(t=>t.metric===metric).sort((a,b)=>a.period.localeCompare(b.period));
+  const canvas=document.getElementById('trendChart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||800;
+  const H=canvas.height=parseInt(canvas.getAttribute('height')||220);
+  const W=canvas.width;
+  ctx.clearRect(0,0,W,H);
+  if(!data.length){ctx.fillStyle='#999';ctx.font='14px Segoe UI';ctx.textAlign='center';ctx.fillText('No data for this metric yet.',W/2,H/2);return;}
+  const pad={top:30,right:30,bottom:50,left:55};
+  const vals=data.map(d=>d.val);
+  const targets=data.map(d=>d.target).filter(v=>v!==null);
+  const allV=[...vals,...targets].filter(v=>v!==null&&!isNaN(v));
+  const minV=Math.min(...allV)*0.95, maxV=Math.max(...allV)*1.05;
+  const scaleX=i=>pad.left+i*(W-pad.left-pad.right)/(data.length-1||1);
+  const scaleY=v=>H-pad.bottom-(v-minV)/(maxV-minV)*(H-pad.top-pad.bottom);
+  // Grid
+  ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.top+i*(H-pad.top-pad.bottom)/4;ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(W-pad.right,y);ctx.stroke();}
+  // Target line
+  if(targets.length){
+    const tgt=targets[0];
+    ctx.setLineDash([8,4]); ctx.strokeStyle='#dc2626'; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(pad.left,scaleY(tgt));ctx.lineTo(W-pad.right,scaleY(tgt));ctx.stroke();
+    ctx.setLineDash([]);ctx.fillStyle='#dc2626';ctx.font='11px Segoe UI';ctx.textAlign='right';
+    ctx.fillText('Target: '+tgt,W-pad.right-4,scaleY(tgt)-5);
+  }
+  // Area fill
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  data.forEach((d,i)=>{if(i===0)ctx.moveTo(scaleX(i),scaleY(d.val));else ctx.lineTo(scaleX(i),scaleY(d.val));});
+  ctx.lineTo(scaleX(data.length-1),H-pad.bottom);ctx.lineTo(pad.left,H-pad.bottom);ctx.closePath();
+  ctx.fillStyle='rgba(37,99,235,0.1)';ctx.fill();
+  // Line
+  ctx.strokeStyle=var_='#2563eb';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  data.forEach((d,i)=>{if(i===0)ctx.moveTo(scaleX(i),scaleY(d.val));else ctx.lineTo(scaleX(i),scaleY(d.val));});
+  ctx.stroke();
+  // Points + labels
+  data.forEach((d,i)=>{
+    ctx.fillStyle='#2563eb';ctx.beginPath();ctx.arc(scaleX(i),scaleY(d.val),5,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#1e2d45';ctx.font='bold 10px Segoe UI';ctx.textAlign='center';
+    ctx.fillText(d.val,scaleX(i),scaleY(d.val)-10);
+    ctx.fillStyle='#64748b';ctx.font='10px Segoe UI';
+    ctx.fillText(d.period,scaleX(i),H-pad.bottom+18);
+  });
+  // Y axis labels
+  ctx.fillStyle='#64748b';ctx.font='10px Segoe UI';ctx.textAlign='right';
+  for(let i=0;i<=4;i++){const v=minV+(maxV-minV)*i/4;const y=pad.top+(4-i)*(H-pad.top-pad.bottom)/4;ctx.fillText(round(v,1),pad.left-6,y+4);}
+}
+
+// ---- INPUTS ----
+function saveInputs(){
+  const fields=['inp_prevDate','inp_openActions','inp_closedActions','inp_actionSummary','inp_external','inp_internal','inp_csat','inp_complaints','inp_objRate','inp_auditRes','inp_procPerf','inp_ncSummary','inp_hrRes','inp_infraRes','inp_risks','inp_opps','inp_supplierOTD','inp_supplierPPM','inp_supplierSum'];
+  const data={};fields.forEach(id=>{const el=document.getElementById(id);if(el)data[id]=el.value;});
+  localStorage.setItem('mrInputs',JSON.stringify(data));
+  showMsg('inputMsg','✅ Inputs saved!',true);
+}
+function clearInputs(){if(!confirm('Clear all inputs?'))return;['inp_prevDate','inp_openActions','inp_closedActions','inp_actionSummary','inp_external','inp_internal','inp_csat','inp_complaints','inp_objRate','inp_auditRes','inp_procPerf','inp_ncSummary','inp_hrRes','inp_infraRes','inp_risks','inp_opps','inp_supplierOTD','inp_supplierPPM','inp_supplierSum'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+
+// Restore saved inputs
+const savedInputs=JSON.parse(localStorage.getItem('mrInputs')||'{}');
+Object.entries(savedInputs).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
+
+// ---- MINUTES ----
+function saveMinutes(){
+  const fields=['minDate','minPeriod','minChair','minLocation','minAttendees','minAbsent','ms1','ms2','ms3','ms4','ms5','ms6','ms7','ms8','ms9','ms10','minConclusion'];
+  const data={};fields.forEach(id=>{const el=document.getElementById(id);if(el)data[id]=el.value;});
+  localStorage.setItem('mrMinutes',JSON.stringify(data));
+  showMsg('minuteMsg','✅ Minutes saved!',true);
+}
+function clearMinutes(){['minDate','minPeriod','minChair','minLocation','minAttendees','minAbsent','ms1','ms2','ms3','ms4','ms5','ms6','ms7','ms8','ms9','ms10','minConclusion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+
+const savedMinutes=JSON.parse(localStorage.getItem('mrMinutes')||'{}');
+Object.entries(savedMinutes).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
+
+// ---- INIT ----
+renderDashboard();
+renderKPIs();
+renderOutputs();
+
+// Fix JS syntax for scaleX var issue
+const var_='#2563eb';
+</script>
+</body>
+</html>
