@@ -2,6 +2,7 @@ import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { BrandLogo } from "../components/brand-logo";
 import { getDashboardData } from "../../lib/dashboard-data";
+import { adminEmails } from "../../lib/admin-access";
 import { getDgqiPlan } from "../../lib/dgqi-entitlements";
 import { getRegulatoryWatchFeed } from "../../lib/regulatory-feed";
 
@@ -19,6 +20,7 @@ export default async function DashboardPage() {
   } = await getDashboardData();
   const awaitingCompanyData = source === "empty";
   const plan = getDgqiPlan(user);
+  const isAdmin = adminEmails().includes(user?.primaryEmailAddress?.emailAddress?.trim().toLowerCase() ?? "");
   const hasMostGood = plan === "most-good";
   const liveRegulatoryWatch = hasMostGood ? await getRegulatoryWatchFeed(8) : [];
   const usingLiveFeed = liveRegulatoryWatch.length > 0;
@@ -53,6 +55,7 @@ export default async function DashboardPage() {
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
           <a href="/dashboard/guide">How to use (work instruction)</a>
+          {isAdmin ? <a href="/admin">Admin</a> : null}
           {hasMostGood ? <a href="/dashboard/team">Logins</a> : null}
         </div>
         <div className="side-bottom">

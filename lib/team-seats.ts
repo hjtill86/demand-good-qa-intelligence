@@ -264,3 +264,18 @@ export async function removeTeamLogin(userId: string, rawEmail: string) {
   await saveSeats(account.client, owner, remaining);
   return { ok: true as const, seats: remaining, used: 1 + remaining.length, limit: loginLimit(owner.publicMetadata) };
 }
+
+export async function removeSharedLogin(ownerId: string, rawEmail: string) {
+  if (!isClerkConfigured()) return { ok: false as const, error: "Authentication required.", status: 401 as const };
+  const client = await clerkClient();
+  const owner = await client.users.getUser(ownerId).catch(() => null);
+  if (!owner) return { ok: false as const, error: "Account not found.", status: 404 as const };
+  const email = rawEmail.trim().toLowerCase();
+  if (email === emailOf(owner)) return { ok: false as const, error: "The subscription login stays on the account.", status: 400 as const };
+  const seats = readSeats(owner.privateMetadata?.dgqiSeats);
+  const seat = seats.find((item) => item.email === email);
+  if (!seat) return { ok: false as const, error: "That login is not on this account.", status: 404 as const };
+  await detachSeat(client, seat);
+  await saveSeats(client, owner, seats.filter((item) => item.email !== email));
+  return { ok: true as const };
+}

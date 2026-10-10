@@ -3,9 +3,9 @@ import { BrandLogo } from "./components/brand-logo";
 import { stripePlans } from "../lib/integration-config";
 
 const features = [
-  ["01", "See risk before it ships", "Bring product, supplier, and regulatory signals into one decision-ready view."],
-  ["02", "Make quality measurable", "Replace spreadsheet archaeology with a shared, auditable source of truth."],
-  ["03", "Move with confidence", "Give every team a clear next action, owner, and evidence trail."],
+  ["01", "Keep the quality record", "Controlled documents, training, complaints, CAPAs, and supplier certificates stay on the account until you change them."],
+  ["02", "Hand an auditor one packet", "Download the document register, training, CAPAs, and approved suppliers as one workbook, dated that day."],
+  ["03", "See what needs attention", "Scores, open actions, expiring certificates, and, on Most Good, the live regulatory radar."],
 ];
 
 export default function Home() {
@@ -31,12 +31,12 @@ export default function Home() {
           decision count.
         </h1>
         <p className="hero-copy">
-          Demand Good QA turns scattered quality evidence and regulatory signals into a calm,
-          clear operating system for teams that care how things get made.
+          Demand Good QA keeps the daily quality pulse, controlled documents, training, complaints,
+          and supplier certificates in one workspace.
         </p>
         <div className="hero-actions">
           <Link className="button button-dark" href="/checkout?plan=foundation">
-            Explore the dashboard <span>→</span>
+            Start with Foundation <span>→</span>
           </Link>
           <a className="text-link" href="#pricing">
             See plans <span>↓</span>
@@ -96,12 +96,12 @@ export default function Home() {
             <div className="preview-top">
               <span className="mini-brand">Demand Good QA</span>
               <span className="preview-label">
-                LIVE QUALITY PULSE <span className="pulse" />
+                DASHBOARD PREVIEW <span className="pulse" />
               </span>
             </div>
             <div className="preview-main">
               <div>
-                <div className="eyebrow">WEEKLY OVERVIEW · SEP 2026</div>
+                <div className="eyebrow">SAMPLE OVERVIEW</div>
                 <h2>
                   Your quality pulse
                   <br />
@@ -154,9 +154,11 @@ export default function Home() {
             </div>
             <p>One clear view of the quality signals that keep your team moving.</p>
             <ul>
-              <li>Quality intelligence dashboard</li>
-              <li>IQ/OQ/PQ validation suite</li>
-              <li>Weekly decision digest</li>
+              <li>Quality dashboard and weekly digest</li>
+              <li>Controlled documents and training records</li>
+              <li>Complaints, deviations, and CAPAs</li>
+              <li>Approved supplier files</li>
+              <li>Auditor packet and validation suite</li>
             </ul>
             <Link className="button button-outline" href="/checkout?plan=foundation">
               Start with Foundation →
@@ -171,10 +173,11 @@ export default function Home() {
             </div>
             <p>Deeper context, shared accountability, and the confidence to scale.</p>
             <ul>
-              <li>Everything in Foundation, including the validation suite</li>
-              <li>Live RSS regulatory radar</li>
-              <li>Supplier risk intelligence</li>
-              <li>Up to 5 logins, with 5 more available for $500/month</li>
+              <li>Everything in Foundation</li>
+              <li>License and certification vault</li>
+              <li>Live regulatory radar</li>
+              <li>Supplier risk scores</li>
+              <li>5 logins, plus 5 more for $500/month</li>
             </ul>
             <Link className="button button-light" href="/checkout?plan=most-good">
               Choose Most Good →
