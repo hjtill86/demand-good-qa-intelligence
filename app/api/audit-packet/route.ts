@@ -8,6 +8,7 @@ import { getDashboardData } from "../../../lib/dashboard-data";
 import { getDgqiPlan } from "../../../lib/dgqi-entitlements";
 import { issuingOrganizationName } from "../../../lib/issuing-organization";
 import { listStoredLicenses } from "../../../lib/license-files";
+import { listValidationPackages } from "../../../lib/part11-validation";
 import { listQualityEvents } from "../../../lib/quality-events";
 import { listSupplierFiles } from "../../../lib/supplier-files";
 import { listTrainingRecords } from "../../../lib/training-records";
@@ -40,6 +41,7 @@ export async function GET() {
   const preparedOn = new Date().toISOString().slice(0, 10);
   let licenses = null;
   let supplierRisk = null;
+  let validations = null;
   if (hasMostGood) {
     licenses = (await listStoredLicenses()) ?? [];
     try {
@@ -47,6 +49,9 @@ export async function GET() {
     } catch {
       supplierRisk = [];
     }
+    const stored = await listValidationPackages();
+    if (!stored.ok) return NextResponse.json({ error: stored.error }, { status: stored.status });
+    validations = stored.packages;
   }
 
   const buffer = await buildAuditPacket({
@@ -61,6 +66,7 @@ export async function GET() {
     supplierRisk,
     auditEvents: auditEvents.events,
     auditTruncated: auditEvents.truncated,
+    validations,
   });
 
   return new NextResponse(new Uint8Array(buffer), {

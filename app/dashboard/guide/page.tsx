@@ -82,7 +82,7 @@ export default async function WorkInstructionsPage() {
           <li><b>Approved suppliers</b> — the supplier, what they are approved to supply, and the certificate with its expiration. Marking the file Approved asks for your password. That file then stays on the register. The certificate shows as expiring inside a 30, 60, or 90 day window, then as expired. Supplier risk scores on the overview are entered separately in Manage data.</li>
           <li><b>Audit trail</b> — each create, change, deletion, and signature on the registers above, with the person, the UTC time, and the previous value. Entries are added by the system and are not edited.</li>
           <li><b>Auditor packet</b> — one workbook of the document register, training records, complaints and CAPAs, approved suppliers, and the audit trail. Most Good also includes the license vault and supplier risk scores. It is a snapshot of those registers on the day you download it.</li>
-          <li><b>Part 11 package</b> — the written description of these controls and the tests still to be run and signed. The package does not by itself make a record Part 11 compliant.</li>
+          <li><b>Part 11 validation</b> — the written controls are on both plans. Most Good runs each test, saves what you saw and an optional file, and signs the revision with your password. That signed copy stays on the account. Signing it does not by itself make every record Part 11 compliant.</li>
         </ul>
         <p className="fine-print">Use ← Workspace on each tool to return to the overview. Available on both Foundation and Most Good.</p>
       </section>
@@ -121,7 +121,18 @@ export default async function WorkInstructionsPage() {
           </section>
 
           <section className="report-section">
-            <h2>9. Using the License &amp; Certification Vault (Most Good)</h2>
+            <h2>9. Validating the site (Most Good)</h2>
+            <ol className="wi-steps">
+              <li>Open <b>Part 11 validation</b> and start revision 1.</li>
+              <li>Run each test on the live site. Save Pass or Fail, write what you saw, and attach a screenshot or export when you have one.</li>
+              <li>When every test is Pass, enter the password for your account and sign. Your name, the meaning approval, and the UTC time are stored.</li>
+              <li>The signed revision stays on the account. A later software revision opens a new validation and leaves this one in place.</li>
+            </ol>
+            <p className="fine-print">Signing this package records that your account ran these tests. It does not by itself make every record Part 11 compliant.</p>
+          </section>
+
+          <section className="report-section">
+            <h2>10. Using the License &amp; Certification Vault (Most Good)</h2>
             <ol className="wi-steps">
               <li>Select <b>License vault</b> from the sidebar to see every tracked company license and certification, its jurisdiction, reference number, expiration date, and status.</li>
               <li>Each record has a renewal alert lead time of 30, 60, or 90 days. When a license enters that window, it is flagged <b>Renewal due</b> or <b>Expiring soon</b> and appears in the Overview dashboard&apos;s alert card automatically — no manual check required.</li>
@@ -132,7 +143,7 @@ export default async function WorkInstructionsPage() {
           </section>
 
           <section className="report-section">
-            <h2>10. Reading the Regulatory Watch feed (Most Good)</h2>
+            <h2>11. Reading the Regulatory Watch feed (Most Good)</h2>
             <p>
               This feed is refreshed automatically about once an hour from official FDA (including
               MedWatch), CDC, NIH, WHO, CMS, DHS, Joint Commission, and NABP RSS feeds. Most state
@@ -152,14 +163,14 @@ export default async function WorkInstructionsPage() {
           <p>
             Foundation includes your scorecard, trend, open actions, weekly digest, review generators,
             FMEA, and the Validation Control Center. Upgrading to <b>Most Good</b> adds Supplier Risk Intelligence, the License &amp;
-            Certification Vault with renewal alerts, the live multi-agency Regulatory Watch feed, and up to 5 logins, with 5 more available for $500 per month.
+            Certification Vault with renewal alerts, the live multi-agency Regulatory Watch feed, the Part 11 validation you run and sign, and up to 5 logins, with 5 more available for $500 per month.
           </p>
           <a className="button button-dark" href="/checkout?plan=most-good">Upgrade to Most Good <span>→</span></a>
         </section>
       )}
 
       <section className="report-section">
-        <h2>{hasMostGood ? "11" : "9"}. Exporting your data</h2>
+        <h2>{hasMostGood ? "12" : "9"}. Exporting your data</h2>
         <p>
           Use <b>Export Excel</b> on the Overview dashboard for a workbook of your metrics, actions, and
           weekly digest (plus Supplier Risk, License Vault, and Regulatory Watch sheets on Most Good). Use
@@ -170,7 +181,7 @@ export default async function WorkInstructionsPage() {
       </section>
 
       <section className="report-section">
-        <h2>{hasMostGood ? "12" : "10"}. Getting help</h2>
+        <h2>{hasMostGood ? "13" : "10"}. Getting help</h2>
         <p>
           If your membership is not recognized, verify you signed in with the email used at checkout, then
           contact support from the Demand Good QA Intelligence site. This work instruction is generated from

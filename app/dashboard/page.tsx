@@ -52,7 +52,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/suppliers">Approved suppliers</a>
           <a href="/dashboard/audit-packet">Auditor packet</a>
           <a href="/dashboard/audit-trail">Audit trail</a>
-          <a href="/dashboard/part-11">Part 11 package</a>
+          <a href="/dashboard/part-11">Part 11 validation</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
@@ -225,6 +225,14 @@ export default async function DashboardPage() {
               <p>See who changed a record, when it changed in UTC, and the previous value.</p>
               <b>Open trail →</b>
             </a>
+            {hasMostGood ? (
+              <a className="generator-card" href="/dashboard/part-11">
+                <span className="eyebrow">MOST GOOD</span>
+                <h3>Part 11 validation</h3>
+                <p>Run the tests, attach what you saw, and sign the revision. The signed copy stays on the account.</p>
+                <b>Open validation →</b>
+              </a>
+            ) : null}
             <a className="generator-card" href="/dashboard/qms/audit-readiness">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
               <h3>Audit readiness pack</h3>
@@ -341,9 +349,9 @@ export default async function DashboardPage() {
                 <div><span className="eyebrow">UPGRADE AVAILABLE</span><h3>Unlock Most Good</h3></div>
               </div>
               <p>
-                Add supplier risk intelligence across every vendor and a live regulatory watch feed
-                automatically pulled from FDA, CDC, CMS, DHS, and The Joint Commission — plus
-                up to 5 logins, with 5 more available for $500 per month.
+                Add supplier risk intelligence across every vendor, a live regulatory watch feed
+                automatically pulled from FDA, CDC, CMS, DHS, and The Joint Commission, a Part 11
+                validation you run and sign, and up to 5 logins, with 5 more available for $500 per month.
               </p>
               <a className="button button-dark" href="/checkout?plan=most-good">
                 Upgrade to Most Good <span>→</span>

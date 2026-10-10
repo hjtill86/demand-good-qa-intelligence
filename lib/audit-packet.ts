@@ -4,6 +4,7 @@ import type { LicenseRecord } from "./dashboard-data";
 import type { SupplierRisk } from "./dashboard-data";
 import { eventStatus } from "./event-status";
 import { formatSignature, formatUtc, signatureList, type AuditEvent } from "./part11-records";
+import { part11Protocol, type ValidationPackage } from "./part11-protocol";
 import type { QualityEvent } from "./quality-events";
 import { certificateStatus } from "./supplier-status";
 import type { SupplierFile } from "./supplier-files";
@@ -24,6 +25,7 @@ export type AuditPacketInput = {
   supplierRisk: SupplierRisk[] | null;
   auditEvents: AuditEvent[];
   auditTruncated: boolean;
+  validations: ValidationPackage[] | null;
 };
 
 function yesNo(value: string | undefined) {
@@ -283,6 +285,31 @@ export async function buildAuditPacket(input: AuditPacketInput) {
     if (event.changes.length === 0) return [{ ...base, field: "", before: "", after: "" }];
     return event.changes.map((change) => ({ ...base, field: change.field, before: change.before, after: change.after }));
   });
+  if (input.validations) {
+    const validationRows = input.validations.flatMap((pkg) => pkg.tests.map((test) => ({
+      revision: pkg.protocolRevision,
+      test: test.id,
+      step: part11Protocol.tests.find((spec) => spec.id === test.id)?.step ?? "",
+      result: test.result || "Not run",
+      notes: test.notes,
+      file: yesNo(test.fileName),
+      recordedBy: test.recordedBy,
+      recordedAt: test.recordedAt ? formatUtc(test.recordedAt) : "",
+      signature: pkg.signature ? formatSignature(pkg.signature) : "",
+    })));
+    addSheet(workbook, "Part 11 validation", [
+      { header: "Revision", key: "revision", width: 12 },
+      { header: "Test", key: "test", width: 12 },
+      { header: "Step", key: "step", width: 42 },
+      { header: "Result", key: "result", width: 12 },
+      { header: "What you saw", key: "notes", width: 36 },
+      { header: "File attached", key: "file", width: 14 },
+      { header: "Recorded by", key: "recordedBy", width: 22 },
+      { header: "Recorded", key: "recordedAt", width: 24 },
+      { header: "Package signature", key: "signature", width: 42 },
+    ], validationRows);
+  }
+
   addSheet(workbook, "Audit trail", [
     { header: "Time UTC", key: "at", width: 24 },
     { header: "Person", key: "person", width: 24 },

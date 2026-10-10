@@ -61,6 +61,7 @@ export default async function AuditPacketPage() {
           <li>{supplierCount} approved supplier {supplierCount === 1 ? "file" : "files"}{supplierAttention > 0 ? `, ${supplierAttention} expired or inside the alert window` : ""}.</li>
           {hasMostGood ? <li>License vault and supplier risk scores.</li> : null}
           <li>The latest audit trail entries, with the previous value and the new value.</li>
+          {hasMostGood ? <li>The Part 11 validation results saved on this account.</li> : null}
         </ul>
         <p className="fine-print">
           The workbook lists each record and whether a file is attached. Open the record in the workspace to download the file itself.

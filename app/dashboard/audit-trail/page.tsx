@@ -67,7 +67,7 @@ export default async function AuditTrailPage() {
         )}
         <p className="fine-print">
           The same entries are on the Audit trail sheet of the <a href="/dashboard/audit-packet">auditor packet</a>.
-          The written tests for these controls are in the <a href="/dashboard/part-11">Part 11 package</a>.
+          Most Good runs and signs the tests on the <a href="/dashboard/part-11">Part 11 validation</a> page.
         </p>
       </section>
     </main>

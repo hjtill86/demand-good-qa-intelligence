@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from "./supabase-server";
 
 export const testWorkspaceEmail = "dgqi-test-workspace@demandgoodqa.com";
 
-const buckets = ["dgqi-documents", "dgqi-training", "dgqi-events", "dgqi-suppliers", "dgqi-qms", "dgqi-licenses", "dgqi-audit"];
+const buckets = ["dgqi-documents", "dgqi-training", "dgqi-events", "dgqi-suppliers", "dgqi-qms", "dgqi-licenses", "dgqi-audit", "dgqi-validation"];
 
 function emailOf(user: User) {
   return user.primaryEmailAddress?.emailAddress?.trim().toLowerCase() ?? "";

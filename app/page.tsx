@@ -177,6 +177,7 @@ export default function Home() {
               <li>License and certification vault</li>
               <li>Live regulatory radar</li>
               <li>Supplier risk scores</li>
+              <li>Part 11 validation you run and sign</li>
               <li>5 logins, plus 5 more for $500/month</li>
             </ul>
             <Link className="button button-light" href="/checkout?plan=most-good">

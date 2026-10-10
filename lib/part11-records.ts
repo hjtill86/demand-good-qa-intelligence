@@ -23,7 +23,7 @@ export type AuditEvent = {
   actorName: string;
   actorEmail: string;
   action: "create" | "update" | "delete" | "sign";
-  recordType: "document" | "training" | "complaint" | "supplier";
+  recordType: "document" | "training" | "complaint" | "supplier" | "validation";
   recordId: string;
   recordLabel: string;
   meaning: string;
