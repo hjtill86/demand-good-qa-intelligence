@@ -110,6 +110,7 @@ export default async function WorkInstructionsPage() {
               <li>Each record has a renewal alert lead time of 30, 60, or 90 days. When a license enters that window, it is flagged <b>Renewal due</b> or <b>Expiring soon</b> and appears in the Overview dashboard&apos;s alert card automatically — no manual check required.</li>
               <li>Work expiring items in order of soonest expiration date.</li>
               <li>Add each license or certification in <b>Manage data</b>. The vault stays empty until those records exist.</li>
+              <li>Upload the PDF or image with the record, or from the File column in the vault. It stays stored until you replace it, remove it, or delete the record.</li>
             </ol>
           </section>
 

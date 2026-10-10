@@ -3,7 +3,9 @@ import { redirect } from "next/navigation";
 import { getDashboardData } from "../../../lib/dashboard-data";
 import { getDgqiPlan } from "../../../lib/dgqi-entitlements";
 import { getLicenseAlertMetadata } from "../../../lib/license-alerts";
+import { listStoredLicenses } from "../../../lib/license-files";
 import { EmailAlertPreference } from "./email-alert-preference";
+import { LicenseFileControl } from "./license-file-control";
 
 function statusClass(status: "Current" | "Renewal due" | "Expiring soon") {
   return status === "Current" ? "license-current" : status === "Renewal due" ? "license-due" : "license-soon";
@@ -15,7 +17,12 @@ export default async function LicensesPage() {
     redirect("/checkout?plan=most-good");
   }
 
-  const { licenseRecords } = await getDashboardData();
+  const storedLicenses = await listStoredLicenses();
+  const licenseRecords = storedLicenses ?? (await getDashboardData()).licenseRecords.map((record) => ({
+    ...record,
+    id: "",
+    fileName: undefined,
+  }));
   const emailAlerts = await getLicenseAlertMetadata(user?.id ?? "");
   const renewalRecords = licenseRecords.filter((record) => record.status !== "Current");
 
@@ -42,16 +49,17 @@ export default async function LicensesPage() {
       <section className="report-section">
         <h2>Company licenses and certifications</h2>
         <table className="report-table">
-          <thead><tr><th>Company</th><th>Document</th><th>Jurisdiction</th><th>Reference</th><th>Expires</th><th>Status</th></tr></thead>
+          <thead><tr><th>Company</th><th>Document</th><th>Jurisdiction</th><th>Reference</th><th>Expires</th><th>Status</th><th>File</th></tr></thead>
           <tbody>
             {licenseRecords.map((record) => (
-              <tr key={record.licenseNumber}>
+              <tr key={record.id || record.licenseNumber}>
                 <td>{record.company}</td>
                 <td>{record.documentName}<br /><small>{record.documentType}</small></td>
                 <td>{record.jurisdiction}</td>
                 <td>{record.licenseNumber}</td>
                 <td>{record.expiresOn}</td>
                 <td><span className={statusClass(record.status)}>{record.status}</span></td>
+                <td>{record.id ? <LicenseFileControl recordId={record.id} fileName={record.fileName} /> : "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -65,10 +73,10 @@ export default async function LicensesPage() {
       </section>
 
       <section className="report-section storage-boundary">
-        <h2>Document storage setup</h2>
+        <h2>Uploaded documents</h2>
         <p>
-          The dashboard currently displays validated sample records. Email alerts are sent only after a
-          member opts in and the email provider and scheduled job are configured.
+          Upload the PDF or image for a license or certificate from the table above, or when you add the
+          record in Manage data. The file stays in cloud storage with that record until you replace or remove it.
         </p>
       </section>
     </main>

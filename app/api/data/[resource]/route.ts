@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { discardLicenseFile } from "../../../../lib/license-files";
 import { getDataScope, getSupabaseAdmin } from "../../../../lib/supabase-server";
 
 const resourceTypes = new Set(["metrics", "actions", "suppliers", "regulatory", "licenses", "digest"]);
@@ -39,6 +40,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ r
   if (!scope) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   if (!supabase) return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 });
   if (!id) return NextResponse.json({ error: "id is required." }, { status: 400 });
+  if (resource === "licenses") await discardLicenseFile(id);
   const { error } = await supabase.from("dgqi_records").delete().eq("id", id).eq("organization_id", scope.organizationId).eq("record_type", typeMap[resource as keyof typeof typeMap]);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ deleted: true });

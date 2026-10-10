@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { LicenseFileControl } from "../licenses/license-file-control";
 
 const resources = ["metrics", "actions", "suppliers", "regulatory", "licenses", "digest"] as const;
 type Resource = (typeof resources)[number];
@@ -62,6 +63,8 @@ export function DataManager() {
   const [records, setRecords] = useState<RecordRow[]>([]);
   const [form, setForm] = useState<Record<string, string>>(() => emptyForm("licenses"));
   const [message, setMessage] = useState("");
+  const [licenseFile, setLicenseFile] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
 
   async function load(selected = resource) {
     const response = await fetch(`/api/data/${selected}`);
@@ -72,6 +75,7 @@ export function DataManager() {
 
   useEffect(() => {
     setForm(emptyForm(resource));
+    setLicenseFile(null);
     setMessage("");
     void load(resource);
   }, [resource]);
@@ -101,7 +105,24 @@ export function DataManager() {
       setMessage(body.error ?? "Could not save record.");
       return;
     }
+    if (resource === "licenses" && licenseFile && typeof body.id === "string") {
+      const uploadBody = new FormData();
+      uploadBody.set("id", body.id);
+      uploadBody.set("file", licenseFile);
+      const upload = await fetch("/api/licenses/file", { method: "POST", body: uploadBody });
+      const uploadResult = await upload.json().catch(() => ({}));
+      if (!upload.ok) {
+        setMessage(uploadResult.error ?? "Record saved, but the file could not be uploaded.");
+        setLicenseFile(null);
+        setFileInputKey((key) => key + 1);
+        setForm(emptyForm(resource));
+        await load();
+        return;
+      }
+    }
     setForm(emptyForm(resource));
+    setLicenseFile(null);
+    setFileInputKey((key) => key + 1);
     setMessage("Record saved.");
     await load();
   }
@@ -137,6 +158,18 @@ export function DataManager() {
               )}
             </label>
           ))}
+          {resource === "licenses" ? (
+            <label className="data-field-wide">
+              <span>Document file</span>
+              <input
+                key={fileInputKey}
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp"
+                onChange={(event) => setLicenseFile(event.target.files?.[0] ?? null)}
+              />
+              <small>PDF, PNG, JPG, or WebP. Up to 10 MB. The file stays with this record until you replace or remove it.</small>
+            </label>
+          ) : null}
         </div>
         <button className="button button-dark" type="submit">Save {resource}</button>
       </form>
@@ -145,7 +178,17 @@ export function DataManager() {
       <h2>Current {resource} records ({records.length})</h2>
       {records.length === 0 ? <p className="fine-print">No records yet.</p> : records.map((record) => (
         <div className="action-row" key={record.id}>
-          <div><b>{String(record.payload.title ?? record.payload.name ?? record.payload.documentName ?? record.payload.headline ?? "Saved record")}</b><span>{JSON.stringify(record.payload)}</span></div>
+          <div>
+            <b>{String(record.payload.title ?? record.payload.name ?? record.payload.documentName ?? record.payload.headline ?? "Saved record")}</b>
+            <span>{JSON.stringify(record.payload)}</span>
+            {resource === "licenses" ? (
+              <LicenseFileControl
+                recordId={record.id}
+                fileName={typeof record.payload.fileName === "string" ? record.payload.fileName : undefined}
+                onChanged={() => void load()}
+              />
+            ) : null}
+          </div>
           <button type="button" onClick={() => void removeRecord(record.id)}>Delete</button>
         </div>
       ))}
