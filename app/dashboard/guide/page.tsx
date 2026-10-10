@@ -77,6 +77,7 @@ export default async function WorkInstructionsPage() {
           <li><b>SPC / MSA</b> — X-bar R, I-MR, Cp/Cpk, histogram, control rules, and Gage R&amp;R.</li>
           <li><b>Controlled documents</b> — SOPs, work instructions, policies, and forms with an approver, effective date, and the retired file from the previous revision. Downloaded files carry a confidential statement at the bottom.</li>
           <li><b>Training records</b> — who was trained on which revision, with the signed sheet attached. A new revision marks that training as due for retraining. The person does not need a login.</li>
+          <li><b>Complaints and deviations</b> — record a complaint or a deviation and a CAPA opens with it. The CAPA stays open until the root cause, corrective action, and verification are saved and the CAPA is closed. Use CAPA / RCA for a 5-Why or fishbone, then write the result on the CAPA.</li>
         </ul>
         <p className="fine-print">Use ← Workspace on each tool to return to the overview. Available on both Foundation and Most Good.</p>
       </section>
