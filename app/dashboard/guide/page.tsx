@@ -79,6 +79,7 @@ export default async function WorkInstructionsPage() {
           <li><b>Training records</b> — who was trained on which revision, with the signed sheet attached. A new revision marks that training as due for retraining. The person does not need a login.</li>
           <li><b>Complaints and deviations</b> — record a complaint or a deviation and a CAPA opens with it. The CAPA stays open until the root cause, corrective action, and verification are saved and the CAPA is closed. Use CAPA / RCA for a 5-Why or fishbone, then write the result on the CAPA.</li>
           <li><b>Approved suppliers</b> — the supplier, what they are approved to supply, who approved them, and the certificate with its expiration. The certificate shows as expiring inside a 30, 60, or 90 day window, then as expired. Supplier risk scores on the overview are entered separately in Manage data.</li>
+          <li><b>Auditor packet</b> — one workbook of the document register, training records, complaints and CAPAs, and approved suppliers. Most Good also includes the license vault and supplier risk scores. It is a snapshot of those registers on the day you download it.</li>
         </ul>
         <p className="fine-print">Use ← Workspace on each tool to return to the overview. Available on both Foundation and Most Good.</p>
       </section>
@@ -159,7 +160,9 @@ export default async function WorkInstructionsPage() {
         <p>
           Use <b>Export Excel</b> on the Overview dashboard for a workbook of your metrics, actions, and
           weekly digest (plus Supplier Risk, License Vault, and Regulatory Watch sheets on Most Good). Use
-          <b> Export PDF</b> for a print-ready version of the same data you can save or share.
+          <b> Export PDF</b> for a print-ready version of the same data you can save or share. Use
+          <b> Auditor packet</b> for one workbook of the document register, training records, complaints and CAPAs,
+          and approved suppliers.
         </p>
       </section>
 

@@ -48,6 +48,7 @@ export default async function DashboardPage() {
           <a href="/dashboard/training">Training records</a>
           <a href="/dashboard/complaints">Complaints &amp; CAPA</a>
           <a href="/dashboard/suppliers">Approved suppliers</a>
+          <a href="/dashboard/audit-packet">Auditor packet</a>
           <a href="/dashboard/data">Manage data</a>
           {hasMostGood ? <a href="/dashboard/licenses">License vault</a> : null}
           {hasMostGood ? <a href="/dashboard/regulatory">Regulatory radar</a> : null}
@@ -88,6 +89,7 @@ export default async function DashboardPage() {
             <div className="dash-intro-actions">
               <a className="outline-small" href="/api/dashboard/export/excel">Export Excel</a>
               <a className="outline-small" href="/dashboard/report" target="_blank" rel="noreferrer">Export PDF</a>
+              <a className="outline-small" href="/dashboard/audit-packet">Auditor packet</a>
               <button className="date-button">Last 30 days⌄</button>
             </div>
           </div>
@@ -205,6 +207,12 @@ export default async function DashboardPage() {
               <h3>Approved suppliers</h3>
               <p>Keep the approval, certificate, and expiration for each supplier in one file.</p>
               <b>Open register →</b>
+            </a>
+            <a className="generator-card" href="/dashboard/audit-packet">
+              <span className="eyebrow">FOUNDATION + MOST GOOD</span>
+              <h3>Auditor packet</h3>
+              <p>Download one workbook of the document register, training, CAPAs, and approved suppliers.</p>
+              <b>Open packet →</b>
             </a>
             <a className="generator-card" href="/dashboard/qms/audit-readiness">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
