@@ -2,7 +2,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { isClerkConfigured } from "../../../../lib/clerk-config";
-import { getStripeWebhookSecret, type StripePlanKey } from "../../../../lib/integration-config";
+import { getStripeWebhookSecret, loginPack, type StripePlanKey } from "../../../../lib/integration-config";
 import { capMostGoodOrganizations, leaveSharedSeat, releaseMostGoodSeats } from "../../../../lib/team-seats";
 
 function asPlan(value: string | null | undefined): StripePlanKey | null {
@@ -53,6 +53,34 @@ async function assignDgqiPlan(input: {
   return userId;
 }
 
+async function assignLoginPack(input: {
+  active: boolean;
+  userId?: string | null;
+  email?: string | null;
+}) {
+  if (!isClerkConfigured()) {
+    console.error("Clerk is not configured, so the login pack was not assigned.");
+    return;
+  }
+
+  const client = await clerkClient();
+  let userId = input.userId?.trim() || null;
+  if (!userId && input.email) {
+    const matches = await client.users.getUserList({ emailAddress: [input.email], limit: 5 });
+    userId = matches.data[0]?.id ?? null;
+  }
+  if (!userId) {
+    console.error("Stripe login pack could not be matched to a Clerk member.");
+    return;
+  }
+
+  await client.users.updateUserMetadata(userId, {
+    publicMetadata: { dgqiLoginPacks: input.active ? 1 : 0 },
+  });
+  await capMostGoodOrganizations(userId);
+  console.info("Updated the Most Good login pack.", { active: input.active });
+}
+
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
   const webhookSecret = getStripeWebhookSecret();
@@ -97,6 +125,14 @@ export async function POST(request: Request) {
       }
 
       const email = session.customer_details?.email ?? session.customer_email;
+      if (session.metadata?.plan === loginPack.key) {
+        await assignLoginPack({
+          active: true,
+          userId: session.metadata.clerk_user_id,
+          email,
+        });
+        break;
+      }
       const plan = asPlan(session.metadata?.plan);
       if (plan) {
         await assignDgqiPlan({
@@ -119,6 +155,14 @@ export async function POST(request: Request) {
           console.error("Could not read the Stripe customer for a canceled subscription.", error);
         }
       }
+      if (subscription.metadata?.plan === loginPack.key) {
+        await assignLoginPack({
+          active: false,
+          userId: subscription.metadata.clerk_user_id,
+          email,
+        });
+        break;
+      }
       await assignDgqiPlan({
         plan: "foundation",
         userId: subscription.metadata?.clerk_user_id,
@@ -130,6 +174,14 @@ export async function POST(request: Request) {
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
       const ended = subscription.status === "canceled" || subscription.status === "unpaid" || subscription.status === "incomplete_expired";
+      if (subscription.metadata?.plan === loginPack.key) {
+        await assignLoginPack({
+          active: !ended,
+          userId: subscription.metadata.clerk_user_id,
+          email: null,
+        });
+        break;
+      }
       const plan = ended ? "foundation" : asPlan(subscription.metadata?.plan);
       if (!plan) break;
       await assignDgqiPlan({

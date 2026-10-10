@@ -109,8 +109,8 @@ export default async function WorkInstructionsPage() {
             <h2>8. Logins (Most Good)</h2>
             <p>
               Most Good includes 5 logins, including the person who bought the subscription. Open <b>Logins</b> and add a colleague by email.
-              That person signs in with their own email and sees the same company workspace. The sixth login is declined.
-              Someone named on a training record does not need a login.
+              That person signs in with their own email and sees the same company workspace. From Logins, add 5 more for $500 per month.
+              Without that add-on, the sixth login is declined. Someone named on a training record does not need a login.
             </p>
           </section>
 
@@ -146,7 +146,7 @@ export default async function WorkInstructionsPage() {
           <p>
             Foundation includes your scorecard, trend, open actions, weekly digest, review generators,
             FMEA, and the Validation Control Center. Upgrading to <b>Most Good</b> adds Supplier Risk Intelligence, the License &amp;
-            Certification Vault with renewal alerts, the live multi-agency Regulatory Watch feed, and up to 5 logins.
+            Certification Vault with renewal alerts, the live multi-agency Regulatory Watch feed, and up to 5 logins, with 5 more available for $500 per month.
           </p>
           <a className="button button-dark" href="/checkout?plan=most-good">Upgrade to Most Good <span>→</span></a>
         </section>

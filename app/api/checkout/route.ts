@@ -2,7 +2,83 @@ import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { isClerkConfigured } from "../../../lib/clerk-config";
-import { getStripePlanConfig, getStripeStatus } from "../../../lib/integration-config";
+import { getDgqiPlan } from "../../../lib/dgqi-entitlements";
+import { getStripePlanConfig, getStripeStatus, loginPack } from "../../../lib/integration-config";
+import { loginLimit } from "../../../lib/team-seats";
+
+async function startLoginPackCheckout(body: { utm_source?: string; utm_campaign?: string }) {
+  if (!process.env.STRIPE_SECRET_KEY || !getStripeStatus().configured) {
+    return NextResponse.json(
+      { error: "Stripe Checkout is not configured." },
+      { status: 501 }
+    );
+  }
+  const user = isClerkConfigured() ? await currentUser().catch(() => null) : null;
+  if (!user) {
+    return NextResponse.json(
+      { error: "Sign in to the Most Good account before adding logins." },
+      { status: 401 }
+    );
+  }
+  if (getDgqiPlan(user) !== "most-good") {
+    return NextResponse.json(
+      { error: "Additional logins are available on an active Most Good subscription." },
+      { status: 403 }
+    );
+  }
+  if (loginLimit(user.publicMetadata) > 5) {
+    return NextResponse.json(
+      { error: "The additional 5 logins are already on this account." },
+      { status: 409 }
+    );
+  }
+
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://demandgoodqa.com";
+    const customerEmail = user.primaryEmailAddress?.emailAddress;
+    const lookupKey = "dgqi_login_pack";
+    const existing = await stripe.prices.list({ lookup_keys: [lookupKey], limit: 1 });
+    const price = existing.data[0]?.id ?? (await stripe.prices.create({
+      currency: "usd",
+      unit_amount: loginPack.amount * 100,
+      recurring: { interval: "month" },
+      lookup_key: lookupKey,
+      transfer_lookup_key: true,
+      product_data: { name: "Most Good additional 5 logins" },
+    })).id;
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price, quantity: 1 }],
+      success_url: `${appUrl}/dashboard/team`,
+      cancel_url: `${appUrl}/dashboard/team`,
+      ...(customerEmail ? { customer_email: customerEmail } : {}),
+      metadata: {
+        plan: loginPack.key,
+        terms_accepted_at: new Date().toISOString(),
+        clerk_user_id: user.id,
+        ...(body.utm_source ? { utm_source: body.utm_source } : {}),
+        ...(body.utm_campaign ? { utm_campaign: body.utm_campaign } : {}),
+      },
+      subscription_data: {
+        metadata: {
+          plan: loginPack.key,
+          clerk_user_id: user.id,
+        },
+      },
+    });
+    if (!session.url) {
+      return NextResponse.json({ error: "Stripe did not return a Checkout URL." }, { status: 502 });
+    }
+    return NextResponse.redirect(session.url, 303);
+  } catch (error) {
+    console.error("Stripe login pack checkout failed.", error);
+    return NextResponse.json(
+      { error: "Stripe Checkout could not be started. Check the Stripe secret key permissions." },
+      { status: 502 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   let body: { plan?: string; utm_source?: string; utm_campaign?: string; agreedToTerms?: string } = {};
@@ -39,6 +115,9 @@ export async function POST(request: Request) {
   }
 
   const plan = body.plan;
+  if (plan === loginPack.key) {
+    return startLoginPackCheckout(body);
+  }
   const planConfig = plan ? getStripePlanConfig(plan) : null;
 
   if (!planConfig) {

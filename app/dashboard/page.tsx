@@ -310,7 +310,7 @@ export default async function DashboardPage() {
               <p>
                 Add supplier risk intelligence across every vendor and a live regulatory watch feed
                 automatically pulled from FDA, CDC, CMS, DHS, and The Joint Commission — plus
-                up to 5 logins.
+                up to 5 logins, with 5 more available for $500 per month.
               </p>
               <a className="button button-dark" href="/checkout?plan=most-good">
                 Upgrade to Most Good <span>→</span>

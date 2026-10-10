@@ -15,6 +15,14 @@ export const stripePlans = {
 
 export type StripePlanKey = keyof typeof stripePlans;
 
+export const loginPack = {
+  key: "login-pack",
+  label: "5 additional logins",
+  amount: 500,
+  cadence: "month",
+  logins: 5,
+} as const;
+
 export function getAppUrl() {
   return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 }

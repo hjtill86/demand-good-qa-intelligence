@@ -8,11 +8,13 @@ export function TeamLogins({
   ownerEmail,
   initialSeats,
   limit,
+  extraLogins,
   canManage,
 }: {
   ownerEmail: string;
   initialSeats: LoginRow[];
   limit: number;
+  extraLogins: boolean;
   canManage: boolean;
 }) {
   const [seats, setSeats] = useState(initialSeats);
@@ -96,7 +98,10 @@ export function TeamLogins({
           <button className="button button-dark" type="submit" disabled={pending}>Send login</button>
         </form>
       ) : null}
-      {canManage && full ? <p className="fine-print">All 5 logins are in use. Remove one before adding another.</p> : null}
+      {canManage && full ? <p className="fine-print">All {limit} logins are in use. Remove one before adding another.</p> : null}
+      {canManage && !extraLogins ? (
+        <p className="fine-print">Add 5 more logins for $500 per month. <a href="/checkout?plan=login-pack">Add logins</a></p>
+      ) : null}
       {!canManage ? <p className="fine-print">The subscription holder manages these logins.</p> : null}
       {message ? <p className="fine-print" role="status">{message}</p> : null}
     </>

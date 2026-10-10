@@ -19,7 +19,10 @@ export default async function TeamPage() {
         <span className="eyebrow">MOST GOOD</span>
         <h1>Logins</h1>
         <p className="fine-print">
-          Most Good includes 5 logins, including the subscription holder. Each person signs in with their own email and sees this company&apos;s workspace.
+          {result.limit > 5
+            ? "This account includes 10 logins: the 5 with Most Good, plus 5 more."
+            : "Most Good includes 5 logins, including the subscription holder. You can add 5 more for $500 per month."}
+          {" "}Each person signs in with their own email and sees this company&apos;s workspace.
           A training record can name someone without giving them a login.
           <a href="/dashboard"> ← Workspace</a>
         </p>
@@ -29,6 +32,7 @@ export default async function TeamPage() {
           ownerEmail={result.ownerEmail}
           initialSeats={result.seats.map((seat) => ({ email: seat.email, pending: !seat.userId }))}
           limit={result.limit}
+          extraLogins={result.limit > 5}
           canManage={result.canManage}
         />
       </section>

@@ -2,6 +2,13 @@ import { clerkClient, type User } from "@clerk/nextjs/server";
 import { isClerkConfigured } from "./clerk-config";
 
 export const MOST_GOOD_LOGIN_LIMIT = 5;
+export const LOGIN_PACK_SIZE = 5;
+
+export function loginLimit(metadata: { dgqiLoginPacks?: unknown } | null | undefined) {
+  const packs = metadata?.dgqiLoginPacks;
+  const extra = packs === 1 || packs === "1" ? LOGIN_PACK_SIZE : 0;
+  return MOST_GOOD_LOGIN_LIMIT + extra;
+}
 
 export type TeamSeat = {
   email: string;
@@ -71,12 +78,14 @@ export async function capMostGoodOrganizations(userId: string) {
   if (!isClerkConfigured()) return;
   try {
     const client = await clerkClient();
+    const owner = await client.users.getUser(userId);
+    const limit = loginLimit(owner.publicMetadata);
     const memberships = await client.users.getOrganizationMembershipList({ userId, limit: 20 });
     await Promise.all(memberships.data.map(async (membership) => {
       if (!String(membership.role).includes("admin")) return;
-      if (membership.organization.maxAllowedMemberships === MOST_GOOD_LOGIN_LIMIT) return;
+      if (membership.organization.maxAllowedMemberships === limit) return;
       await client.organizations.updateOrganization(membership.organization.id, {
-        maxAllowedMemberships: MOST_GOOD_LOGIN_LIMIT,
+        maxAllowedMemberships: limit,
       });
     }));
   } catch (error) {
@@ -171,12 +180,13 @@ export async function getTeamLogins(userId: string) {
   if (account.canManage) await capMostGoodOrganizations(account.owner.id);
   const owner = account.canManage ? await account.client.users.getUser(account.owner.id) : account.owner;
   const seats = readSeats(owner.privateMetadata?.dgqiSeats);
+  const limit = loginLimit(owner.publicMetadata);
   return {
     ok: true as const,
     canManage: account.canManage,
     ownerEmail: emailOf(owner),
     seats,
-    limit: MOST_GOOD_LOGIN_LIMIT,
+    limit,
     used: 1 + seats.length,
   };
 }
@@ -191,9 +201,13 @@ export async function addTeamLogin(userId: string, rawEmail: string) {
   const ownerEmail = emailOf(owner);
   if (email === ownerEmail) return { ok: false as const, error: "That email is already the subscription login.", status: 409 as const };
   const seats = readSeats(owner.privateMetadata?.dgqiSeats);
+  const limit = loginLimit(owner.publicMetadata);
   if (seats.some((seat) => seat.email === email)) return { ok: false as const, error: "That login is already on this account.", status: 409 as const };
-  if (1 + seats.length >= MOST_GOOD_LOGIN_LIMIT) {
-    return { ok: false as const, error: "Most Good includes 5 logins.", status: 409 as const };
+  if (1 + seats.length >= limit) {
+    const error = limit > MOST_GOOD_LOGIN_LIMIT
+      ? "This account includes 10 logins."
+      : "Most Good includes 5 logins. Add 5 more for $500 per month.";
+    return { ok: false as const, error, status: 409 as const };
   }
 
   const existing = await account.client.users.getUserList({ emailAddress: [email], limit: 5 });
@@ -232,7 +246,7 @@ export async function addTeamLogin(userId: string, rawEmail: string) {
     return { ok: false as const, error: clerkMessage(error), status: 500 as const };
   }
   await capMostGoodOrganizations(owner.id);
-  return { ok: true as const, seats: [...seats, seat], used: 2 + seats.length, limit: MOST_GOOD_LOGIN_LIMIT };
+  return { ok: true as const, seats: [...seats, seat], used: 2 + seats.length, limit };
 }
 
 export async function removeTeamLogin(userId: string, rawEmail: string) {
@@ -248,5 +262,5 @@ export async function removeTeamLogin(userId: string, rawEmail: string) {
   await detachSeat(account.client, seat);
   const remaining = seats.filter((item) => item.email !== email);
   await saveSeats(account.client, owner, remaining);
-  return { ok: true as const, seats: remaining, used: 1 + remaining.length, limit: MOST_GOOD_LOGIN_LIMIT };
+  return { ok: true as const, seats: remaining, used: 1 + remaining.length, limit: loginLimit(owner.publicMetadata) };
 }
