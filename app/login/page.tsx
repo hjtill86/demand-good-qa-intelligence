@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { SignIn } from "@clerk/nextjs";
 import { BrandLogo } from "../components/brand-logo";
 import { isClerkConfigured } from "../../lib/clerk-config";
 import { LegalGate } from "./legal-gate";
+import { MemberAuth } from "./member-auth";
 
 export default async function LoginPage({
   searchParams,
@@ -21,7 +21,7 @@ export default async function LoginPage({
         <p>Sign in to your quality intelligence workspace.</p>
         {isClerkConfigured() ? (
           <LegalGate>
-            <SignIn routing="hash" forceRedirectUrl={afterSignInUrl} fallbackRedirectUrl={afterSignInUrl} />
+            <MemberAuth afterSignInUrl={afterSignInUrl} />
           </LegalGate>
         ) : (
           <p>Member login will be available once Clerk keys are added to production.</p>

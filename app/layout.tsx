@@ -22,7 +22,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <ClerkProvider publishableKey={getClerkPublishableKey()} signInUrl="/login" signUpUrl="/login">
+        <ClerkProvider
+          publishableKey={getClerkPublishableKey()}
+          signInUrl="/login"
+          signUpUrl="/sign-up"
+          signInFallbackRedirectUrl="/dashboard"
+          signUpFallbackRedirectUrl="/dashboard"
+        >
           {children}
         </ClerkProvider>
       </body>
