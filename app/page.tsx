@@ -3,8 +3,8 @@ import { BrandLogo } from "./components/brand-logo";
 import { stripePlans } from "../lib/integration-config";
 
 const features = [
-  ["01", "Keep the quality record", "Controlled documents, training, complaints, CAPAs, and supplier certificates stay on the account until you change them."],
-  ["02", "Hand an auditor one packet", "Download the document register, training, CAPAs, and approved suppliers as one workbook, dated that day."],
+  ["01", "Keep the quality record", "Controlled documents, training, complaints, CAPAs, and supplier certificates stay on the account."],
+  ["02", "Hand an auditor one packet", "Download the document register, training, CAPAs, approved suppliers, and the audit trail as one workbook, dated that day."],
   ["03", "See what needs attention", "Scores, open actions, expiring certificates, and, on Most Good, the live regulatory radar."],
 ];
 
@@ -120,6 +120,7 @@ export default function Home() {
                 <small>↑ 6% from last week</small>
               </div>
             </div>
+            <p className="fine-print">Illustration. A customer account shows the numbers that account enters.</p>
             <div className="mini-cards">
               <div>
                 <span>OPEN ACTIONS</span>
@@ -158,7 +159,7 @@ export default function Home() {
               <li>Controlled documents and training records</li>
               <li>Complaints, deviations, and CAPAs</li>
               <li>Approved supplier files</li>
-              <li>Auditor packet and validation suite</li>
+              <li>Auditor packet and audit trail</li>
             </ul>
             <Link className="button button-outline" href="/checkout?plan=foundation">
               Start with Foundation →

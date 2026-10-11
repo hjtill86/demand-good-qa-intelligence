@@ -21,9 +21,10 @@ export default async function WorkInstructionsPage() {
       <section className="report-section">
         <h2>1. Purpose and scope</h2>
         <p>
-          This work instruction explains how a subscriber signs in, reads the daily quality pulse, uses
-          the review generators, and (on Most Good) manages supplier risk, the live regulatory watch feed,
-          and license/certification renewals. It applies to every Demand Good QA Intelligence subscriber.
+          This work instruction explains how a subscriber signs in, reads the quality pulse, keeps
+          controlled documents, training, complaints, and supplier files, and downloads an auditor packet.
+          On Most Good it also covers shared logins, the Part 11 validation you run and sign, supplier risk,
+          the license vault, and the regulatory watch feed. It applies to every Demand Good QA Intelligence subscriber.
         </p>
       </section>
 
@@ -102,11 +103,11 @@ export default async function WorkInstructionsPage() {
       <section className="report-section">
         <h2>7. Using the Validation Control Center</h2>
         <ol className="wi-steps">
-          <li>From the sidebar or Overview, select <b>Validation suite</b>.</li>
+          <li>From the sidebar, select <b>Validation suite</b>.</li>
           <li>On <b>IQ/OQ/PQ generator</b>, enter the system name, choose IQ, OQ, or PQ, describe the test objective, then compile the protocol.</li>
-          <li>Use <b>Validation KPI tracker</b> to log pass/fail execution against a protocol reference and review first-pass yield and open deviations.</li>
+          <li>Print the page if you want to keep that draft. The worksheet stays on the screen for this visit.</li>
         </ol>
-        <p className="fine-print">Available on both Foundation and Most Good.</p>
+        <p className="fine-print">Available on both Foundation and Most Good. Most Good stores the Part 11 tests from Part 11 validation.</p>
       </section>
 
       {hasMostGood ? (

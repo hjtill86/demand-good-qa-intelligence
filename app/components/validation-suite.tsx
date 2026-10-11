@@ -64,15 +64,7 @@ const protocolLibrary: Record<Phase, ProtocolStep[]> = {
   ],
 };
 
-const seedKpis: KpiRow[] = [
-  {
-    id: 1,
-    timestamp: "2026-09-24",
-    protocolId: "PROT-LIMS-IQ-09",
-    result: "Successful Build Integrity",
-    integrity: "COMPLIANT",
-  },
-];
+const seedKpis: KpiRow[] = [];
 
 export function ValidationSuite() {
   const [tab, setTab] = useState<"protocol" | "kpis">("protocol");
@@ -104,7 +96,7 @@ export function ValidationSuite() {
         id: Date.now(),
         timestamp: new Date().toISOString().slice(0, 10),
         protocolId,
-        result: passed ? "Successful execution logged" : "Deviation logged",
+        result: passed ? "Pass" : "Fail",
         integrity: passed ? "COMPLIANT" : "DEVIATION",
       },
       ...current,
@@ -198,20 +190,20 @@ export function ValidationSuite() {
         </div>
       ) : (
         <div>
-          <h2>Live validation quality metrics</h2>
+          <h2>Worksheet</h2>
+          <p className="fine-print">These rows stay on this page until you leave it. They are not saved to the account.</p>
           <div className="metric-grid">
             <div className="metric-card">
-              <span>FIRST-PASS YIELD (FPY)</span>
-              <strong>94.2<small>%</small></strong>
+              <span>ROWS IN THIS WORKSHEET</span>
+              <strong>{kpiRows.length}</strong>
             </div>
             <div className="metric-card">
-              <span>OPEN VALIDATION DEVIATIONS</span>
-              <strong>3</strong>
-              <b className="neutral">Active</b>
+              <span>PASS</span>
+              <strong>{kpiRows.filter((row) => row.integrity === "COMPLIANT").length}</strong>
             </div>
             <div className="metric-card">
-              <span>AVERAGE CYCLE TIME TO CLOSE</span>
-              <strong>4.5<small> days</small></strong>
+              <span>FAIL</span>
+              <strong>{kpiRows.filter((row) => row.integrity === "DEVIATION").length}</strong>
             </div>
           </div>
 
@@ -240,6 +232,7 @@ export function ValidationSuite() {
             </button>
           </form>
 
+          {kpiRows.length === 0 ? <p className="fine-print">Nothing is logged in this worksheet yet.</p> : null}
           <table className="report-table">
             <thead>
               <tr>
@@ -257,7 +250,7 @@ export function ValidationSuite() {
                   <td>{row.result}</td>
                   <td>
                     <span className={row.integrity === "COMPLIANT" ? "status-pass" : "status-fail"}>
-                      {row.integrity}
+                      {row.integrity === "COMPLIANT" ? "Pass" : "Fail"}
                     </span>
                   </td>
                 </tr>

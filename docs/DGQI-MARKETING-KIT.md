@@ -3,31 +3,22 @@
 ## Marketing kit
 
 **Prepared for:** Demand Good QA LLC  
-**Product:** Demand Good QA Intelligence (DGQI)  
-**Primary audience:** Quality, regulatory, compliance, and operations leaders  
+**Product:** Demand Good QA Intelligence  
+**Primary audience:** Quality, regulatory, and operations leaders  
 **Website:** `https://demandgoodqa.com`  
 **Contact:** `htillman@demandgoodqa.com`
 
-> Use `https://demandgoodqa.com` in every public link.
+Use `https://demandgoodqa.com` in every public link. The homepage sample score is an illustration. Do not present it as a customer result.
 
 ---
 
 ## 1. One-line description
 
-Demand Good QA Intelligence gives quality and operations leaders one focused
-workspace for reviewing quality trends, open actions, supplier context, and
-regulatory signals.
+Demand Good QA Intelligence is the workspace where a team keeps controlled documents, training, complaints and CAPAs, and approved supplier files, then hands an auditor one packet.
 
 ## 2. Short elevator pitch
 
-Quality decisions should not require searching through disconnected
-spreadsheets, emails, and agency websites. Demand Good QA Intelligence brings
-key quality signals into a clear, decision-ready dashboard with weekly
-summaries, prioritized actions, review generators, and exportable reports.
-
-Start with **Foundation** for the core quality workspace. Choose **Most Good**
-for deeper supplier-risk context, regulatory-watch views, and license and
-certification tracking.
+Quality records should not live in disconnected spreadsheets. Demand Good QA Intelligence keeps the document register, training, complaints and CAPAs, and supplier certificates on the account, with an audit trail of who changed them. Foundation is $300 a month. Most Good is $500 a month and adds the license vault, supplier risk scores, the regulatory watch feed, five logins, and a Part 11 validation the customer runs and signs.
 
 ## 3. Website hero copy
 
@@ -37,238 +28,157 @@ certification tracking.
 
 ### Supporting copy
 
-Demand Good QA Intelligence turns scattered quality evidence and regulatory
-signals into a calm, clear operating view for teams that care how things get
-made.
+Demand Good QA keeps the daily quality pulse, controlled documents, training, complaints, and supplier certificates in one workspace.
 
 ### Primary CTA
 
-**Explore DGQI**
+**Start with Foundation**  
+`https://demandgoodqa.com/checkout?plan=foundation`
 
 ### Secondary CTA
 
-**Compare plans**
+**See plans**  
+`https://demandgoodqa.com/#pricing`
 
 ### Trust line
 
-Built for quality, regulatory, compliance, and operations leaders.
+Built for quality, regulatory, and operations leaders.
 
 ## 4. Plan comparison
 
 | | Foundation | Most Good |
 |---|---|---|
-| Best for | Focused teams building a consistent quality review rhythm | Growing operations that need supplier and regulatory context |
 | Price | **$300/month** | **$500/month** |
-| Quality score and trend view | Included | Included |
-| Prioritized open actions | Included | Included |
-| Weekly decision digest | Included | Included |
-| Management Review generator | Included | Included |
-| Quarterly Business Review generator | Included | Included |
-| Excel and PDF exports | Included | Included |
-| Supplier risk intelligence | — | Included |
-| Regulatory Watch view | — | Included |
-| License and certification register | — | Included |
+| Quality dashboard and weekly digest | Included | Included |
+| Controlled documents, with retired revisions kept | Included | Included |
+| Training records tied to a document revision | Included | Included |
+| Complaints, deviations, and CAPAs | Included | Included |
+| Approved supplier files and certificates | Included | Included |
+| Audit trail | Included | Included |
+| Auditor packet | Included | Included |
+| Management review and quarterly review generators | Included | Included |
+| FMEA generator | Included | Included |
+| License and certification vault, with file upload | — | Included |
+| Supplier risk scores | — | Included |
+| Regulatory watch | — | Included |
+| Part 11 validation the customer runs and signs | Written tests only | Included |
+| Logins | The subscriber | 5, plus 5 more for $500/month |
 
-### Foundation CTA
+Canceling the extra-login add-on returns Most Good to 5 logins. It does not cancel Most Good.
 
-**Start with Foundation →**  
-`https://demandgoodqa.com/checkout?plan=foundation&utm_source=site&utm_campaign=foundation`
+### Do not say
 
-### Most Good CTA
-
-**Choose Most Good →**  
-`https://demandgoodqa.com/checkout?plan=most-good&utm_source=site&utm_campaign=most_good`
+- Do not say the product is 21 CFR Part 11 compliant, FDA validated, or a substitute for the customer’s own quality system.
+- Do not say a signed Part 11 validation is a certificate from Demand Good QA. It is the customer’s record that they ran the tests.
+- Do not say the homepage score of 87 is a live customer result.
+- Do not say the Validation suite stores a validation. It is a draft worksheet on the screen.
+- Do not say regulatory watch is legal advice, or that every state board of pharmacy has its own feed.
+- Do not say scores, actions, or supplier risk appear on their own. The customer enters them.
 
 ## 5. Feature benefit copy
 
-### Quality pulse
+### Quality registers
 
-Review the overall quality score, trend direction, compliant-product view, and
-open actions from one dashboard.
+Keep the current SOP or form, who signed the approval, and the retired revision. Record who was trained on that revision. Open a CAPA when a complaint or deviation is recorded. Keep the supplier approval, the certificate, and the expiration.
 
-### Weekly decision digest
+### Audit trail and auditor packet
 
-Start the week with a concise summary of what changed and what deserves
-attention next.
+The audit trail stores who changed a register, the UTC time, and the previous value. The auditor packet is one workbook of those registers and the trail, dated the day it is downloaded. Files are listed as attached. The file itself stays on the record.
 
-### Management Review generator
+### Part 11 validation — Most Good
 
-Turn current scorecards, highlights, corrective actions, decisions, resource
-needs, and improvement opportunities into a structured management-review
-document.
+The customer runs the listed tests, writes what they saw, may attach a file, and signs with their password. The signed revision stays on the account. Say that plainly. Do not shorten it to “Part 11 compliant.”
 
-### Quarterly Business Review generator
+### Regulatory watch — Most Good
 
-Prepare an executive-ready quarterly snapshot with performance highlights,
-priority commitments, and next-quarter planning fields.
+The feed reads public RSS from FDA (including MedWatch), CDC, NIH, WHO, CMS, DHS, The Joint Commission, and NABP. Impact labels are a keyword estimate and a starting point for the customer’s own review. Most state boards of pharmacy do not publish their own feed.
 
-### Supplier Risk Intelligence — Most Good
+### License vault — Most Good
 
-Review supplier-level risk scores, trends, categories, and notes to support
-vendor conversations and prioritization.
+The customer enters each license, uploads the file, and sets a 30-, 60-, or 90-day alert. Email reminders are available when the account opts in and the mail service is configured. Do not promise email if that opt-in is off.
 
-### Regulatory Watch — Most Good
+### Weekly digest and review generators
 
-Review public updates from configured sources including FDA, CDC, CMS, Federal
-DHS, and The Joint Commission. Items include source, jurisdiction, summary,
-impact estimate, and a link to the original notice.
-
-**Important qualification:** DGQI is an intelligence and triage aid, not legal
-or regulatory advice. Coverage depends on available public feeds. State
-Departments of Health, State Boards of Pharmacy, and ISO do not have one
-universal public feed; additional sources must be configured separately. Impact
-labels are heuristic estimates and should be reviewed by a qualified person.
-
-### License and Certification Vault — Most Good
-
-Use the register to review company licenses and certifications, expiration
-dates, jurisdictions, and renewal lead-time alerts.
-
-**Important qualification:** Most Good members can opt in to email reminders
-in addition to the in-app alerts. Email delivery requires the configured Resend
-provider and daily scheduled job. The current MVP displays validated sample
-records; durable document uploads are not yet enabled.
-
-### Exportable reporting
-
-Export the dashboard to Excel or use the print-ready PDF view for leadership
-reviews, internal discussions, and quality records.
+The dashboard and weekly digest use the metrics and actions the customer enters. Management review and quarterly review pages turn those figures into a document the customer can print.
 
 ## 6. Email campaign copy
 
-### Email 1 — launch announcement
+### Email 1 — launch
 
-**Subject:** A clearer way to review quality signals
+**Subject:** The quality record, in one workspace
 
-Quality work is important. Finding the right signal at the right time should
-not be the hardest part of the job.
+Demand Good QA Intelligence keeps controlled documents, training, complaints and CAPAs, and supplier certificates on the account, with an audit trail and one auditor packet.
 
-Demand Good QA Intelligence brings quality trends, open actions, and a weekly
-decision digest into one focused workspace. Use the Management Review and
-Quarterly Business Review generators to prepare structured conversations, then
-export your dashboard to Excel or PDF.
+Foundation is $300 a month. Most Good is $500 a month and adds the license vault, supplier risk, regulatory watch, five logins, and a Part 11 validation you run and sign.
 
-Start with Foundation at **$300/month** or choose Most Good at **$500/month**
-for supplier-risk context, regulatory-watch views, and license/certification
-tracking.
-
-**Explore DGQI:**  
+**See plans:**  
 `https://demandgoodqa.com/#pricing?utm_source=email&utm_campaign=launch`
 
 ### Email 2 — Foundation
 
-**Subject:** Start with a focused quality workspace
+**Subject:** Start the quality record at $300 a month
 
-Foundation is designed for teams that want a consistent way to review quality
-performance and decide what needs attention next.
+Foundation includes the dashboard and weekly digest, controlled documents, training, complaints and CAPAs, approved supplier files, the audit trail, and the auditor packet.
 
-You get:
-
-- Quality score and trend views
-- Prioritized open actions
-- Weekly decision digest
-- Management Review generator
-- Quarterly Business Review generator
-- Excel and PDF exports
-
-**Start with Foundation — $300/month:**  
+**Start with Foundation:**  
 `https://demandgoodqa.com/checkout?plan=foundation&utm_source=email&utm_campaign=foundation`
 
 ### Email 3 — Most Good
 
-**Subject:** Add supplier and regulatory context to your quality review
+**Subject:** Five logins, the license vault, and a validation you sign
 
-Most Good is built for operations that need more context around quality
-decisions. In addition to everything in Foundation, it adds supplier-risk
-intelligence, a Regulatory Watch view, and license and certification tracking.
+Most Good is $500 a month and includes everything in Foundation. It adds supplier risk scores, the license and certification vault, the regulatory watch feed, five logins, and the Part 11 validation you run on your account and sign with your password. Five more logins are $500 a month.
 
-Regulatory Watch helps you triage configured public updates; it does not replace
-your organization’s regulatory review or professional advice.
+Regulatory watch helps you see public notices. It does not replace your own regulatory review.
 
-**Explore Most Good — $500/month:**  
+**Choose Most Good:**  
 `https://demandgoodqa.com/checkout?plan=most-good&utm_source=email&utm_campaign=most_good`
 
-## 7. Social media copy
+## 7. Social copy
 
-### LinkedIn post 1
+### LinkedIn
 
-Quality teams should not have to reconstruct the week from scattered
-spreadsheets and inboxes.
+Quality records belong on the account, not in a folder of spreadsheets.
 
-Demand Good QA Intelligence creates one focused review rhythm for quality
-trends, open actions, weekly decisions, management reviews, QBRs, and
-exportable reports.
-
-Foundation and Most Good plans are available.
+Demand Good QA Intelligence keeps controlled documents, training, CAPAs, and supplier certificates together, then exports one auditor packet. Foundation is $300 a month. Most Good is $500 a month.
 
 `https://demandgoodqa.com/#pricing`
 
-### LinkedIn post 2
+### Short post
 
-What changed? What needs attention? What decision is next?
-
-DGQI helps quality and operations leaders review those questions from one
-dashboard — with supplier-risk and regulatory-watch context available on Most
-Good.
-
-`https://demandgoodqa.com/checkout?plan=most-good`
-
-### Short social post
-
-Make quality signals easier to review and act on.  
-Demand Good QA Intelligence: scorecards, open actions, weekly digest, review
-generators, and exportable reports.  
+Controlled documents, training, complaints, and supplier files. One auditor packet. Foundation $300/month. Most Good $500/month.  
 `https://demandgoodqa.com/#pricing`
 
 ## 8. 30-second spoken pitch
 
-“Demand Good QA Intelligence is a subscription workspace for quality,
-regulatory, and operations leaders. It brings quality trends, open actions, and
-a weekly decision digest into one clear view. Foundation covers the core
-quality rhythm and review generators. Most Good adds supplier-risk context,
-regulatory-watch views, and license and certification tracking. Teams can
-export their dashboard to Excel or PDF and use the generated reports in
-management and quarterly business reviews.”
+“Demand Good QA Intelligence is where a quality team keeps controlled documents, training, complaints and CAPAs, and approved suppliers. Changes are written to an audit trail, and an auditor can download one packet. Foundation is $300 a month. Most Good is $500 a month and adds the license vault, supplier risk, a regulatory watch feed, five logins, and a Part 11 validation the customer runs and signs. That signature records their test. It is not a claim that the product is already Part 11 compliant.”
 
 ## 9. Frequently asked questions
 
-### Where do customers purchase?
+### Where do customers buy?
 
-Customers purchase the DGQI subscription on https://demandgoodqa.com through Stripe.
+On https://demandgoodqa.com through Stripe. Sign-in is on https://demandgoodqa.com/login.
 
-### Do customers need two logins?
+### How many people can sign in?
 
-No. Members sign in with Clerk on https://demandgoodqa.com/login. Stripe assigns Foundation or Most Good on that same account.
+Foundation is the subscriber’s login. Most Good includes 5 logins. One add-on adds 5 more for $500 a month, $1,000 a month in total. Each person uses their own email.
 
-### Is DGQI regulatory advice?
+### Is this Part 11 compliant?
 
-No. DGQI is a quality and regulatory intelligence aid. Users must evaluate
-source notices and apply their own quality, legal, and regulatory judgment.
+No advertisement should say that. The product has an audit trail, password signatures on approvals and CAPA closures, and limits on deleting approved or closed records. Most Good lets the customer run and sign a validation of those controls. Compliance still depends on the customer’s procedures, training, and the tests they actually sign.
 
-### Does Regulatory Watch cover every agency, state, ISO, and board?
+### Is regulatory watch legal advice?
 
-Not automatically. The current feed includes configured public sources such as
-FDA, CDC, CMS, Federal DHS, and The Joint Commission. State and ISO sources
-require separate configuration where an appropriate public feed is available.
+No. It lists public notices and a keyword impact estimate. The customer reviews the original notice.
 
-### Does the License Vault store uploaded documents and send email reminders?
+### Does the license vault store files?
 
-Not in the current MVP. It provides an in-app register and renewal alert view
-using the current data boundary. Document storage and scheduled notifications
-are future integrations and should not be advertised as available until
-implemented.
+Yes. Most Good can upload the license or certificate file and can opt in to email reminders.
 
-## 10. Publishing checklist
+## 10. Before you publish an ad
 
-- Publish every link on `https://demandgoodqa.com`.
-- Confirm the live Stripe Price IDs and prices before publishing.
-- Confirm Terms and Privacy links remain current:
-  - `https://demandgoodqa.com/terms`
-  - `https://demandgoodqa.com/privacy`
-- Test both checkout links on mobile and desktop.
-- Do not publish claims that DGQI guarantees compliance, predicts incidents,
-  replaces professional advice, has unlimited members, stores uploaded
-  documents, or sends renewal emails unless those capabilities are verified
-  live.
-- Replace the sample dashboard screenshot/metrics before using them in an
-  advertisement that could be interpreted as customer results.
+- Use links on `https://demandgoodqa.com`.
+- Prices on the site are $300 and $500 a month. Confirm the live Stripe checkout shows those amounts.
+- Terms and Privacy stay linked from the footer.
+- Walk one real purchase yourself before paid ads: create an account, enter the email code, pay, upload a file, invite a login on Most Good, and download the auditor packet.
+- Leave the homepage sample labeled as an illustration.

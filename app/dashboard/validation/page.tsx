@@ -7,8 +7,8 @@ export default function DashboardValidationPage() {
         <span className="eyebrow">FOUNDATION + MOST GOOD</span>
         <h1>Validation control center</h1>
         <p>
-          Generate IQ/OQ/PQ protocol steps and log validation execution metrics. Included with
-          Foundation and Most Good.
+          Draft IQ/OQ/PQ steps for a system you name. Print the page to keep the draft. Most Good stores
+          the Part 11 tests you run and sign on Part 11 validation.
         </p>
       </header>
       <ValidationSuite />

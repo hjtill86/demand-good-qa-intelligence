@@ -180,7 +180,7 @@ export default async function DashboardPage() {
             <a className="generator-card" href="/dashboard/qms/management-review">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
               <h3>Management review board</h3>
-              <p>Track KPIs, review inputs, meeting minutes, outputs, and trends. Saved in this browser.</p>
+              <p>Track KPIs, review inputs, meeting minutes, outputs, and trends. Saved on your account.</p>
               <b>Open board →</b>
             </a>
             <a className="generator-card" href="/dashboard/qms/capa">
