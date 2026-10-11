@@ -260,7 +260,7 @@ export default async function DashboardPage() {
             <a className="generator-card" href="/dashboard/validation">
               <span className="eyebrow">FOUNDATION + MOST GOOD</span>
               <h3>Validation control center</h3>
-              <p>Compile IQ/OQ/PQ protocols and track first-pass yield, deviations, and execution results.</p>
+              <p>Draft IQ/OQ/PQ steps for a system you name. Print the page to keep the draft. Most Good stores the Part 11 tests you run and sign.</p>
               <b>Open suite →</b>
             </a>
             <a className="generator-card" href="/dashboard/guide">
